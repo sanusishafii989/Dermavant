@@ -45,6 +45,7 @@ export function PaymentResultCard({ mode }: Props) {
         if (!response.ok || !payload.ok || payload.paymentStatus !== "success") {
           setStatus("failed");
           setMessage(payload.error || "Payment verification failed. Please contact support if the charge already went through.");
+          router.replace(`/patient/dashboard/payment/failed?reference=${encodeURIComponent(reference)}`);
           return;
         }
 

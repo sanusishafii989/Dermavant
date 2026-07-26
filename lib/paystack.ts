@@ -47,6 +47,11 @@ export function toKobo(amount: number | string): number {
   return Math.round(numeric * 100);
 }
 
+function extractAppointmentIdFromReference(reference: string): string | null {
+  const match = reference.match(/^apt_([a-f0-9]{24})_/i);
+  return match?.[1] || null;
+}
+
 export async function markAppointmentPaid(params: {
   appointmentIdentifier?: string | null;
   reference: string;
@@ -57,8 +62,14 @@ export async function markAppointmentPaid(params: {
 }) {
   await connectDB();
 
+  const referenceAppointmentId = extractAppointmentIdFromReference(params.reference);
   const appointment = await Appointment.findOne({
-    $or: [{ _id: params.appointmentIdentifier }, { appointment_id: params.appointmentIdentifier }],
+    $or: [
+      { _id: params.appointmentIdentifier },
+      { appointment_id: params.appointmentIdentifier },
+      { _id: referenceAppointmentId },
+      { appointment_id: referenceAppointmentId },
+    ],
   });
 
   if (!appointment) {

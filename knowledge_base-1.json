@@ -1,0 +1,206 @@
+{
+  "topical": [
+    "High-potency Steroids (Clobetasol or Betamethasone) for hands and feet.",
+    "Low-potency Steroids (Hydrocortisone) for the face.",
+    "Calamine Lotion: To soothe itching and dry up weeping blisters.",
+    "Barrier Creams: To protect the skin from further contact."
+  ],
+  "oral": "Increased risk of squamous cell carcinoma (cancer) in chronic erosive oral cases.",
+  "general": "Intense itching (in 25% of cases).",
+  "key_features": "Tense bullae on normal or erythematous skin. Usually found on the abdomen, groin, and inner thighs/arms.",
+  "differential_diagnosis": "Distinguish from Pemphigus Vulgaris (flaccid blisters/baki), Cicatricial Pemphigoid, and Bullous Impetigo.",
+  "intravenous_IV": [
+    "Cefazolin",
+    "Ceftriaxone",
+    "Vancomycin (for severe or hospital-based cases)"
+  ],
+  "emergency": "If redness spreads rapidly or signs of fever appear, seek IV antibiotics immediately.",
+  "injectable": [
+    "Intralesional Steroid (Triamcinolone): Injected into an inflamed (but not infected) cyst to shrink it quickly."
+  ],
+  "common_locations": "Anywhere an injury or rash occurred (Face, back, legs).",
+  "topical_shampoos": [
+    "Ketoconazole 2% (Nizoral) - Antifungal",
+    "Selenium Sulfide (Selsun Blue)",
+    "Coal Tar (T-Gel)",
+    "Zinc Pyrithione (Head & Shoulders)"
+  ],
+  "topical_creams": [
+    "Ketoconazole Cream",
+    "Low-potency Corticosteroids (Desonide) - for short-term use on the face",
+    "Pimecrolimus (Elidel) - Non-steroidal cream for sensitive areas"
+  ],
+  "shampoo_use": "Apply medicated shampoo to the scalp, leave it for 5-10 minutes before rinsing. Use 2-3 times a week.",
+  "treatment": "Apply steroid cream 2 times daily for up to 2 weeks. Avoid the trigger substance strictly.",
+  "common_triggers": "Nickel (in jewelry), Fragrances, Latex, Harsh detergents, and certain plants.",
+  "adult": "Requires immediate surgical consultation. Treatment plans are highly individualized by an Oncologist.",
+  "senior": "Monitor for skin thinning. Check for interactions between systemic psoriasis drugs and heart medications.",
+  "physical": "Contractures (difficulty moving arms or legs due to scarring), Lymphoedema, and rarely, Skin Cancer (SCC) in chronic scars.",
+  "psychological": "Lowered self-esteem, especially when PIH covers large areas of the face.",
+  "dark_skin_presentation": "Must be distinguished from 'Melanonychia' (dark lines in the nail), which can be a sign of Melanoma in dark-skinned individuals.",
+  "pediatric": "Sun protection must start from birth. Use clothing as the primary barrier.",
+  "skin": "Post-inflammatory Hyperpigmentation (dark spots that remain after the rash heals, especially in dark skin).",
+  "hair": "Lichen Planopilaris (permanent hair loss if it affects the scalp).",
+  "christmas_tree_pattern": "The long axis of the oval spots follows the lines of the ribs on the back.",
+  "pregnancy_warning": "Consult a doctor; many rosacea treatments are not safe during pregnancy.",
+  "ocular": "Permanent eye damage if Ocular Rosacea is not treated.",
+  "topical_therapy": [
+    "High-potency Clobetasol Propionate cream: Applied to the whole body (very effective for localized cases)."
+  ],
+  "systemic_oral": [
+    "Oral Antibiotics: Combination of Clindamycin and Rifampicin (for severe cases).",
+    "Doxycycline: For its anti-inflammatory properties.",
+    "Hormonal therapy: Spironolactone or birth control pills for women.",
+    "Metformin: Sometimes used to help reduce inflammation even if the patient isn't diabetic."
+  ],
+  "biologics_injectables": [
+    "Adalimumab (Humira): The first FDA-approved biologic for moderate-to-severe HS."
+  ],
+  "social": "Severe pain, foul-smelling discharge leading to social isolation and work absenteeism.",
+  "oral_medications": [
+    "Antibiotics (Dicloxacillin or Cephalexin): Only if the cyst becomes infected (red, hot, and painful).",
+    "NSAIDs (Ibuprofen): To reduce pain and swelling."
+  ],
+  "rupture": "If the cyst pops inside the skin, it causes a severe inflammatory reaction (feels like a massive boil).",
+  "infection": "Abscess formation requiring emergency drainage.",
+  "recurrence": "The condition is unpredictable; hair may fall out and grow back several times in a lifetime.",
+  "skin_damage": "Ochronosis (permanent blue-black soot-like pigmentation) if high-strength Hydroquinone is used for too long without a break.",
+  "permanence": "Dermal PIH (deep pigment) may take years to fade or may never fully disappear without professional intervention.",
+  "malignancy": "Squamous Cell Carcinoma (SCC) - The most common and dangerous skin cancer in Albinism.",
+  "basal_cell_carcinoma": "Slow-growing but destructive skin tumors.",
+  "solar_elastosis": "Prematurely wrinkled, thick, and leathery skin from sun damage.",
+  "dark_skin_context": "In African communities, Albinism is very prominent, and the sun damage often presents as 'freckles' (Ephelides) which are early signs of UV stress.",
+  "advanced_treatments": [
+    "Immunotherapy: Drugs like Pembrolizumab (Keytruda) or Nivolumab that help the immune system fight the cancer.",
+    "Targeted Therapy: Vemurafenib or Dabrafenib (for cancers with the BRAF gene mutation).",
+    "Chemotherapy: Rarely used today as first-line treatment due to better options."
+  ],
+  "metastasis": "Spreading to the lungs, liver, or brain (associated with high mortality).",
+  "clinical_assessment": "Dermoscopy to visualize 'leaf-like areas', 'large blue-gray ovoid nests', and 'arborizing telangiectasias'.",
+  "biopsy_techniques": "Shave biopsy for superficial lesions; Punch biopsy or incisional biopsy for thicker or recurrent lesions.",
+  "imaging": "CT or MRI for large tumors (>2cm) to check for perineural invasion or bone destruction.",
+  "topical_agents": [
+    "Imiquimod 5% Cream: Immune response modifier used for small, superficial BCCs.",
+    "5-Fluorouracil (5-FU) 5%: Topical antimetabolite for multiple superficial lesions."
+  ],
+  "targeted_systemic_therapy": [
+    "Hedgehog Pathway Inhibitors: Vismodegib (Erivedge) or Sonidegib (Odomzo) for metastatic or locally advanced BCC not amenable to surgery or radiation."
+  ],
+  "local_destruction": "Destruction of facial structures like the nose (columella), eyelids, and pinna of the ear.",
+  "perineural_invasion": "The cancer grows along nerves, causing severe pain, numbness, or facial paralysis.",
+  "recurrent_disease": "Incomplete excision leads to recurrence, often with more aggressive histology.",
+  "physical_examination": "Assessment for subungual hyperkeratosis (debris under nail), onycholysis (nail lifting), and thickening.",
+  "biopsy_protocol": "Deep punch biopsy or incisional biopsy to evaluate the depth of invasion (Breslow thickness) and histological grade (Well-differentiated vs. Poorly differentiated).",
+  "lymph_node_assessment": "Palpation of regional lymph nodes (neck, armpits, groin). Ultrasound-guided fine-needle aspiration (FNA) if nodes are suspicious.",
+  "topical_chemotherapy": [
+    "5-Fluorouracil (Efudix): Blocks DNA synthesis in rapidly dividing cancer cells (Used only for early, non-invasive SCC).",
+    "Imiquimod (Aldara): A toll-like receptor 7 agonist that stimulates the immune system to destroy tumor cells."
+  ],
+  "systemic_immunotherapy": [
+    "Cemiplimab (Libtayo): A PD-1 inhibitor for patients with metastatic SCC or locally advanced SCC who are not candidates for surgery.",
+    "Pembrolizumab (Keytruda): Another immunotherapy option for advanced cases."
+  ],
+  "physical_palpation": "Tactile examination is essential; AKs often feel like 'sandpaper' or 'grittiness' even if they are not fully visible.",
+  "dermoscopy": "Looking for 'red-to-blue lacunae' (well-defined rounded structures) which are diagnostic for vascular lesions.",
+  "skin_biopsy": "Required if the lesion becomes thick, tender, bleeds, or grows rapidly to rule out invasive SCC.",
+  "topical_antimetabolites": [
+    "5-Fluorouracil (Efudix) 5% Cream: The gold standard for treating large areas ('field cancerization'). It kills precancerous cells by blocking DNA synthesis.",
+    "Diclofenac Sodium 3% Gel: A milder topical treatment used for 60-90 days."
+  ],
+  "immune_response_modifiers": [
+    "Imiquimod (Aldara) 5% Cream: Stimulates the local immune system to recognize and destroy the abnormal cells.",
+    "Tirbanibulin (Klisyri): A newer, short-course treatment (5 days) that disrupts microtubule formation in cancer cells."
+  ],
+  "malignant_transformation": "Small percentage can evolve into Melanoma.",
+  "field_cancerization": "When a whole area (like the scalp) has sub-clinical damage, leading to multiple new AKs over time.",
+  "cosmetic_disfigurement": "Chronic crusting, redness, and scarring if left untreated.",
+  "clinical_inspection": "Searching for violaceous (purple) or reddish-brown lesions on the skin, mucosa, and hard palate.",
+  "histopathology": "Skin biopsy showing spindle cells, slit-like vascular spaces, and extravasated red blood cells.",
+  "systemic_screening": "HIV ELISA/Western Blot test (Mandatory); Chest X-ray to check for pulmonary KS; Endoscopy for GI involvement if abdominal pain is present.",
+  "cd4_count_and_viral_load": "To assess the level of immune suppression.",
+  "antiretroviral_therapy_art": "The cornerstone for AIDS-related KS. HAART helps the immune system recover, which can lead to spontaneous regression of the tumors.",
+  "systemic_chemotherapy": [
+    "Liposomal Doxorubicin (Doxil): The first-line treatment for advanced or symptomatic KS.",
+    "Paclitaxel: Used as a second-line therapy for resistant cases."
+  ],
+  "topical_and_intralesional": [
+    "Alitretinoin Gel: For localized skin lesions.",
+    "Intralesional Vinblastine: Injecting chemotherapy directly into the tumor (for small, localized spots)."
+  ],
+  "visceral_involvement": "Spreading to the lungs (causing cough and breathing difficulty) or GI tract (causing bleeding).",
+  "lymphedema": "Severe swelling of the legs or face because the tumor blocks the lymph nodes.",
+  "secondary_infections": "Ulcerated lesions can become infected with bacteria.",
+  "ugly_duckling_sign": "Comparing one mole to others on the body to see if it stands out as abnormal.",
+  "biopsy": "Scalp biopsy may be done if the diagnosis is unclear to rule out scarring alopecia.",
+  "psychological_distress": "Especially if the mole is large or on a prominent part of the face.",
+  "irritation": "Can be nicked during shaving (especially on the legs), leading to recurrent bleeding.",
+  "topical_treatment": [
+    "Hydrogen Peroxide 40% (Eskata): An FDA-approved concentrated solution for clearing raised SKs (used in-clinic).",
+    "Ammonium Lactate or Alpha Hydroxy Acids (AHAs): To help soften and reduce the thickness of the lesions."
+  ],
+  "psychological_impact": "Cosmetic concern when they appear in large numbers on the face or chest.",
+  "misdiagnosis": "Mistaking it for Melanoma or Basal Cell Carcinoma due to dark pigmentation.",
+  "note": "Medical treatment is generally not required unless the lesion is symptomatic.",
+  "topical_steroids": "May occasionally be used if the nodule is very itchy or inflamed, though they won't remove it.",
+  "cosmetic_concern": "Persistent dark spot that may be mistaken for a mole or cancer.",
+  "scarring": "The scar from removal is often more noticeable than the nodule itself.",
+  "diascopy": "Pressing a glass slide against the lesion to see if the blood empties from the vessels.",
+  "ultrasound_doppler": "Used for deep hemangiomas to assess blood flow and depth.",
+  "infantile_specific": [
+    "Propranolol (Oral): The gold standard for growing Infantile Hemangiomas; it helps shrink the vessels.",
+    "Timolol Maleate (Topical): A beta-blocker gel used for superficial, thin hemangiomas."
+  ],
+  "topical_for_adults": "No effective topical cream to remove Cherry Angiomas; physical removal is required.",
+  "hemorrhage": "Spontaneous bleeding if the lesion is bumped or scratched (especially Pyogenic Granuloma).",
+  "ulceration": "The surface can break down, leading to pain and potential infection.",
+  "visual_impairment": "If located on the eyelid, it can cause amblyopia (lazy eye) or vision loss.",
+  "trichoscopy": "Using a dermoscope to see 'Exclamation point hairs' (hairs that are thinner at the base), 'yellow dots', and 'black dots'.",
+  "blood_tests": "Checking for Thyroid (TSH) and ANA (Lupus) levels as it often co-occurs with other autoimmune issues.",
+  "first_line_treatment": [
+    "Intralesional Corticosteroids (Triamcinolone): Injections directly into the bald patches every 4-6 weeks (Most effective).",
+    "Topical High-Potency Steroids: Clobetasol propionate cream or foam for children or those who fear needles."
+  ],
+  "second_line_treatment": [
+    "Minoxidil (Rogaine) 5%: Used to stimulate hair regrowth after the inflammation is controlled.",
+    "Anthralin: A synthetic tar-like substance that irritates the skin to trigger hair growth."
+  ],
+  "advanced_therapy": [
+    "JAK Inhibitors (Baricitinib): A newer, FDA-approved oral medication for severe, universal alopecia."
+  ],
+  "regrowth_pattern": "Hair often regrows white or fine (vellus) at first before returning to its original color.",
+  "spontaneous_remission": "Up to 50% of patients with mild patchy disease recover within one year without treatment.",
+  "potassium_hydroxide_koh_test": "Scraping debris from under the nail and looking at it under a microscope to find fungal hyphae.",
+  "fungal_culture": "To identify the exact species of fungus (takes 2-4 weeks).",
+  "nail_biopsy_pas_stain": "The most accurate test; a piece of the nail is sent to the lab for special staining.",
+  "oral_antifungals": [
+    "Terbinafine (Lamisil): The first-line treatment. Dose: 250mg daily for 6 weeks (fingernails) or 12 weeks (toenails).",
+    "Itraconazole (Sporanox): Used in 'pulse therapy' (one week on, three weeks off)."
+  ],
+  "topical_lacquers": [
+    "Ciclopirox (Penlac) 8%: Applied daily like nail polish; effective for mild cases.",
+    "Efinaconazole (Jublia): A newer topical with better penetration into the nail plate."
+  ],
+  "warning_note": "Oral antifungals require monitoring of liver enzymes (LFTs) before and during treatment.",
+  "secondary_infection": "Staphylococcus aureus infection of the raw areas.",
+  "permanent_nail_dystrophy": "The nail may never grow back normally if the matrix is damaged.",
+  "pain_and_discomfort": "Difficulty walking or wearing shoes due to thickened nails.",
+  "immediate_action": "Discontinue the offending drug immediately. This is the single most important step.",
+  "hospital_treatment": [
+    "Intravenous Fluids: For massive fluid loss (like a burn victim).",
+    "Cyclosporine: To suppress the immune attack on the skin.",
+    "IVIG (Intravenous Immunoglobulin): To neutralize the cell death process.",
+    "Systemic Corticosteroids: Controversial but used in very early stages."
+  ],
+  "sepsis": "Bacterial infection of the blood due to loss of skin barrier.",
+  "blindness": "Severe scarring of the conjunctiva (eyes).",
+  "organ_failure": "Acute kidney injury or respiratory failure.",
+  "death": "Mortality rate is approximately 5-10% for SJS.",
+  "mucosal_involvement": "Hemostatic crusting (bloody crusts) on the lips is a hallmark.",
+  "systemic_therapy": [
+    "Prednisolone (Oral Steroids): For widespread disease.",
+    "Doxycycline: Often combined with Nicotinamide for its anti-inflammatory effects.",
+    "Immunosuppressants: Azathioprine or Mycophenolate Mofetil to reduce steroid side effects."
+  ],
+  "steroid_side_effects": "Diabetes, hypertension, and osteoporosis in elderly patients due to long-term treatment.",
+  "dehydration": "Loss of fluids through the blistered areas."
+}
