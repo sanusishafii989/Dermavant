@@ -1,0 +1,121 @@
+import Link from "next/link";
+import { currentUser } from "@clerk/nextjs/server";
+import { PortalDashboardShell } from "@/components/layout/PortalDashboardShell";
+import { Avatar } from "@/components/ui/Avatar";
+import { Badge } from "@/components/ui/Badge";
+import { Card } from "@/components/ui/Card";
+import { patientNavLinks } from "@/lib/portal-nav";
+
+export const dynamic = "force-dynamic";
+
+const serviceCards = [
+  {
+    title: "Start AI Consultation",
+    description: "Open your guided clinical assistant for symptom triage and next steps.",
+    href: "/patient/dashboard/start-ai-consultation",
+    accent: "border-cyan/40 bg-cyan/10",
+  },
+  {
+    title: "Book Specialist",
+    description: "Choose a specialist and reserve your visit in a single flow.",
+    href: "/patient/dashboard/book-specialist",
+    accent: "border-gold/40 bg-gold/10",
+  },
+  {
+    title: "Nearby Doctors",
+    description: "Find medical professionals close to your current location.",
+    href: "/patient/dashboard/nearby-doctors",
+    accent: "border-cyan/40 bg-cyan/10",
+  },
+  {
+    title: "Nearby Pharmacies",
+    description: "Locate nearby licensed partners and quick-access prescriptions.",
+    href: "/patient/dashboard/nearby-pharmacies",
+    accent: "border-gold/40 bg-gold/10",
+  },
+  {
+    title: "Medical History",
+    description: "Review care records, reports, and treatment milestones.",
+    href: "/patient/dashboard/medical-history",
+    accent: "border-cyan/40 bg-cyan/10",
+  },
+  {
+    title: "Clinical AI Suite",
+    description: "Use advanced AI tools to summarize and guide ongoing care.",
+    href: "/patient/dashboard/clinical-ai-suite",
+    accent: "border-gold/40 bg-gold/10",
+  },
+  {
+    title: "Global E-Pharmacy",
+    description: "Browse essential medicines and trusted partner fulfillment.",
+    href: "/patient/dashboard/global-e-pharmacy",
+    accent: "border-cyan/40 bg-cyan/10",
+  },
+  {
+    title: "Emergency Services",
+    description: "Quick access to urgent response, emergency support, and escalation.",
+    href: "/patient/dashboard/emergency-services",
+    accent: "border-gold/40 bg-gold/10",
+  },
+];
+
+export default async function PatientDashboardPage() {
+  const user = await currentUser();
+  const fullName =
+    user?.fullName ||
+    [user?.firstName, user?.lastName].filter(Boolean).join(" ") ||
+    "Patient";
+
+  return (
+    <PortalDashboardShell title="Patient Portal" links={patientNavLinks}>
+      <div className="space-y-6">
+        <Card className="max-w-5xl">
+          <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+            <div className="flex items-center gap-4">
+              <Avatar src={user?.imageUrl} name={fullName} size="lg" />
+              <div>
+                <p className="text-xs uppercase tracking-[0.32em] text-cyan">Welcome back</p>
+                <h1 className="mt-1 text-3xl font-bold text-white">{fullName}</h1>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  <Badge variant="cyan">patient</Badge>
+                  <Badge variant="gold">AI care portal</Badge>
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/70">
+              <p className="font-medium text-white">Today&apos;s care snapshot</p>
+              <p className="mt-1">Your dashboard shell is active and ready for future care flows.</p>
+            </div>
+          </div>
+        </Card>
+
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          {serviceCards.map((item) => (
+            <Link key={item.title} href={item.href} className="group block h-full">
+              <Card
+                hover
+                className={`h-full border ${item.accent} transition-transform duration-200 group-hover:-translate-y-1`}
+              >
+                <div className="flex h-full flex-col justify-between gap-5">
+                  <div>
+                    <div className="mb-3 inline-flex rounded-full bg-white/5 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-cyan">
+                      Service
+                    </div>
+                    <h2 className="text-lg font-semibold text-white">{item.title}</h2>
+                    <p className="mt-2 text-sm text-white/70">{item.description}</p>
+                  </div>
+
+                  <div className="flex items-center justify-between text-sm text-cyan">
+                    <span>Open</span>
+                    <span aria-hidden="true">→</span>
+                  </div>
+                </div>
+              </Card>
+            </Link>
+          ))}
+        </div>
+      </div>
+    </PortalDashboardShell>
+  );
+}
