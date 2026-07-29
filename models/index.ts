@@ -4,6 +4,8 @@ export { Doctor } from "./Doctor";
 export { Partner } from "./Partner";
 export { Appointment } from "./Appointment";
 export { Payment } from "./Payment";
+export { Medicine } from "./Medicine";
+export { PharmacyOrder } from "./PharmacyOrder";
 export { AIReport } from "./AIReport";
 export { Admin } from "./Admin";
 export { Wallet } from "./Wallet";

@@ -2,7 +2,7 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
 import { getPaystackSecret, toKobo, validatePaystackEnvKeys } from "@/lib/paystack";
-import { Appointment, Doctor, Patient, User } from "@/models";
+import { Appointment, Doctor, Patient, PharmacyOrder, Partner, User } from "@/models";
 
 export async function POST(req: Request) {
   try {
@@ -14,9 +14,13 @@ export async function POST(req: Request) {
     const body = await req.json();
     const appointmentIdentifier = body.appointmentId || body.appointment_id;
     const amount = body.amount;
+    const purpose = body.purpose || "appointment_payment";
+    const items = body.items || [];
+    const deliveryAddress = body.deliveryAddress || "";
+    const partnerId = body.partnerId || "";
     const callbackUrl = body.callbackUrl || "";
 
-    if (!appointmentIdentifier) {
+    if (purpose !== "pharmacy_order" && !appointmentIdentifier) {
       return NextResponse.json({ ok: false, error: "appointmentId is required" }, { status: 400 });
     }
 
@@ -35,26 +39,85 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: false, error: "Patient profile not found" }, { status: 404 });
     }
 
-    const appointment = await Appointment.findOne({
-      $or: [{ _id: appointmentIdentifier }, { appointment_id: appointmentIdentifier }],
-    }).lean();
+    let amountInKobo = 0;
+    let reference = `apt_${appointmentIdentifier}_${Date.now()}`;
+    let metadata: any = { purpose, appointment_id: appointmentIdentifier };
 
-    if (!appointment) {
-      return NextResponse.json({ ok: false, error: "Appointment not found" }, { status: 404 });
+    if (purpose === "pharmacy_order") {
+      if (!items.length) {
+        return NextResponse.json({ ok: false, error: "pharmacy order items are required" }, { status: 400 });
+      }
+
+      if (!partnerId) {
+        return NextResponse.json({ ok: false, error: "partnerId is required for pharmacy orders" }, { status: 400 });
+      }
+
+      const partnerDoc = await Partner.findById(partnerId).lean();
+      if (!partnerDoc) {
+        return NextResponse.json({ ok: false, error: "Partner not found" }, { status: 404 });
+      }
+
+      const itemPartnerIds = new Set(items.map((item: any) => item.partnerId));
+      if (itemPartnerIds.size > 1 || !itemPartnerIds.has(partnerId)) {
+        return NextResponse.json({ ok: false, error: "All pharmacy order items must belong to the same partner" }, { status: 400 });
+      }
+
+      const totalAmount = Number(body.total || 0);
+      if (!Number.isFinite(totalAmount) || totalAmount <= 0) {
+        return NextResponse.json({ ok: false, error: "total amount must be a positive number" }, { status: 400 });
+      }
+
+      const order = await PharmacyOrder.create({
+        patient_id: patientDoc._id,
+        partner_id: partnerId,
+        items: items.map((item: any) => ({
+          medicine_id: item.medicineId,
+          name: item.name,
+          qty: item.qty,
+          unit_price: item.unitPrice,
+        })),
+        total: totalAmount,
+        delivery_address: deliveryAddress,
+      } as any);
+
+      reference = `pharm_${order.order_id}_${Date.now()}`;
+      metadata = {
+        purpose,
+        order_id: order.order_id,
+        order_db_id: order._id?.toString?.() || order._id,
+        items,
+        total: totalAmount,
+        delivery_address: deliveryAddress,
+        partner_id: partnerId,
+      };
+      amountInKobo = toKobo(totalAmount);
+    } else {
+      const appointment = await Appointment.findOne({
+        $or: [{ _id: appointmentIdentifier }, { appointment_id: appointmentIdentifier }],
+      }).lean();
+
+      if (!appointment) {
+        return NextResponse.json({ ok: false, error: "Appointment not found" }, { status: 404 });
+      }
+
+      if (appointment.patient_id?.toString() !== patientDoc._id.toString()) {
+        return NextResponse.json({ ok: false, error: "Appointment does not belong to current user" }, { status: 403 });
+      }
+
+      if (appointment.payment_status === "paid") {
+        return NextResponse.json({ ok: false, error: "Appointment is already paid" }, { status: 400 });
+      }
+
+      const doctorDoc = await Doctor.findById(appointment.doctor_id as any).lean();
+      const consultationFee = amount ?? doctorDoc?.consultation_fee ?? 5000;
+      amountInKobo = toKobo(consultationFee);
+      metadata = {
+        ...metadata,
+        appointment_db_id: appointment._id?.toString?.() || appointment._id,
+        doctor_id: appointment.doctor_id?.toString?.() || appointment.doctor_id,
+        patient_id: appointment.patient_id?.toString?.() || appointment.patient_id,
+      };
     }
-
-    if (appointment.patient_id?.toString() !== patientDoc._id.toString()) {
-      return NextResponse.json({ ok: false, error: "Appointment does not belong to current user" }, { status: 403 });
-    }
-
-    if (appointment.payment_status === "paid") {
-      return NextResponse.json({ ok: false, error: "Appointment is already paid" }, { status: 400 });
-    }
-
-    const doctorDoc = await Doctor.findById(appointment.doctor_id as any).lean();
-    const consultationFee = amount ?? doctorDoc?.consultation_fee ?? 5000;
-    const amountInKobo = toKobo(consultationFee);
-    const reference = `apt_${appointment.appointment_id}_${Date.now()}`;
     const secret = getPaystackSecret();
     const envValidation = validatePaystackEnvKeys();
 
@@ -83,12 +146,7 @@ export async function POST(req: Request) {
         currency: "NGN",
         reference,
         callback_url: callbackUrlWithReference.toString(),
-        metadata: {
-          appointment_id: appointment.appointment_id,
-          appointment_db_id: appointment._id?.toString?.() || appointment._id,
-          doctor_id: appointment.doctor_id?.toString?.() || appointment.doctor_id,
-          patient_id: appointment.patient_id?.toString?.() || appointment.patient_id,
-        },
+        metadata,
       }),
     });
 

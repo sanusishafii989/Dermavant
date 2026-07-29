@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { markAppointmentPaid, validatePaystackEnvKeys, verifyPaystackSignature } from "@/lib/paystack";
+import { markAppointmentPaid, markPharmacyOrderPaid, validatePaystackEnvKeys, verifyPaystackSignature } from "@/lib/paystack";
 
 export async function POST(req: Request) {
   try {
@@ -27,14 +27,27 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: true, received: true, ignored: true });
     }
 
-    const payment = await markAppointmentPaid({
-      appointmentIdentifier: data.metadata?.appointment_id || data.metadata?.appointment_db_id,
-      reference: data.reference,
-      gatewayResponse: data,
-      email: data.customer?.email,
-      channel: data.channel,
-      metadata: data.metadata,
-    });
+    let payment: any = null;
+    const purpose = data.metadata?.purpose || "appointment_payment";
+    if (purpose === "pharmacy_order") {
+      payment = await markPharmacyOrderPaid({
+        orderIdentifier: data.metadata?.order_id || data.metadata?.order_db_id,
+        reference: data.reference,
+        gatewayResponse: data,
+        email: data.customer?.email,
+        channel: data.channel,
+        metadata: data.metadata,
+      });
+    } else {
+      payment = await markAppointmentPaid({
+        appointmentIdentifier: data.metadata?.appointment_id || data.metadata?.appointment_db_id,
+        reference: data.reference,
+        gatewayResponse: data,
+        email: data.customer?.email,
+        channel: data.channel,
+        metadata: data.metadata,
+      });
+    }
 
     return NextResponse.json({ ok: true, received: true, paymentStatus: payment ? "success" : "ignored" });
   } catch (error: any) {
