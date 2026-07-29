@@ -6,6 +6,7 @@ import Groq from "groq-sdk";
 import { connectDB } from "@/lib/db";
 import { AIReport, Patient, User } from "@/models";
 import { extractJsonFromText, isValidDermatologyResponse } from "@/lib/ai/guardrails";
+import { getRelevantKnowledgeContext } from "@/lib/ai/rag";
 
 function getEnvValue(name: string): string | undefined {
   const fromProcess = process.env[name]?.trim();
@@ -30,7 +31,7 @@ function getEnvValue(name: string): string | undefined {
 const GROQ_API_KEY = getEnvValue("GROQ_API_KEY");
 const GROQ_MODEL = getEnvValue("GROQ_MODEL") || "llama-3.3-70b-versatile";
 
-function buildDermatologyPrompt(symptoms: string) {
+function buildDermatologyPrompt(symptoms: string, clinicalContext: string) {
   return `You are a dermatological symptom triage assistant for a patient-facing health app, focused specifically on skin, hair, and nail conditions.
 - You are not a licensed professional.
 - Do not diagnose with false certainty.
@@ -41,6 +42,8 @@ function buildDermatologyPrompt(symptoms: string) {
 - Treat the input as a text description of visible dermatological symptoms (rash location, appearance, duration, itching, pain, scaling, color changes, nail changes, hair loss, etc.).
 - Use dermatology-relevant conditions like eczema, contact dermatitis, psoriasis, fungal infection, acne, rosacea, seborrheic dermatitis, folliculitis, lichen planus, xerosis, urticaria, pityriasis rosea, or other common skin conditions.
 - If the description is too vague or lacks symptom details (e.g. greetings like "hello"), state that the input lacks symptom details, set confidence low, and recommend providing specific symptoms.
+
+${clinicalContext ? `RELEVANT CLINICAL KNOWLEDGE BASE GUIDELINES:\n"""\n${clinicalContext}\n"""\n` : ""}
 
 You MUST respond ONLY with a JSON object matching this exact schema:
 {
@@ -144,7 +147,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: false, error: "Patient profile not found" }, { status: 404 });
     }
 
-    const prompt = buildDermatologyPrompt(symptoms);
+    const knowledgeContext = await getRelevantKnowledgeContext(symptoms, 3);
+    const prompt = buildDermatologyPrompt(symptoms, knowledgeContext);
     const client = new Groq({ apiKey: GROQ_API_KEY });
 
     const completion = await client.chat.completions.create({
