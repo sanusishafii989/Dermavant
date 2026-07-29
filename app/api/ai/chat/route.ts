@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
-import { auth } from "@clerk/nextjs/server";
+import { auth, clerkClient } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import Groq from "groq-sdk";
 import { connectDB } from "@/lib/db";
@@ -40,8 +40,29 @@ function buildDermatologyPrompt(symptoms: string) {
 - If symptoms are unclear, serious, or suggest infection, explicitly advise the patient to seek a healthcare professional or emergency care.
 - Treat the input as a text description of visible dermatological symptoms (rash location, appearance, duration, itching, pain, scaling, color changes, nail changes, hair loss, etc.).
 - Use dermatology-relevant conditions like eczema, contact dermatitis, psoriasis, fungal infection, acne, rosacea, seborrheic dermatitis, folliculitis, lichen planus, xerosis, urticaria, pityriasis rosea, or other common skin conditions.
-- If the description is too vague for a confident assessment, say so and recommend professional evaluation.
-- Return only a valid JSON object matching the requested schema. No prose, no markdown, and no code fences.
+- If the description is too vague or lacks symptom details (e.g. greetings like "hello"), state that the input lacks symptom details, set confidence low, and recommend providing specific symptoms.
+
+You MUST respond ONLY with a JSON object matching this exact schema:
+{
+  "clinicalSummary": "Short summary of symptoms and triage assessment",
+  "possibleConditions": [
+    {
+      "condition": "Condition name or 'Insufficient Information'",
+      "confidence": 0.1,
+      "reasoning": "Reasoning for condition or explanation of insufficient data"
+    }
+  ],
+  "recommendedNextSteps": "Recommended next steps for the user",
+  "followUpGuidance": "Follow-up guidance for monitoring",
+  "confidenceScore": 0.1,
+  "needsImmediateProfessionalCare": false
+}
+
+CRITICAL SCHEMA RULES:
+1. All string fields ("clinicalSummary", "recommendedNextSteps", "followUpGuidance") MUST be non-empty strings.
+2. "confidenceScore" MUST be a number between 0.0 and 1.0.
+3. "needsImmediateProfessionalCare" MUST be a boolean (true or false).
+4. "possibleConditions" MUST be a non-empty array with at least 1 item.
 
 Input symptoms:
 """
@@ -75,16 +96,50 @@ export async function POST(req: Request) {
 
     await connectDB();
 
-    const userDoc = await User.findOne({ clerkId: userId }).lean();
+    let userDoc = await User.findOne({ clerkId: userId }).lean();
     if (!userDoc) {
-      return NextResponse.json({ ok: false, error: "Patient account not found" }, { status: 404 });
+      try {
+        const client = await clerkClient();
+        const clerkUser = await client.users.getUser(userId);
+        const fullName =
+          [clerkUser.firstName, clerkUser.lastName].filter(Boolean).join(" ") || "Aetheris Patient";
+        const email = clerkUser.emailAddresses[0]?.emailAddress || `${userId}@example.com`;
+        const phone = clerkUser.phoneNumbers[0]?.phoneNumber || "";
+
+        const createdUser = await User.create({
+          clerkId: userId,
+          fullName,
+          email,
+          phone,
+          role: "patient",
+          status: "pending_verification",
+        } as any);
+        userDoc = createdUser.toObject();
+      } catch (autoProvisionErr) {
+        console.error("[AI CHAT] Failed to auto-provision user document:", autoProvisionErr);
+      }
+    }
+
+    if (!userDoc) {
+      return NextResponse.json({ ok: false, error: "Patient account not found in database" }, { status: 404 });
     }
 
     if (userDoc.role !== "patient") {
       return NextResponse.json({ ok: false, error: "Only patients may use dermatology AI consultation" }, { status: 403 });
     }
 
-    const patientDoc = await Patient.findOne({ user_id: userDoc._id as any }).lean();
+    let patientDoc = await Patient.findOne({ user_id: userDoc._id as any }).lean();
+    if (!patientDoc) {
+      try {
+        const createdPatient = await Patient.create({
+          user_id: userDoc._id,
+        } as any);
+        patientDoc = createdPatient.toObject();
+      } catch (autoProvisionErr) {
+        console.error("[AI CHAT] Failed to auto-provision patient document:", autoProvisionErr);
+      }
+    }
+
     if (!patientDoc) {
       return NextResponse.json({ ok: false, error: "Patient profile not found" }, { status: 404 });
     }

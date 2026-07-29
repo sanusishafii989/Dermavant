@@ -195,7 +195,7 @@ Full, current, honest status of every feature — see the companion documents in
 | Patient dashboard | ✅ Done |
 | Doctor booking flow (end-to-end, DB-verified) | ✅ Done |
 | Paystack payment integration | ✅ Done, verified (success + failure paths) |
-| AI dermatology consultation | 🔄 In progress (Ahmed) |
+| AI dermatology consultation | ✅ In progress (Ahmed) |
 | E-Pharmacy marketplace | ⬜ Not started |
 | Doctor/Partner/Admin full feature sets | ⬜ Not started |
 | Telemedicine (video/voice calling) | ⬜ Not started, provider not yet chosen |

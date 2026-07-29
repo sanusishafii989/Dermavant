@@ -71,7 +71,7 @@ test("declined Paystack verification does not create a payment or flip the appoi
     assert.equal(payments.length, 0);
   } finally {
     global.fetch = originalFetch;
-    await Appointment.deleteOne({ _id: appointment._id });
+    await Appointment.deleteOne({ _id: appointment._id } as any);
     await Payment.deleteMany({ reference });
   }
 });
@@ -117,7 +117,7 @@ test("markAppointmentPaid is idempotent for the same reference", async () => {
     assert.equal(payments.length, 1);
     assert.equal(refreshedAppointment?.payment_status, "paid");
   } finally {
-    await Appointment.deleteOne({ _id: appointment._id });
+    await Appointment.deleteOne({ _id: appointment._id } as any);
     await Payment.deleteMany({ reference });
   }
 });
