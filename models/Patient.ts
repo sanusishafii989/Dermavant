@@ -34,7 +34,6 @@ const PatientSchema = new Schema(
   { timestamps: { createdAt: "created_at", updatedAt: "updated_at" } }
 );
 
-PatientSchema.index({ user_id: 1 });
 
 export type IPatient = InferSchemaType<typeof PatientSchema> & {
   _id: mongoose.Types.ObjectId;

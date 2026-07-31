@@ -120,6 +120,21 @@ export function AIConsultationWizard() {
               <p className="mt-2 text-sm text-white/80">{result.clinicalSummary}</p>
             </div>
 
+            <div className="space-y-4">
+              <p className="text-sm uppercase tracking-[0.24em] text-cyan">Possible dermatology conditions</p>
+              {result.possibleConditions.map((condition) => (
+                <div key={condition.condition} className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                  <div className="flex items-center justify-between gap-4">
+                    <p className="text-lg font-semibold text-white">{condition.condition}</p>
+                    <span className="rounded-full bg-cyan/10 px-3 py-1 text-xs uppercase tracking-[0.24em] text-cyan">
+                      {(condition.confidence * 100).toFixed(0)}%
+                    </span>
+                  </div>
+                  <p className="mt-2 text-sm text-white/80">{condition.reasoning}</p>
+                </div>
+              ))}
+            </div>
+
             <div className="grid gap-4 md:grid-cols-2">
               <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
                 <p className="text-sm uppercase tracking-[0.24em] text-cyan">Confidence score</p>
@@ -148,21 +163,6 @@ export function AIConsultationWizard() {
             <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
               <p className="text-sm uppercase tracking-[0.24em] text-cyan">Follow-up guidance</p>
               <p className="mt-2 text-sm text-white/80">{result.followUpGuidance}</p>
-            </div>
-
-            <div className="space-y-4">
-              <p className="text-sm uppercase tracking-[0.24em] text-cyan">Possible dermatology conditions</p>
-              {result.possibleConditions.map((condition) => (
-                <div key={condition.condition} className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                  <div className="flex items-center justify-between gap-4">
-                    <p className="text-lg font-semibold text-white">{condition.condition}</p>
-                    <span className="rounded-full bg-cyan/10 px-3 py-1 text-xs uppercase tracking-[0.24em] text-cyan">
-                      {(condition.confidence * 100).toFixed(0)}%
-                    </span>
-                  </div>
-                  <p className="mt-2 text-sm text-white/80">{condition.reasoning}</p>
-                </div>
-              ))}
             </div>
           </div>
         </Card>
