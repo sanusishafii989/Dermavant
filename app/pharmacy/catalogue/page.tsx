@@ -1,15 +1,13 @@
 import { pharmacyNavLinks } from "@/lib/portal-nav";
 import { PortalDashboardShell } from "@/components/layout/PortalDashboardShell";
-import { PlaceholderPage } from "@/components/PlaceholderPage";
+import { PharmacyCatalogue } from "@/components/pharmacy/PharmacyCatalogue";
 
 export const dynamic = "force-dynamic";
 
 export default function PharmacyCataloguePage() {
   return (
-    <PlaceholderPage
-      title="Medicine Catalogue"
-      description="Manage your pharmacy catalogue, add new listings, and edit inventory."
-      links={pharmacyNavLinks}
-    />
+    <PortalDashboardShell title="Medicine Catalogue" links={pharmacyNavLinks}>
+      <PharmacyCatalogue />
+    </PortalDashboardShell>
   );
 }
