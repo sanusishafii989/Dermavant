@@ -49,7 +49,7 @@ export async function POST(req: Request) {
       });
     }
 
-    return NextResponse.json({ ok: true, received: true, paymentStatus: payment ? "success" : "ignored" });
+    return NextResponse.json({ ok: true, received: true, type: "appointment", paymentStatus: payment ? "success" : "ignored" });
   } catch (error: any) {
     return NextResponse.json(
       {

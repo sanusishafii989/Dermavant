@@ -9,3 +9,6 @@ export { PharmacyOrder } from "./PharmacyOrder";
 export { AIReport } from "./AIReport";
 export { Admin } from "./Admin";
 export { Wallet } from "./Wallet";
+export { MedicalRecord } from "./MedicalRecord";
+export { WalletTransaction } from "./WalletTransaction";
+

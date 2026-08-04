@@ -6,7 +6,6 @@ import {
   ROLE_DASHBOARD,
   type UserRole,
 } from "@/lib/roles";
-
 async function resolveUserRole(
   userId: string | null | undefined,
   sessionClaims: Record<string, unknown> | null | undefined
@@ -20,28 +19,50 @@ async function resolveUserRole(
     return null;
   }
 
+  // 1. Resolve role from Clerk user metadata
   try {
     const client = await clerkClient();
     const user = await client.users.getUser(userId);
+
     const publicRole = (user as any).publicMetadata?.role;
     if (isUserRole(publicRole)) {
       return publicRole as any;
     }
+
     const unsafeRole = (user as any).unsafeMetadata?.role;
     if (isUserRole(unsafeRole)) {
+      try {
+        await client.users.updateUserMetadata(userId, {
+          publicMetadata: { role: unsafeRole },
+        });
+      } catch {
+        // ignore sync error
+      }
       return unsafeRole as any;
     }
+
     const public_metadata = (user as any).public_metadata?.role;
     if (isUserRole(public_metadata)) {
       return public_metadata as any;
     }
   } catch (error) {
     if (process.env.NODE_ENV !== "production") {
-      console.warn("[MIDDLEWARE] Failed to resolve Clerk user role:", error);
+      console.warn("[MIDDLEWARE] Failed to resolve Clerk user role from API:", error);
     }
   }
 
-  return null;
+  // 2. Fallback for authenticated users missing role metadata: default to "patient"
+  const defaultRole: UserRole = "patient";
+  try {
+    const client = await clerkClient();
+    await client.users.updateUserMetadata(userId, {
+      publicMetadata: { role: defaultRole },
+    });
+  } catch {
+    // ignore
+  }
+
+  return defaultRole;
 }
 
 const isPublicRoute = createRouteMatcher([
