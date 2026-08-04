@@ -1,6 +1,6 @@
 import crypto from "crypto";
 import { connectDB } from "@/lib/db";
-import { Appointment, Payment } from "@/models";
+import { Appointment, Patient, Payment, User, Wallet, WalletTransaction } from "@/models";
 
 export function getPaystackSecret(): string {
   return process.env.PAYSTACK_SECRET_KEY || "";
@@ -116,4 +116,73 @@ export async function markAppointmentPaid(params: {
 
   await Appointment.updateOne({ _id: appointment._id as any }, { $set: { payment_status: "paid" } });
   return paymentDoc;
+}
+
+export async function processWalletTopUp(params: {
+  reference: string;
+  gatewayResponse?: any;
+  email?: string | null;
+  metadata?: any;
+}) {
+  await connectDB();
+
+  const existingTx = await WalletTransaction.findOne({ reference: params.reference }).lean();
+  if (existingTx) {
+    return existingTx;
+  }
+
+  const metadata = params.metadata || params.gatewayResponse?.metadata || {};
+  const amountInKobo = Number(params.gatewayResponse?.amount || 0);
+  const amountInNaira = amountInKobo > 0 ? amountInKobo / 100 : Number(metadata.amount || 0);
+
+  if (amountInNaira <= 0) {
+    throw new Error("Invalid top-up amount in Paystack response");
+  }
+
+  let patientDoc: any = null;
+  if (metadata.patient_id) {
+    patientDoc = await Patient.findById(metadata.patient_id as any).lean();
+  }
+
+  let userDoc: any = null;
+  if (patientDoc?.user_id) {
+    userDoc = await User.findById(patientDoc.user_id as any).lean();
+  } else if (metadata.user_id) {
+    userDoc = await User.findById(metadata.user_id as any).lean();
+    if (userDoc) {
+      patientDoc = await Patient.findOne({ user_id: userDoc._id } as any).lean();
+    }
+  }
+
+  if (!userDoc || !patientDoc) {
+    throw new Error("Patient or User profile not found for wallet top-up verification");
+  }
+
+  let wallet = await Wallet.findOne({ ownerId: userDoc._id } as any);
+  if (!wallet) {
+    wallet = await Wallet.create({
+      ownerId: userDoc._id,
+      ownerRole: "patient",
+      balance: 0,
+      currency: "NGN",
+    } as any);
+  }
+
+  wallet.balance += amountInNaira;
+  await wallet.save();
+
+  const transaction = await WalletTransaction.create({
+    wallet_id: wallet._id,
+    patient_id: patientDoc._id,
+    type: "top_up",
+    amount: amountInNaira,
+    direction: "credit",
+    currency: params.gatewayResponse?.currency || "NGN",
+    status: "completed",
+    reference: params.reference,
+    description: "E-Wallet Top-Up via Paystack",
+    metadata,
+  } as any);
+
+  return transaction;
 }

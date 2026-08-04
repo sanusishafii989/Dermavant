@@ -39,5 +39,11 @@ export function getRoleFromClaims(
   const public_metadata = claims.public_metadata as { role?: string } | undefined;
   if (isUserRole(public_metadata?.role)) return public_metadata.role;
 
+  const directRole = claims.role as string | undefined;
+  if (isUserRole(directRole)) return directRole;
+
+  const userRole = claims.user_role as string | undefined;
+  if (isUserRole(userRole)) return userRole;
+
   return null;
 }
