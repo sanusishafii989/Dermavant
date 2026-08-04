@@ -10,11 +10,15 @@ type Props = {
   mode: "success" | "failed";
 };
 
+type PaymentPurpose = "appointment_payment" | "pharmacy_order";
+
 export function PaymentResultCard({ mode }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [status, setStatus] = useState<"loading" | "success" | "failed">("loading");
   const [message, setMessage] = useState("Verifying your payment…");
+  const [purpose, setPurpose] = useState<PaymentPurpose>("appointment_payment");
+  const [orderId, setOrderId] = useState<string | null>(null);
 
   useEffect(() => {
     const reference = searchParams.get("reference") || "";
@@ -49,8 +53,22 @@ export function PaymentResultCard({ mode }: Props) {
           return;
         }
 
-        setStatus("success");
-        setMessage("Payment confirmed. Your appointment is now marked paid.");
+        const paymentPurpose = payload.purpose || payload.metadata?.purpose || payload.payment?.metadata?.purpose || "appointment_payment";
+        setPurpose(paymentPurpose);
+
+        if (paymentPurpose === "pharmacy_order") {
+          const foundOrderId = payload.orderId || payload.metadata?.order_id || payload.metadata?.order_db_id || payload.payment?.order_id;
+          if (foundOrderId) setOrderId(foundOrderId);
+          setStatus("success");
+          setMessage(
+            foundOrderId
+              ? `Payment confirmed. Your pharmacy order ${foundOrderId} is now confirmed.`
+              : "Payment confirmed. Your pharmacy order is now confirmed."
+          );
+        } else {
+          setStatus("success");
+          setMessage("Payment confirmed. Your appointment is now marked paid.");
+        }
       } catch (error: any) {
         setStatus("failed");
         setMessage(error?.message || "Payment verification failed. Please try again in a moment.");

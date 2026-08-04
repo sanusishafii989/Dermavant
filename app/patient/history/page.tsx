@@ -1,5 +1,14 @@
-import { redirect } from "next/navigation";
+import { patientNavLinks } from "@/lib/portal-nav";
+import { PlaceholderPage } from "@/components/PlaceholderPage";
 
-export default function PatientHistoryRedirect() {
-  redirect("/patient/dashboard/medical-history");
+export const dynamic = "force-dynamic";
+
+export default function PatientHistoryPage() {
+  return (
+    <PlaceholderPage
+      title="Medical History"
+      description="Medical history summaries and records will appear here once connected."
+      links={patientNavLinks}
+    />
+  );
 }

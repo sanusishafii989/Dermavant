@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getPaystackSecret, markAppointmentPaid, processWalletTopUp, validatePaystackEnvKeys } from "@/lib/paystack";
+import { getPaystackSecret, markAppointmentPaid, markPharmacyOrderPaid, validatePaystackEnvKeys } from "@/lib/paystack";
 
 export async function POST(req: Request) {
   try {
@@ -39,36 +39,38 @@ export async function POST(req: Request) {
     }
 
     if (data.data?.status === "success") {
-      const isWalletTopUp =
-        data.data.metadata?.type === "wallet_topup" ||
-        reference.startsWith("WLT-");
-
-      if (isWalletTopUp) {
-        const transaction = await processWalletTopUp({
+      const purpose = data.data.metadata?.purpose || "appointment_payment";
+      let payment: any = null;
+      if (purpose === "pharmacy_order") {
+        payment = await markPharmacyOrderPaid({
+          orderIdentifier: data.data.metadata?.order_id || data.data.metadata?.order_db_id,
           reference,
           gatewayResponse: data.data,
           email: data.data.customer?.email,
+          channel: data.data.channel,
           metadata: data.data.metadata,
         });
-
-        return NextResponse.json({
-          ok: true,
-          type: "wallet_topup",
-          paymentStatus: "success",
-          transaction,
+      } else {
+        payment = await markAppointmentPaid({
+          appointmentIdentifier: data.data.metadata?.appointment_id || data.data.metadata?.appointment_db_id,
+          reference,
+          gatewayResponse: data.data,
+          email: data.data.customer?.email,
+          channel: data.data.channel,
+          metadata: data.data.metadata,
         });
       }
 
-      const payment = await markAppointmentPaid({
-        appointmentIdentifier: data.data.metadata?.appointment_id || data.data.metadata?.appointment_db_id,
+      return NextResponse.json({
+        ok: true,
+        paymentStatus: payment ? "success" : "ignored",
+        payment,
+        purpose,
         reference,
-        gatewayResponse: data.data,
-        email: data.data.customer?.email,
-        channel: data.data.channel,
+        orderId: payment?.order_id || data.data.metadata?.order_id || data.data.metadata?.order_db_id,
+        orderDbId: payment?._id || data.data.metadata?.order_db_id,
         metadata: data.data.metadata,
       });
-
-      return NextResponse.json({ ok: true, type: "appointment", paymentStatus: payment ? "success" : "ignored", payment });
     }
 
     return NextResponse.json({ ok: true, paymentStatus: data.data?.status || "pending", data: data.data });
