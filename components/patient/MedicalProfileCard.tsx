@@ -1,15 +1,17 @@
 "use client";
 
-import { Activity, AlertTriangle, Heart, Shield, UserCheck } from "lucide-react";
+import { Activity, AlertTriangle, FileDown, Heart, Shield, UserCheck } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import type { PatientVitalsSummary } from "@/types/history";
 
 interface MedicalProfileCardProps {
   vitals?: PatientVitalsSummary | null;
+  onExportPDF?: () => void;
 }
 
-export function MedicalProfileCard({ vitals }: MedicalProfileCardProps) {
+export function MedicalProfileCard({ vitals, onExportPDF }: MedicalProfileCardProps) {
   if (!vitals) {
     return null;
   }
@@ -26,7 +28,7 @@ export function MedicalProfileCard({ vitals }: MedicalProfileCardProps) {
             <p className="text-xs text-white/60">Persistent clinical summary</p>
           </div>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Badge variant="cyan" className="text-xs">
             Blood Group: {vitals.bloodGroup || "O+"}
           </Badge>
@@ -34,6 +36,12 @@ export function MedicalProfileCard({ vitals }: MedicalProfileCardProps) {
             <Badge variant="gold" className="text-xs">
               BP: {vitals.bloodPressure}
             </Badge>
+          )}
+          {onExportPDF && (
+            <Button variant="gold" size="sm" onClick={onExportPDF} className="flex items-center gap-1.5 text-xs ml-2">
+              <FileDown className="h-3.5 w-3.5" />
+              <span>Export PDF</span>
+            </Button>
           )}
         </div>
       </div>

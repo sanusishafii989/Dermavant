@@ -7,13 +7,17 @@ import { MedicalProfileCard } from "@/components/patient/MedicalProfileCard";
 import { Card } from "@/components/ui/Card";
 import { patientNavLinks } from "@/lib/portal-nav";
 import type { MedicalHistoryItem, PatientVitalsSummary } from "@/types/history";
-import { RefreshCw } from "lucide-react";
+import { useUser } from "@clerk/nextjs";
+import { FileDown, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { generateMedicalHistoryPDF } from "@/lib/pdf-export";
 
 export default function MedicalHistoryPage() {
+  const { user } = useUser();
   const [items, setItems] = useState<MedicalHistoryItem[]>([]);
   const [vitals, setVitals] = useState<PatientVitalsSummary | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [isExporting, setIsExporting] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
   const fetchHistory = async () => {
@@ -40,6 +44,27 @@ export default function MedicalHistoryPage() {
     fetchHistory();
   }, []);
 
+  const handleExportPDF = () => {
+    try {
+      setIsExporting(true);
+      const patientName =
+        user?.fullName ||
+        [user?.firstName, user?.lastName].filter(Boolean).join(" ") ||
+        "Aetheris Patient";
+
+      generateMedicalHistoryPDF({
+        patientName,
+        vitals,
+        items,
+      });
+    } catch (err: any) {
+      console.error("[PDF EXPORT] Error:", err);
+      setError("Failed to generate PDF export.");
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return (
     <PortalDashboardShell title="Continuous Medical History Archive" links={patientNavLinks}>
       <div className="space-y-6">
@@ -50,10 +75,21 @@ export default function MedicalHistoryPage() {
               Aggregated timeline of AI triages, doctor consultations, prescriptions, and health vitals.
             </p>
           </div>
-          <Button variant="secondary" onClick={fetchHistory} className="flex items-center gap-2 text-xs self-start sm:self-auto">
-            <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
-            <span>Refresh Archive</span>
-          </Button>
+          <div className="flex flex-wrap items-center gap-3 self-start sm:self-auto">
+            <Button
+              variant="gold"
+              onClick={handleExportPDF}
+              disabled={isExporting || loading}
+              className="flex items-center gap-2 text-xs shadow-md"
+            >
+              <FileDown className="h-4 w-4" />
+              <span>{isExporting ? "Generating PDF..." : "Export PDF"}</span>
+            </Button>
+            <Button variant="secondary" onClick={fetchHistory} className="flex items-center gap-2 text-xs">
+              <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
+              <span>Refresh</span>
+            </Button>
+          </div>
         </div>
 
         {error && (
@@ -70,7 +106,7 @@ export default function MedicalHistoryPage() {
         ) : (
           <>
             {/* Vitals Summary Card */}
-            <MedicalProfileCard vitals={vitals} />
+            <MedicalProfileCard vitals={vitals} onExportPDF={handleExportPDF} />
 
             {/* History Timeline */}
             <div className="mt-8">
