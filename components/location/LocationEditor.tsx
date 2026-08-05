@@ -14,9 +14,9 @@ import { MapPin, Navigation } from "lucide-react";
 const defaultCenter = { lat: 6.5244, lng: 3.3792 };
 
 const pinIcon = new Icon({
-  iconUrl: icon.src || icon,
-  iconRetinaUrl: iconRetina.src || iconRetina,
-  shadowUrl: iconShadow.src || iconShadow,
+  iconUrl: typeof icon === "string" ? icon : (icon as any).src,
+  iconRetinaUrl: typeof iconRetina === "string" ? iconRetina : (iconRetina as any).src,
+  shadowUrl: typeof iconShadow === "string" ? iconShadow : (iconShadow as any).src,
   iconSize: [25, 41],
   iconAnchor: [12, 41],
   popupAnchor: [1, -34],

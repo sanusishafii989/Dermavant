@@ -53,7 +53,7 @@ export async function POST(req: Request) {
 
     const types = ["video", "voice", "chat"] as const;
 
-    const appointments = await Appointment.create([
+    const appointments = await Appointment.insertMany([
       {
         patient_id: patient._id,
         doctor_id: doctor._id,
@@ -95,7 +95,7 @@ export async function POST(req: Request) {
     return NextResponse.json({
       ok: true,
       message: "Seeded 4 appointments (video, voice, chat, and a completed one)",
-      appointments: appointments.map((a) => ({
+      appointments: appointments.map((a: any) => ({
         id: a._id.toString(),
         type: a.type,
         date: a.date,
