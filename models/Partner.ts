@@ -1,5 +1,22 @@
 import mongoose, { Schema, type InferSchemaType, type Model } from "mongoose";
 
+const syncPartnerLocation = function (doc: any) {
+  if (doc.location && Array.isArray(doc.location.coordinates) && doc.location.coordinates.length === 2) {
+    doc.latitude = Number(doc.location.coordinates[1]);
+    doc.longitude = Number(doc.location.coordinates[0]);
+    return;
+  }
+
+  if (doc.latitude !== undefined || doc.longitude !== undefined) {
+    const latitude = Number(doc.latitude ?? 0);
+    const longitude = Number(doc.longitude ?? 0);
+    doc.location = {
+      type: "Point",
+      coordinates: [longitude, latitude],
+    };
+  }
+};
+
 const PartnerSchema = new Schema(
   {
     partner_id: {
@@ -21,6 +38,17 @@ const PartnerSchema = new Schema(
       enum: ["pending", "verified", "rejected", "inactive"],
       default: "pending",
     },
+    location: {
+      type: {
+        type: String,
+        enum: ["Point"],
+        default: "Point",
+      },
+      coordinates: {
+        type: [Number],
+        default: [0, 0],
+      },
+    },
     latitude: { type: Number, default: 0 },
     longitude: { type: Number, default: 0 },
     deleted_at: { type: Date, default: null },
@@ -28,6 +56,11 @@ const PartnerSchema = new Schema(
   { timestamps: { createdAt: "created_at", updatedAt: "updated_at" } }
 );
 
+PartnerSchema.pre("save", function () {
+  syncPartnerLocation(this as any);
+});
+
+PartnerSchema.index({ location: "2dsphere" });
 PartnerSchema.index({ status: 1, rating: -1 });
 PartnerSchema.index({ latitude: 1, longitude: 1 });
 

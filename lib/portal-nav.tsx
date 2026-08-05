@@ -22,8 +22,8 @@ export const patientNavLinks: SidebarLink[] = [
   { href: "/patient/dashboard/book-specialist", label: "Book Specialist", icon: <Calendar className="h-4 w-4" /> },
   { href: "/patient/pharmacy", label: "E-Pharmacy", icon: <Pill className="h-4 w-4" /> },
   { href: "/patient/consultation", label: "Consultation", icon: <Stethoscope className="h-4 w-4" /> },
-  { href: "/patient/wallet", label: "Wallet", icon: <Wallet className="h-4 w-4" /> },
-  { href: "/patient/history", label: "Medical History", icon: <History className="h-4 w-4" /> },
+  { href: "/patient/dashboard/wallet", label: "Wallet", icon: <Wallet className="h-4 w-4" /> },
+  { href: "/patient/dashboard/medical-history", label: "Medical History", icon: <History className="h-4 w-4" /> },
   { href: "/patient/profile", label: "Profile", icon: <Settings className="h-4 w-4" /> },
 ];
 

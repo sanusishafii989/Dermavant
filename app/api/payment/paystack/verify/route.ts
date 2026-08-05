@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getPaystackSecret, markAppointmentPaid, markPharmacyOrderPaid, validatePaystackEnvKeys } from "@/lib/paystack";
+import { getPaystackSecret, markAppointmentPaid, markPharmacyOrderPaid, markWalletTopUpPaid, validatePaystackEnvKeys } from "@/lib/paystack";
 
 export async function POST(req: Request) {
   try {
@@ -39,11 +39,19 @@ export async function POST(req: Request) {
     }
 
     if (data.data?.status === "success") {
-      const purpose = data.data.metadata?.purpose || "appointment_payment";
+      const purpose = data.data.metadata?.purpose || data.data.metadata?.type || "appointment_payment";
       let payment: any = null;
       if (purpose === "pharmacy_order") {
         payment = await markPharmacyOrderPaid({
           orderIdentifier: data.data.metadata?.order_id || data.data.metadata?.order_db_id,
+          reference,
+          gatewayResponse: data.data,
+          email: data.data.customer?.email,
+          channel: data.data.channel,
+          metadata: data.data.metadata,
+        });
+      } else if (purpose === "wallet_topup") {
+        payment = await markWalletTopUpPaid({
           reference,
           gatewayResponse: data.data,
           email: data.data.customer?.email,

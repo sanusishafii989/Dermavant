@@ -1,6 +1,6 @@
 import crypto from "crypto";
 import { connectDB } from "@/lib/db";
-import { Appointment, Payment, PharmacyOrder } from "@/models";
+import { Appointment, Payment, PharmacyOrder, Wallet, WalletTransaction, Patient, User } from "@/models";
 
 export function getPaystackSecret(): string {
   return process.env.PAYSTACK_SECRET_KEY || "";
@@ -133,6 +133,46 @@ export async function markPharmacyOrderPaid(params: {
 }) {
   await connectDB();
 
+  const referenceOrderId = extractPharmacyOrderIdFromReference(params.reference);
+  const order = await PharmacyOrder.findOne({
+    $or: [
+      { _id: params.orderIdentifier },
+      { order_id: params.orderIdentifier },
+      { _id: referenceOrderId },
+      { order_id: referenceOrderId },
+    ],
+  });
+
+  if (!order) {
+    return null;
+  }
+
+  if (order.payment_status === "paid") {
+    return order;
+  }
+
+  await PharmacyOrder.updateOne(
+    { _id: order._id as any },
+    {
+      $set: {
+        payment_status: "paid",
+        payment_reference: params.reference,
+      },
+    }
+  );
+
+  return PharmacyOrder.findOne({ _id: order._id } as any).lean();
+}
+
+export async function markWalletTopUpPaid(params: {
+  reference: string;
+  gatewayResponse?: any;
+  email?: string | null;
+  channel?: string | null;
+  metadata?: any;
+}) {
+  await connectDB();
+
   const existingTx = await WalletTransaction.findOne({ reference: params.reference }).lean();
   if (existingTx) {
     return existingTx;
@@ -192,33 +232,4 @@ export async function markPharmacyOrderPaid(params: {
   } as any);
 
   return transaction;
-  const referenceOrderId = extractPharmacyOrderIdFromReference(params.reference);
-  const order = await PharmacyOrder.findOne({
-    $or: [
-      { _id: params.orderIdentifier },
-      { order_id: params.orderIdentifier },
-      { _id: referenceOrderId },
-      { order_id: referenceOrderId },
-    ],
-  });
-
-  if (!order) {
-    return null;
-  }
-
-  if (order.payment_status === "paid") {
-    return order;
-  }
-
-  await PharmacyOrder.updateOne(
-    { _id: order._id as any },
-    {
-      $set: {
-        payment_status: "paid",
-        payment_reference: params.reference,
-      },
-    }
-  );
-
-  return PharmacyOrder.findOne({ _id: order._id } as any).lean();
 }

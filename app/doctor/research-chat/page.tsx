@@ -1,14 +1,13 @@
 import { doctorNavLinks } from "@/lib/portal-nav";
-import { PlaceholderPage } from "@/components/PlaceholderPage";
+import { PortalDashboardShell } from "@/components/layout/PortalDashboardShell";
+import { ResearchChat } from "@/components/doctor/ResearchChat";
 
 export const dynamic = "force-dynamic";
 
 export default function DoctorResearchChatPage() {
   return (
-    <PlaceholderPage
-      title="Research Chat"
-      description="Doctor research chat and knowledge tools will appear here in the future."
-      links={doctorNavLinks}
-    />
+    <PortalDashboardShell title="Doctor Portal" links={doctorNavLinks}>
+      <ResearchChat />
+    </PortalDashboardShell>
   );
 }

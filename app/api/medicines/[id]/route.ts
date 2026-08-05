@@ -24,7 +24,7 @@ export async function PUT(req: Request, context: { params: Promise<{ id: string 
       return NextResponse.json({ ok: false, error: "Only partners can edit medicines" }, { status: 403 });
     }
 
-    const partnerDoc = await Partner.findOne({ user_id: userDoc._id as any }).lean();
+    const partnerDoc = await Partner.findOne({ email: userDoc.email }).lean();
     if (!partnerDoc) {
       return NextResponse.json({ ok: false, error: "Partner profile not found" }, { status: 404 });
     }
@@ -75,7 +75,7 @@ export async function DELETE(req: Request, context: { params: Promise<{ id: stri
       return NextResponse.json({ ok: false, error: "Only partners can remove medicines" }, { status: 403 });
     }
 
-    const partnerDoc = await Partner.findOne({ user_id: userDoc._id as any }).lean();
+    const partnerDoc = await Partner.findOne({ email: userDoc.email }).lean();
     if (!partnerDoc) {
       return NextResponse.json({ ok: false, error: "Partner profile not found" }, { status: 404 });
     }
