@@ -16,12 +16,12 @@ function SignInContent() {
   const portalLabel = role ? PORTAL_LABELS[role] : "Aetheris Health";
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-dark px-4 py-12">
+    <div className="flex min-h-screen items-center justify-center bg-[var(--bg-primary)] px-4 py-12">
       <div className="w-full max-w-md space-y-6">
         <div className="text-center">
-          <p className="text-sm uppercase tracking-[0.25em] text-cyan">Secure Access</p>
-          <h1 className="mt-2 text-3xl font-bold text-white">{portalLabel}</h1>
-          <p className="mt-2 text-white/60">Sign in to continue to your dashboard.</p>
+          <p className="text-sm uppercase tracking-[0.25em] text-[var(--accent-cyan)]">Secure Access</p>
+          <h1 className="mt-2 text-3xl font-bold text-[var(--text-primary)]">{portalLabel}</h1>
+          <p className="mt-2 text-[var(--text-secondary)]">Sign in to continue to your dashboard.</p>
         </div>
 
         <Card className="flex justify-center p-4">
@@ -40,7 +40,7 @@ export default function SignInPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex min-h-screen items-center justify-center bg-dark text-white/70">
+        <div className="flex min-h-screen items-center justify-center bg-[var(--bg-primary)] text-[var(--text-secondary)]">
           Loading sign in...
         </div>
       }

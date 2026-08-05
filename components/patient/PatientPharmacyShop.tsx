@@ -134,8 +134,8 @@ export default function PatientPharmacyShop() {
       <Card className="p-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-cyan">E-Pharmacy</p>
-            <h1 className="mt-1 text-3xl font-semibold text-white">Browse medicines</h1>
+            <p className="text-xs uppercase tracking-[0.2em] text-[var(--accent-cyan)]">E-Pharmacy</p>
+            <h1 className="mt-1 text-3xl font-semibold text-[var(--text-primary)]">Browse medicines</h1>
           </div>
           <div className="max-w-xl sm:flex-1">
             <Input
@@ -156,9 +156,9 @@ export default function PatientPharmacyShop() {
       <div className="grid gap-4 xl:grid-cols-[2fr_1fr]">
         <div className="space-y-4">
           {loading ? (
-            <Card className="p-6 text-white/70">Loading medicines…</Card>
+            <Card className="p-6 text-[var(--text-secondary)]">Loading medicines…</Card>
           ) : items.length === 0 ? (
-            <Card className="p-6 text-white/70">No medicines match your search.</Card>
+            <Card className="p-6 text-[var(--text-secondary)]">No medicines match your search.</Card>
           ) : (
             <div className="grid gap-4 md:grid-cols-2">
               {items.map((item) => (
@@ -173,17 +173,17 @@ export default function PatientPharmacyShop() {
                       unoptimized
                     />
                     <div className="flex-1">
-                      <div className="flex flex-wrap items-center gap-2 text-sm text-white/70">
+                      <div className="flex flex-wrap items-center gap-2 text-sm text-[var(--text-secondary)]">
                         <span>{item.brand}</span>
                         <span>·</span>
                         <span>{item.category}</span>
                       </div>
-                      <h2 className="mt-2 text-lg font-semibold text-white">{item.name}</h2>
-                      <p className="mt-2 text-sm text-white/70">Stock: {item.quantity > 0 ? item.quantity : "Out of stock"}</p>
+                      <h2 className="mt-2 text-lg font-semibold text-[var(--text-primary)]">{item.name}</h2>
+                      <p className="mt-2 text-sm text-[var(--text-secondary)]">Stock: {item.quantity > 0 ? item.quantity : "Out of stock"}</p>
                     </div>
                   </div>
                   <div className="flex items-center justify-between gap-4">
-                    <span className="text-lg font-semibold text-white">₦{item.price.toLocaleString()}</span>
+                    <span className="text-lg font-semibold text-[var(--text-primary)]">₦{item.price.toLocaleString()}</span>
                     <Button
                       disabled={item.quantity === 0}
                       onClick={() => addToCart(item.medicine_id)}
@@ -199,31 +199,31 @@ export default function PatientPharmacyShop() {
 
         <Card className="space-y-4 p-6">
           <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-cyan">Cart</p>
-            <h2 className="mt-1 text-xl font-semibold text-white">Your order</h2>
+            <p className="text-xs uppercase tracking-[0.2em] text-[var(--accent-cyan)]">Cart</p>
+            <h2 className="mt-1 text-xl font-semibold text-[var(--text-primary)]">Your order</h2>
           </div>
           {cartItems.length === 0 ? (
-            <p className="text-white/70">Add medicines to your cart to start checkout.</p>
+            <p className="text-[var(--text-secondary)]">Add medicines to your cart to start checkout.</p>
           ) : (
             <div className="space-y-3">
               {cartItems.map((entry) => (
-                <div key={entry.item.medicine_id} className="rounded-2xl border border-white/10 bg-white/5 p-3">
+                <div key={entry.item.medicine_id} className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-3">
                   <div className="flex items-center justify-between gap-3">
                     <div>
-                      <p className="font-medium text-white">{entry.item.name}</p>
-                      <p className="text-sm text-white/70">Qty: {entry.qty}</p>
+                      <p className="font-medium text-[var(--text-primary)]">{entry.item.name}</p>
+                      <p className="text-sm text-[var(--text-secondary)]">Qty: {entry.qty}</p>
                     </div>
-                    <div className="text-right text-white/70">
+                    <div className="text-right text-[var(--text-secondary)]">
                       <p>₦{entry.subtotal.toLocaleString()}</p>
-                      <button className="text-sm text-cyan hover:underline" onClick={() => removeFromCart(entry.item.medicine_id)}>
+                      <button className="text-sm text-[var(--accent-cyan)] hover:underline" onClick={() => removeFromCart(entry.item.medicine_id)}>
                         Remove
                       </button>
                     </div>
                   </div>
                 </div>
               ))}
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                <div className="flex items-center justify-between text-sm text-white/70">
+              <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
+                <div className="flex items-center justify-between text-sm text-[var(--text-secondary)]">
                   <span>Total</span>
                   <span>₦{total.toLocaleString()}</span>
                 </div>

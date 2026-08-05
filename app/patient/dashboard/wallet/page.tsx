@@ -75,8 +75,8 @@ function WalletContent() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-white">Patient E-Wallet Ledger</h1>
-        <p className="text-xs text-white/60">
+        <h1 className="text-2xl font-bold text-[var(--text-primary)]">Patient E-Wallet Ledger</h1>
+        <p className="text-xs text-[var(--text-secondary)]">
           Manage your balance, add funds via Paystack, and view all consultation & pharmacy transactions.
         </p>
       </div>
@@ -95,8 +95,8 @@ function WalletContent() {
       )}
 
       {loading ? (
-        <Card className="p-12 text-center text-white/60">
-          <RefreshCw className="mx-auto h-8 w-8 animate-spin text-cyan" />
+        <Card className="p-12 text-center text-[var(--text-secondary)]">
+          <RefreshCw className="mx-auto h-8 w-8 animate-spin text-[var(--accent-cyan)]" />
           <p className="mt-3 text-sm font-medium">Processing wallet data...</p>
         </Card>
       ) : (
@@ -115,8 +115,8 @@ export default function PatientWalletPage() {
   return (
     <PortalDashboardShell title="E-Wallet Management" links={patientNavLinks}>
       <Suspense fallback={
-        <Card className="p-12 text-center text-white/60">
-          <RefreshCw className="mx-auto h-8 w-8 animate-spin text-cyan" />
+        <Card className="p-12 text-center text-[var(--text-secondary)]">
+          <RefreshCw className="mx-auto h-8 w-8 animate-spin text-[var(--accent-cyan)]" />
           <p className="mt-3 text-sm font-medium">Loading e-wallet...</p>
         </Card>
       }>

@@ -23,19 +23,19 @@ function StatCard({
   variant?: "cyan" | "gold" | "success";
 }) {
   const colorMap = {
-    cyan: "text-cyan",
-    gold: "text-gold",
+    cyan: "text-[var(--accent-cyan)]",
+    gold: "text-[var(--accent-gold)]",
     success: "text-emerald-400",
   };
   return (
     <Card className="space-y-2">
       <div className="flex items-center gap-3">
-        <div className={`flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 ${colorMap[variant]}`}>
+        <div className={`flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--bg-card)] ${colorMap[variant]}`}>
           {icon}
         </div>
         <div>
-          <p className="text-xs uppercase tracking-[0.2em] text-white/50">{label}</p>
-          <p className="text-2xl font-bold text-white">{value}</p>
+          <p className="text-xs uppercase tracking-[0.2em] text-[var(--text-muted)]">{label}</p>
+          <p className="text-2xl font-bold text-[var(--text-primary)]">{value}</p>
         </div>
       </div>
     </Card>
@@ -134,8 +134,8 @@ export default async function DoctorDashboardPage() {
           <div className="flex items-center gap-4">
             <Avatar src={user?.imageUrl} name={fullName} size="lg" />
             <div>
-              <p className="text-sm uppercase tracking-[0.2em] text-cyan">Welcome back</p>
-              <h1 className="mt-1 text-3xl font-bold text-white">{fullName}</h1>
+              <p className="text-sm uppercase tracking-[0.2em] text-[var(--accent-cyan)]">Welcome back</p>
+              <h1 className="mt-1 text-3xl font-bold text-[var(--text-primary)]">{fullName}</h1>
               <div className="mt-2 flex items-center gap-2">
                 <Badge variant="gold">doctor</Badge>
                 {doctor?.status === "verified" ? (
@@ -182,30 +182,30 @@ export default async function DoctorDashboardPage() {
         <Card>
           <div className="mb-4 flex items-center justify-between">
             <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-cyan">Upcoming appointments</p>
-              <h2 className="mt-1 text-xl font-semibold text-white">Next consultations</h2>
+              <p className="text-xs uppercase tracking-[0.2em] text-[var(--accent-cyan)]">Upcoming appointments</p>
+              <h2 className="mt-1 text-xl font-semibold text-[var(--text-primary)]">Next consultations</h2>
             </div>
-            <Link href="/doctor/appointments" className="text-sm text-cyan hover:underline">
+            <Link href="/doctor/appointments" className="text-sm text-[var(--accent-cyan)] hover:underline">
               View all
             </Link>
           </div>
 
           {upcomingAppointments.length === 0 ? (
-            <p className="py-6 text-center text-white/60">No upcoming appointments scheduled.</p>
+            <p className="py-6 text-center text-[var(--text-secondary)]">No upcoming appointments scheduled.</p>
           ) : (
             <div className="space-y-3">
               {upcomingAppointments.map((apt) => (
                 <div
                   key={apt._id}
-                  className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 p-4"
+                  className="flex items-center justify-between rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan/15 text-cyan">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--accent-cyan)]/15 text-[var(--accent-cyan)]">
                       <Calendar className="h-4 w-4" />
                     </div>
                     <div>
-                      <p className="font-medium text-white">{apt.patient_name}</p>
-                      <p className="text-sm text-white/60">{formatDate(apt.date)} at {apt.time}</p>
+                      <p className="font-medium text-[var(--text-primary)]">{apt.patient_name}</p>
+                      <p className="text-sm text-[var(--text-secondary)]">{formatDate(apt.date)} at {apt.time}</p>
                     </div>
                   </div>
                   <Badge variant="cyan" className="capitalize">{apt.type}</Badge>
@@ -218,26 +218,26 @@ export default async function DoctorDashboardPage() {
         {/* Recent earnings */}
         <Card>
           <div className="mb-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-cyan">Recent earnings</p>
-            <h2 className="mt-1 text-xl font-semibold text-white">Latest payments</h2>
+            <p className="text-xs uppercase tracking-[0.2em] text-[var(--accent-cyan)]">Recent earnings</p>
+            <h2 className="mt-1 text-xl font-semibold text-[var(--text-primary)]">Latest payments</h2>
           </div>
 
           {recentPayments.length === 0 ? (
-            <p className="py-6 text-center text-white/60">No payments received yet.</p>
+            <p className="py-6 text-center text-[var(--text-secondary)]">No payments received yet.</p>
           ) : (
             <div className="space-y-3">
               {recentPayments.map((payment) => (
                 <div
                   key={payment._id.toString()}
-                  className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 p-4"
+                  className="flex items-center justify-between rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gold/15 text-gold">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--accent-gold)]/15 text-[var(--accent-gold)]">
                       <Wallet className="h-4 w-4" />
                     </div>
                     <div>
-                      <p className="font-medium text-white">₦{payment.amount.toLocaleString()}</p>
-                      <p className="text-sm text-white/60">
+                      <p className="font-medium text-[var(--text-primary)]">₦{payment.amount.toLocaleString()}</p>
+                      <p className="text-sm text-[var(--text-secondary)]">
                         {payment.paid_at ? new Date(payment.paid_at).toLocaleDateString("en-NG", { month: "short", day: "numeric", year: "numeric" }) : "—"}
                       </p>
                     </div>

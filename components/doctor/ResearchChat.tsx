@@ -77,12 +77,12 @@ export function ResearchChat() {
       {/* Header */}
       <Card className="shrink-0">
         <div className="flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-cyan/15 text-cyan">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--accent-cyan)]/15 text-[var(--accent-cyan)]">
             <Stethoscope className="h-6 w-6" />
           </div>
           <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-cyan">Research assistant</p>
-            <h1 className="mt-1 text-xl font-semibold text-white">Medical research chat</h1>
+            <p className="text-xs uppercase tracking-[0.2em] text-[var(--accent-cyan)]">Research assistant</p>
+            <h1 className="mt-1 text-xl font-semibold text-[var(--text-primary)]">Medical research chat</h1>
           </div>
         </div>
       </Card>
@@ -93,15 +93,15 @@ export function ResearchChat() {
           {messages.length === 0 ? (
             <div className="flex h-full flex-col items-center justify-center gap-6">
               <div className="text-center">
-                <Stethoscope className="mx-auto h-12 w-12 text-cyan/40" />
-                <p className="mt-4 text-white/60">Ask about clinical guidelines, differential diagnoses, drug interactions, or treatment protocols.</p>
+                <Stethoscope className="mx-auto h-12 w-12 text-[var(--accent-cyan)]/40" />
+                <p className="mt-4 text-[var(--text-secondary)]">Ask about clinical guidelines, differential diagnoses, drug interactions, or treatment protocols.</p>
               </div>
               <div className="grid w-full max-w-2xl gap-2 sm:grid-cols-2">
                 {SUGGESTED_PROMPTS.map((prompt) => (
                   <button
                     key={prompt}
                     onClick={() => sendMessage(prompt)}
-                    className="rounded-xl border border-white/10 bg-white/5 p-3 text-left text-sm text-white/70 transition-colors hover:border-cyan/40 hover:text-white"
+                    className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-3 text-left text-sm text-[var(--text-secondary)] transition-colors hover:border-[var(--accent-cyan)]/40 hover:text-[var(--text-primary)]"
                   >
                     {prompt}
                   </button>
@@ -118,27 +118,27 @@ export function ResearchChat() {
                   <div
                     className={`max-w-[80%] rounded-2xl px-4 py-3 ${
                       msg.role === "user"
-                        ? "bg-cyan text-dark"
-                        : "border border-white/10 bg-white/5 text-white"
+                        ? "bg-[var(--accent-cyan)] text-white"
+                        : "border border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-primary)]"
                     }`}
                   >
                     {msg.role === "assistant" ? (
                       <div className="prose prose-sm prose-invert max-w-none">
                         <ReactMarkdown
                           components={{
-                            h1: ({ children }) => <h1 className="text-lg font-bold text-white mt-4 mb-2">{children}</h1>,
-                            h2: ({ children }) => <h2 className="text-base font-semibold text-white mt-4 mb-2">{children}</h2>,
-                            h3: ({ children }) => <h3 className="text-sm font-semibold text-cyan mt-3 mb-1">{children}</h3>,
-                            h4: ({ children }) => <h4 className="text-sm font-medium text-cyan mt-2 mb-1">{children}</h4>,
-                            p: ({ children }) => <p className="text-sm text-white/90 leading-relaxed mb-2">{children}</p>,
-                            ul: ({ children }) => <ul className="list-disc list-inside space-y-1 mb-2 text-sm text-white/90">{children}</ul>,
-                            ol: ({ children }) => <ol className="list-decimal list-inside space-y-1 mb-2 text-sm text-white/90">{children}</ol>,
-                            li: ({ children }) => <li className="text-sm text-white/90">{children}</li>,
-                            strong: ({ children }) => <strong className="font-semibold text-white">{children}</strong>,
-                            em: ({ children }) => <em className="italic text-white/80">{children}</em>,
-                            code: ({ children }) => <code className="rounded bg-white/10 px-1 py-0.5 text-xs text-cyan">{children}</code>,
-                            blockquote: ({ children }) => <blockquote className="border-l-2 border-cyan/40 pl-3 text-sm text-white/70 italic">{children}</blockquote>,
-                            hr: () => <hr className="border-white/10 my-3" />,
+                            h1: ({ children }) => <h1 className="text-lg font-bold text-[var(--text-primary)] mt-4 mb-2">{children}</h1>,
+                            h2: ({ children }) => <h2 className="text-base font-semibold text-[var(--text-primary)] mt-4 mb-2">{children}</h2>,
+                            h3: ({ children }) => <h3 className="text-sm font-semibold text-[var(--accent-cyan)] mt-3 mb-1">{children}</h3>,
+                            h4: ({ children }) => <h4 className="text-sm font-medium text-[var(--accent-cyan)] mt-2 mb-1">{children}</h4>,
+                            p: ({ children }) => <p className="text-sm text-[var(--text-primary)] leading-relaxed mb-2">{children}</p>,
+                            ul: ({ children }) => <ul className="list-disc list-inside space-y-1 mb-2 text-sm text-[var(--text-primary)]">{children}</ul>,
+                            ol: ({ children }) => <ol className="list-decimal list-inside space-y-1 mb-2 text-sm text-[var(--text-primary)]">{children}</ol>,
+                            li: ({ children }) => <li className="text-sm text-[var(--text-primary)]">{children}</li>,
+                            strong: ({ children }) => <strong className="font-semibold text-[var(--text-primary)]">{children}</strong>,
+                            em: ({ children }) => <em className="italic text-[var(--text-primary)]">{children}</em>,
+                            code: ({ children }) => <code className="rounded bg-[var(--bg-input)] px-1 py-0.5 text-xs text-[var(--accent-cyan)]">{children}</code>,
+                            blockquote: ({ children }) => <blockquote className="border-l-2 border-[var(--accent-cyan)]/40 pl-3 text-sm text-[var(--text-secondary)] italic">{children}</blockquote>,
+                            hr: () => <hr className="border-[var(--border)] my-3" />,
                           }}
                         >
                           {msg.content}
@@ -153,7 +153,7 @@ export function ResearchChat() {
 
               {loading ? (
                 <div className="flex justify-start">
-                  <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+                  <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] px-4 py-3">
                     <div className="flex gap-2">
                       <span className="h-2 w-2 animate-bounce rounded-full bg-cyan" style={{ animationDelay: "0ms" }} />
                       <span className="h-2 w-2 animate-bounce rounded-full bg-cyan" style={{ animationDelay: "150ms" }} />
@@ -180,7 +180,7 @@ export function ResearchChat() {
         <Card className="p-3">
           <div className="flex items-end gap-3">
             <textarea
-              className="flex-1 resize-none rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder:text-white/40 transition-colors focus:border-cyan focus:outline-none focus:ring-2 focus:ring-cyan/20"
+              className="flex-1 resize-none rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-4 py-3 text-[var(--text-primary)] placeholder:text-[var(--text-muted)] transition-colors focus:border-cyan focus:outline-none focus:ring-2 focus:ring-cyan/20"
               rows={2}
               placeholder="Ask a medical research question…"
               value={input}
@@ -196,7 +196,7 @@ export function ResearchChat() {
               <Send className="h-4 w-4" />
             </Button>
           </div>
-          <p className="mt-2 px-2 text-xs text-white/40">
+          <p className="mt-2 px-2 text-xs text-[var(--text-muted)]">
             AI-generated responses should be verified against primary sources before clinical decision-making. Press Enter to send, Shift+Enter for new line.
           </p>
         </Card>

@@ -151,9 +151,9 @@ export function LocationPicker({
         </div>
       </div>
 
-      {status ? <p className="text-sm text-cyan">{status}</p> : null}
+      {status ? <p className="text-sm text-[var(--accent-cyan)]">{status}</p> : null}
 
-      <div className="overflow-hidden rounded-2xl border border-white/10 bg-slate-900/50" style={{ height: 360 }}>
+      <div className="overflow-hidden rounded-2xl border border-[var(--border)] bg-slate-900/50" style={{ height: 360 }}>
         <MapContainer center={position} zoom={13} scrollWheelZoom style={{ height: "100%", width: "100%" }}>
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -163,9 +163,9 @@ export function LocationPicker({
         </MapContainer>
       </div>
 
-      <div className="flex items-center justify-between rounded-xl border border-cyan/20 bg-cyan/5 px-3 py-2 text-sm text-white/80">
+      <div className="flex items-center justify-between rounded-xl border border-cyan/20 bg-[var(--accent-cyan)]/5 px-3 py-2 text-sm text-[var(--text-primary)]">
         <span>Confirmed coordinates</span>
-        <span className="font-medium text-cyan">{locationSummary}</span>
+        <span className="font-medium text-[var(--accent-cyan)]">{locationSummary}</span>
       </div>
     </div>
   );

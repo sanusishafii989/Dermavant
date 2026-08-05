@@ -4,27 +4,27 @@ export const dynamic = "force-dynamic";
 
 export default function TermsPage() {
   return (
-    <div className="min-h-screen bg-dark p-6 md:p-12">
+    <div className="min-h-screen bg-[var(--bg-primary)] p-6 md:p-12">
       <div className="mx-auto max-w-3xl space-y-6">
         <div>
-          <p className="text-xs uppercase tracking-[0.2em] text-cyan">Legal</p>
-          <h1 className="mt-2 text-3xl font-bold text-white">Terms &amp; Conditions</h1>
-          <p className="mt-2 text-sm text-white/60">Last updated: August 2026</p>
+          <p className="text-xs uppercase tracking-[0.2em] text-[var(--accent-cyan)]">Legal</p>
+          <h1 className="mt-2 text-3xl font-bold text-[var(--text-primary)]">Terms &amp; Conditions</h1>
+          <p className="mt-2 text-sm text-[var(--text-secondary)]">Last updated: August 2026</p>
         </div>
 
-        <Card className="space-y-4 text-sm leading-relaxed text-white/80">
+        <Card className="space-y-4 text-sm leading-relaxed text-[var(--text-primary)]">
           <section>
-            <h2 className="mb-2 text-lg font-semibold text-white">1. Acceptance of Terms</h2>
+            <h2 className="mb-2 text-lg font-semibold text-[var(--text-primary)]">1. Acceptance of Terms</h2>
             <p>By creating an account on Aetheris Health, you agree to be bound by these Terms &amp; Conditions. If you do not agree, you may not access or use the platform.</p>
           </section>
 
           <section>
-            <h2 className="mb-2 text-lg font-semibold text-white">2. Platform Description</h2>
+            <h2 className="mb-2 text-lg font-semibold text-[var(--text-primary)]">2. Platform Description</h2>
             <p>Aetheris Health is an AI-powered digital healthcare ecosystem connecting patients with licensed doctors and verified pharmacies. The platform offers AI-assisted dermatological triage, specialist booking, e-pharmacy services, and consultation tools.</p>
           </section>
 
           <section>
-            <h2 className="mb-2 text-lg font-semibold text-white">3. Commission &amp; Fees</h2>
+            <h2 className="mb-2 text-lg font-semibold text-[var(--text-primary)]">3. Commission &amp; Fees</h2>
             <p>Aetheris Health operates on a commission-based revenue model:</p>
             <ul className="ml-4 list-disc space-y-1">
               <li><strong>Doctor consultations:</strong> A 10% commission is deducted from each consultation payment. Doctors receive 90% of the consultation fee.</li>
@@ -35,7 +35,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="mb-2 text-lg font-semibold text-white">4. User Roles &amp; Responsibilities</h2>
+            <h2 className="mb-2 text-lg font-semibold text-[var(--text-primary)]">4. User Roles &amp; Responsibilities</h2>
             <ul className="ml-4 list-disc space-y-1">
               <li><strong>Patients:</strong> Must provide accurate medical information and use AI triage as guidance only, not a substitute for professional medical care.</li>
               <li><strong>Doctors:</strong> Must hold valid medical licenses and provide professional, ethical care during consultations.</li>
@@ -45,17 +45,17 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="mb-2 text-lg font-semibold text-white">5. AI Consultation Disclaimer</h2>
+            <h2 className="mb-2 text-lg font-semibold text-[var(--text-primary)]">5. AI Consultation Disclaimer</h2>
             <p>The AI dermatological triage tool provides preliminary assessments only. It is not a medical diagnosis and should not replace consultation with a licensed healthcare professional. Aetheris Health is not liable for decisions made based solely on AI triage results.</p>
           </section>
 
           <section>
-            <h2 className="mb-2 text-lg font-semibold text-white">6. Privacy &amp; Data Protection</h2>
+            <h2 className="mb-2 text-lg font-semibold text-[var(--text-primary)]">6. Privacy &amp; Data Protection</h2>
             <p>Your use of the platform is also governed by our Privacy Policy. Medical data is stored securely and shared only with your healthcare providers for consultation purposes.</p>
           </section>
 
           <section>
-            <h2 className="mb-2 text-lg font-semibold text-white">7. Prohibited Conduct</h2>
+            <h2 className="mb-2 text-lg font-semibold text-[var(--text-primary)]">7. Prohibited Conduct</h2>
             <ul className="ml-4 list-disc space-y-1">
               <li>Sharing account credentials with others</li>
               <li>Attempting to access other users&apos; data without authorization</li>
@@ -66,18 +66,18 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="mb-2 text-lg font-semibold text-white">8. Limitation of Liability</h2>
+            <h2 className="mb-2 text-lg font-semibold text-[var(--text-primary)]">8. Limitation of Liability</h2>
             <p>Aetheris Health, operated by Danhaire Medical Services, is not liable for any indirect, incidental, or consequential damages arising from the use of the platform. Medical professionals are independently responsible for their clinical decisions.</p>
           </section>
 
           <section>
-            <h2 className="mb-2 text-lg font-semibold text-white">9. Account Suspension</h2>
+            <h2 className="mb-2 text-lg font-semibold text-[var(--text-primary)]">9. Account Suspension</h2>
             <p>Accounts may be suspended or terminated for violations of these terms, fraudulent activity, or upon request from regulatory authorities.</p>
           </section>
 
           <section>
-            <h2 className="mb-2 text-lg font-semibold text-white">10. Contact</h2>
-            <p>For questions regarding these Terms, contact: <span className="text-cyan">support@aetherishealth.ng</span></p>
+            <h2 className="mb-2 text-lg font-semibold text-[var(--text-primary)]">10. Contact</h2>
+            <p>For questions regarding these Terms, contact: <span className="text-[var(--accent-cyan)]">support@aetherishealth.ng</span></p>
           </section>
         </Card>
       </div>

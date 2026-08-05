@@ -72,16 +72,16 @@ export function WalletCard({ balance, currency, transactions, onRefresh }: Walle
   return (
     <div className="space-y-6">
       {/* Wallet Balance Hero Card */}
-      <Card className="relative overflow-hidden border border-cyan/30 bg-gradient-to-r from-navy via-dark to-cyan/10 p-6 shadow-2xl backdrop-blur-md">
+      <Card className="relative overflow-hidden border border-[var(--accent-cyan)]/30 bg-gradient-to-r from-navy via-dark to-cyan/10 p-6 shadow-2xl backdrop-blur-md">
         <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-cyan">
+            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-[var(--accent-cyan)]">
               <Wallet className="h-4 w-4" />
               <span>Aetheris Patient E-Wallet</span>
             </div>
             <div className="mt-3">
-              <p className="text-xs text-white/50">Available Balance</p>
-              <h2 className="text-4xl font-extrabold text-white tracking-tight">
+              <p className="text-xs text-[var(--text-muted)]">Available Balance</p>
+              <h2 className="text-4xl font-extrabold text-[var(--text-primary)] tracking-tight">
                 {formatCurrency(balance, currency)}
               </h2>
             </div>
@@ -109,12 +109,12 @@ export function WalletCard({ balance, currency, transactions, onRefresh }: Walle
       {/* Quick Amount Selection & Modal */}
       <Modal open={isTopUpOpen} onClose={() => setIsTopUpOpen(false)} title="Fund Your E-Wallet">
         <form onSubmit={handleTopUp} className="space-y-5">
-          <p className="text-xs text-white/70">
+          <p className="text-xs text-[var(--text-secondary)]">
             Top up your balance for instant consultations, pharmacy orders, and specialist bookings.
           </p>
 
           <div>
-            <label className="block text-xs font-semibold text-white/80 mb-2">Select Preset Amount</label>
+            <label className="block text-xs font-semibold text-[var(--text-primary)] mb-2">Select Preset Amount</label>
             <div className="grid grid-cols-3 gap-2">
               {[2000, 5000, 10000, 25000, 50000].map((amt) => (
                 <button
@@ -123,8 +123,8 @@ export function WalletCard({ balance, currency, transactions, onRefresh }: Walle
                   onClick={() => setTopUpAmount(amt.toString())}
                   className={`rounded-lg border py-2 text-xs font-semibold transition-all ${
                     topUpAmount === amt.toString()
-                      ? "border-cyan bg-cyan/20 text-cyan"
-                      : "border-white/10 bg-white/5 text-white/70 hover:bg-white/10"
+                      ? "border-cyan bg-[var(--accent-cyan)]/20 text-[var(--accent-cyan)]"
+                      : "border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-secondary)] hover:bg-[var(--bg-input)]"
                   }`}
                 >
                   ₦{amt.toLocaleString()}
@@ -134,7 +134,7 @@ export function WalletCard({ balance, currency, transactions, onRefresh }: Walle
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-white/80 mb-1">Custom Amount (NGN)</label>
+            <label className="block text-xs font-semibold text-[var(--text-primary)] mb-1">Custom Amount (NGN)</label>
             <Input
               type="number"
               min="100"
@@ -161,12 +161,12 @@ export function WalletCard({ balance, currency, transactions, onRefresh }: Walle
       {/* Transaction History Ledger */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-bold text-white">Transaction History</h3>
-          <span className="text-xs text-white/50">{transactions.length} Transactions</span>
+          <h3 className="text-lg font-bold text-[var(--text-primary)]">Transaction History</h3>
+          <span className="text-xs text-[var(--text-muted)]">{transactions.length} Transactions</span>
         </div>
 
         {transactions.length === 0 ? (
-          <Card className="border-dashed border-white/10 p-8 text-center text-white/50">
+          <Card className="border-dashed border-[var(--border)] p-8 text-center text-[var(--text-muted)]">
             <CreditCard className="mx-auto h-10 w-10 text-white/20" />
             <p className="mt-2 text-xs font-medium">No transactions recorded yet</p>
           </Card>
@@ -175,7 +175,7 @@ export function WalletCard({ balance, currency, transactions, onRefresh }: Walle
             {transactions.map((tx) => (
               <Card
                 key={tx.id}
-                className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border border-white/10 bg-dark/60 p-4 backdrop-blur-md"
+                className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border border-[var(--border)] bg-[var(--bg-primary)]/60 p-4 backdrop-blur-md"
               >
                 <div className="flex items-center gap-3">
                   <div
@@ -193,15 +193,15 @@ export function WalletCard({ balance, currency, transactions, onRefresh }: Walle
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <p className="text-sm font-semibold text-white">
+                      <p className="text-sm font-semibold text-[var(--text-primary)]">
                         {tx.description || (tx.direction === "credit" ? "Account Credit" : "Account Debit")}
                       </p>
                       <Badge variant={tx.direction === "credit" ? "cyan" : "gold"} className="text-[10px]">
                         {tx.type}
                       </Badge>
                     </div>
-                    <p className="mt-0.5 text-xs text-white/40">
-                      Ref: <span className="font-mono text-white/60">{tx.reference}</span> •{" "}
+                    <p className="mt-0.5 text-xs text-[var(--text-muted)]">
+                      Ref: <span className="font-mono text-[var(--text-secondary)]">{tx.reference}</span> •{" "}
                       {new Date(tx.createdAt).toLocaleString(undefined, {
                         dateStyle: "short",
                         timeStyle: "short",

@@ -7,7 +7,7 @@ const LocationEditor = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="h-[500px] animate-pulse rounded-2xl border border-white/10 bg-white/5" />
+      <div className="h-[500px] animate-pulse rounded-2xl border border-[var(--border)] bg-[var(--bg-card)]" />
     ),
   }
 );

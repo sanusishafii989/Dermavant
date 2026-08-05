@@ -77,8 +77,8 @@ export default async function PharmacyDashboardPage() {
           <div className="flex items-center gap-4">
             <Avatar src={user?.imageUrl} name={fullName} size="lg" />
             <div>
-              <p className="text-sm uppercase tracking-[0.2em] text-cyan">Welcome back</p>
-              <h1 className="mt-1 text-3xl font-bold text-white">{fullName}</h1>
+              <p className="text-sm uppercase tracking-[0.2em] text-[var(--accent-cyan)]">Welcome back</p>
+              <h1 className="mt-1 text-3xl font-bold text-[var(--text-primary)]">{fullName}</h1>
               <div className="mt-2 flex items-center gap-2">
                 <Badge variant="cyan">partner</Badge>
                 {partner?.status === "verified" ? (
@@ -94,12 +94,12 @@ export default async function PharmacyDashboardPage() {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <Card className="space-y-2">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan/15 text-cyan">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--accent-cyan)]/15 text-[var(--accent-cyan)]">
                 <Package className="h-5 w-5" />
               </div>
               <div>
-                <p className="text-xs uppercase tracking-[0.2em] text-white/50">Medicines</p>
-                <p className="text-2xl font-bold text-white">{totalMedicines}</p>
+                <p className="text-xs uppercase tracking-[0.2em] text-[var(--text-muted)]">Medicines</p>
+                <p className="text-2xl font-bold text-[var(--text-primary)]">{totalMedicines}</p>
               </div>
             </div>
           </Card>
@@ -110,8 +110,8 @@ export default async function PharmacyDashboardPage() {
                 <Clock className="h-5 w-5" />
               </div>
               <div>
-                <p className="text-xs uppercase tracking-[0.2em] text-white/50">Pending orders</p>
-                <p className="text-2xl font-bold text-white">{pendingOrders}</p>
+                <p className="text-xs uppercase tracking-[0.2em] text-[var(--text-muted)]">Pending orders</p>
+                <p className="text-2xl font-bold text-[var(--text-primary)]">{pendingOrders}</p>
               </div>
             </div>
           </Card>
@@ -122,20 +122,20 @@ export default async function PharmacyDashboardPage() {
                 <ClipboardList className="h-5 w-5" />
               </div>
               <div>
-                <p className="text-xs uppercase tracking-[0.2em] text-white/50">Active orders</p>
-                <p className="text-2xl font-bold text-white">{activeOrders}</p>
+                <p className="text-xs uppercase tracking-[0.2em] text-[var(--text-muted)]">Active orders</p>
+                <p className="text-2xl font-bold text-[var(--text-primary)]">{activeOrders}</p>
               </div>
             </div>
           </Card>
 
           <Card className="space-y-2">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gold/15 text-gold">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--accent-gold)]/15 text-[var(--accent-gold)]">
                 <TrendingUp className="h-5 w-5" />
               </div>
               <div>
-                <p className="text-xs uppercase tracking-[0.2em] text-white/50">Revenue</p>
-                <p className="text-2xl font-bold text-white">₦{totalRevenue.toLocaleString()}</p>
+                <p className="text-xs uppercase tracking-[0.2em] text-[var(--text-muted)]">Revenue</p>
+                <p className="text-2xl font-bold text-[var(--text-primary)]">₦{totalRevenue.toLocaleString()}</p>
               </div>
             </div>
           </Card>
@@ -143,29 +143,29 @@ export default async function PharmacyDashboardPage() {
 
         <Card>
           <div className="mb-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-cyan">Recent orders</p>
-            <h2 className="mt-1 text-xl font-semibold text-white">Latest pharmacy orders</h2>
+            <p className="text-xs uppercase tracking-[0.2em] text-[var(--accent-cyan)]">Recent orders</p>
+            <h2 className="mt-1 text-xl font-semibold text-[var(--text-primary)]">Latest pharmacy orders</h2>
           </div>
 
           {recentOrders.length === 0 ? (
-            <p className="py-8 text-center text-white/60">No orders yet. Orders will appear here when patients purchase medicines.</p>
+            <p className="py-8 text-center text-[var(--text-secondary)]">No orders yet. Orders will appear here when patients purchase medicines.</p>
           ) : (
             <div className="space-y-3">
               {recentOrders.map((order) => (
-                <div key={order._id} className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 p-4">
+                <div key={order._id} className="flex items-center justify-between rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan/15 text-cyan">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--accent-cyan)]/15 text-[var(--accent-cyan)]">
                       <ClipboardList className="h-4 w-4" />
                     </div>
                     <div>
-                      <p className="font-medium text-white">{order.patient_name}</p>
-                      <p className="text-sm text-white/60">
+                      <p className="font-medium text-[var(--text-primary)]">{order.patient_name}</p>
+                      <p className="text-sm text-[var(--text-secondary)]">
                         {new Date(order.created_at).toLocaleDateString("en-NG", { month: "short", day: "numeric", year: "numeric" })}
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className="text-sm font-medium text-white">₦{order.total.toLocaleString()}</span>
+                    <span className="text-sm font-medium text-[var(--text-primary)]">₦{order.total.toLocaleString()}</span>
                     <Badge variant={order.payment_status === "paid" ? "success" : "warning"}>
                       {order.payment_status}
                     </Badge>

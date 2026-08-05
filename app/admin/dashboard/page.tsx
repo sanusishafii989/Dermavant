@@ -20,14 +20,14 @@ export default async function AdminDashboardPage() {
         <div className="flex items-center gap-4">
           <Avatar src={user?.imageUrl} name={fullName} size="lg" />
           <div>
-            <p className="text-sm uppercase tracking-[0.2em] text-cyan">Welcome back</p>
-            <h1 className="mt-1 text-3xl font-bold text-white">{fullName}</h1>
+            <p className="text-sm uppercase tracking-[0.2em] text-[var(--accent-cyan)]">Welcome back</p>
+            <h1 className="mt-1 text-3xl font-bold text-[var(--text-primary)]">{fullName}</h1>
             <Badge variant="gold" className="mt-2">
               admin
             </Badge>
           </div>
         </div>
-        <p className="mt-6 text-white/70">
+        <p className="mt-6 text-[var(--text-secondary)]">
           Your admin dashboard shell is ready. User management, support, and audit tools
           will be wired in upcoming tasks.
         </p>
