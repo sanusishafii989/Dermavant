@@ -11,4 +11,5 @@ export { Admin } from "./Admin";
 export { Wallet } from "./Wallet";
 export { MedicalRecord } from "./MedicalRecord";
 export { WalletTransaction } from "./WalletTransaction";
+export { ContactMessage } from "./ContactMessage";
 

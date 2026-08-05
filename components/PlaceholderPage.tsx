@@ -13,10 +13,10 @@ export function PlaceholderPage({ title, description, links }: PlaceholderPagePr
     <PortalDashboardShell title={title} links={links}>
       <Card className="max-w-3xl">
         <div className="space-y-4">
-          <p className="text-xs uppercase tracking-[0.2em] text-cyan">Coming soon</p>
-          <h1 className="text-3xl font-semibold text-white">{title}</h1>
-          <p className="text-white/70">{description}</p>
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-white/70">
+          <p className="text-xs uppercase tracking-[0.2em] text-[var(--accent-cyan)]">Coming soon</p>
+          <h1 className="text-3xl font-semibold text-[var(--text-primary)]">{title}</h1>
+          <p className="text-[var(--text-secondary)]">{description}</p>
+          <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-input)] p-4 text-sm text-[var(--text-secondary)]">
             This section is not built yet. We will wire it into the portal in a future step.
           </div>
         </div>

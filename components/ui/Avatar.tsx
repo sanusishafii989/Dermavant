@@ -51,7 +51,7 @@ export function Avatar({ src, name, size = "md", className }: AvatarProps) {
     <div
       aria-label={name}
       className={cn(
-        "inline-flex items-center justify-center rounded-full bg-cyan/20 font-semibold text-cyan",
+        "inline-flex items-center justify-center rounded-full bg-[var(--accent-cyan)]/15 font-semibold text-[var(--accent-cyan)]",
         sizeStyles[size],
         className
       )}

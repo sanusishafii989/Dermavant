@@ -3,7 +3,9 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 
 export interface SidebarLink {
   href: string;
@@ -24,13 +26,27 @@ export function Sidebar({ links, title = "Aetheris Health", footer, className }:
   return (
     <aside
       className={cn(
-        "glass-panel flex h-full min-h-screen w-64 shrink-0 flex-col border-r border-white/10 p-4",
+        "glass-panel flex h-full min-h-screen w-64 shrink-0 flex-col p-4",
         className
       )}
     >
       <div className="mb-8 px-2">
-        <p className="text-xs uppercase tracking-[0.2em] text-cyan">Portal</p>
-        <h1 className="mt-1 text-lg font-semibold text-white">{title}</h1>
+        <Image
+          src="/logo.svg"
+          alt="Aetheris Health"
+          width={140}
+          height={28}
+          priority
+          className="dark:block hidden"
+        />
+        <Image
+          src="/logo-light.svg"
+          alt="Aetheris Health"
+          width={140}
+          height={28}
+          priority
+          className="dark:hidden block"
+        />
       </div>
 
       <nav className="flex flex-1 flex-col gap-1">
@@ -45,8 +61,8 @@ export function Sidebar({ links, title = "Aetheris Health", footer, className }:
               className={cn(
                 "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
                 isActive
-                  ? "bg-cyan/15 text-cyan"
-                  : "text-white/70 hover:bg-white/5 hover:text-white"
+                  ? "bg-[var(--accent-cyan)]/15 text-[var(--accent-cyan)]"
+                  : "text-[var(--text-secondary)] hover:bg-[var(--bg-input)] hover:text-[var(--text-primary)]"
               )}
             >
               {link.icon ? (
@@ -58,7 +74,16 @@ export function Sidebar({ links, title = "Aetheris Health", footer, className }:
         })}
       </nav>
 
-      {footer ? <div className="mt-auto border-t border-white/10 pt-4">{footer}</div> : null}
+      {footer ? (
+        <div className="mt-auto flex items-center justify-between border-t border-[var(--border)] pt-4">
+          <div className="flex items-center gap-2">{footer}</div>
+          <ThemeToggle />
+        </div>
+      ) : (
+        <div className="mt-auto border-t border-[var(--border)] pt-4">
+          <ThemeToggle />
+        </div>
+      )}
     </aside>
   );
 }

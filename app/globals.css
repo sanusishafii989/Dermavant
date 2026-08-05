@@ -2,6 +2,46 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --bg-primary: #FFFFFF;
+  --bg-secondary: #F8FAFC;
+  --bg-card: #FFFFFF;
+  --bg-input: #F1F5F9;
+  --text-primary: #0A1628;
+  --text-secondary: #475569;
+  --text-muted: #94A3B8;
+  --border: #E2E8F0;
+  --border-hover: #CBD5E1;
+  --accent-cyan: #0D9488;
+  --accent-gold: #D97706;
+  --sidebar-bg: #F8FAFC;
+  --sidebar-border: #E2E8F0;
+  --hero-bg: #F0F9FF;
+  --shadow: 0 4px 24px rgba(0, 8, 20, 0.08);
+  --shadow-lg: 0 8px 48px rgba(0, 8, 20, 0.12);
+  color-scheme: light;
+}
+
+.dark {
+  --bg-primary: #000814;
+  --bg-secondary: #023047;
+  --bg-card: rgba(255, 255, 255, 0.05);
+  --bg-input: rgba(255, 255, 255, 0.05);
+  --text-primary: #FFFFFF;
+  --text-secondary: rgba(255, 255, 255, 0.7);
+  --text-muted: rgba(255, 255, 255, 0.45);
+  --border: rgba(255, 255, 255, 0.1);
+  --border-hover: rgba(255, 255, 255, 0.2);
+  --accent-cyan: #219EBC;
+  --accent-gold: #FFB703;
+  --sidebar-bg: rgba(2, 48, 71, 0.4);
+  --sidebar-border: rgba(255, 255, 255, 0.1);
+  --hero-bg: #000814;
+  --shadow: 0 8px 32px rgba(0, 8, 20, 0.45);
+  --shadow-lg: 0 16px 48px rgba(0, 8, 20, 0.55);
+  color-scheme: dark;
+}
+
 /* Leaflet map fixes */
 .leaflet-container {
   width: 100%;
@@ -10,43 +50,45 @@
   z-index: 0;
 }
 
-.leaflet-tile {
-  z-index: 0;
-}
-
-.leaflet-control-zoom {
-  z-index: 1;
-}
-
-.leaflet-pane,
-.leaflet-map-pane,
-.leaflet-tile-pane,
-.leaflet-marker-pane,
-.leaflet-popup-pane,
-.leaflet-overlay-pane,
-.leaflet-shadow-pane {
-  z-index: 0;
-}
-
-.leaflet-top,
-.leaflet-bottom {
-  z-index: 1;
-}
-
-.leaflet-marker-icon {
-  z-index: 1 !important;
-}
+.leaflet-tile { z-index: 0; }
+.leaflet-control-zoom { z-index: 1; }
+.leaflet-pane, .leaflet-map-pane, .leaflet-tile-pane,
+.leaflet-marker-pane, .leaflet-popup-pane,
+.leaflet-overlay-pane, .leaflet-shadow-pane { z-index: 0; }
+.leaflet-top, .leaflet-bottom { z-index: 1; }
+.leaflet-marker-icon { z-index: 1 !important; }
 
 @layer base {
-  :root {
-    color-scheme: dark;
-  }
-
   html {
-    @apply bg-dark text-white;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
   }
 
   body {
-    @apply min-h-screen bg-dark text-white antialiased;
+    min-height: 100vh;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
+}
+
+@layer utilities {
+  .bg-primary { background-color: var(--bg-primary); }
+  .bg-secondary { background-color: var(--bg-secondary); }
+  .bg-card { background-color: var(--bg-card); }
+  .bg-input { background-color: var(--bg-input); }
+  .text-primary { color: var(--text-primary); }
+  .text-secondary { color: var(--text-secondary); }
+  .text-muted { color: var(--text-muted); }
+  .border-theme { border-color: var(--border); }
+  .border-hover { border-color: var(--border-hover); }
+  .accent-cyan { color: var(--accent-cyan); }
+  .accent-gold { color: var(--accent-gold); }
+  .bg-accent-cyan { background-color: var(--accent-cyan); }
+  .bg-accent-gold { background-color: var(--accent-gold); }
+  .shadow-theme { box-shadow: var(--shadow); }
+  .shadow-theme-lg { box-shadow: var(--shadow-lg); }
+  .sidebar-bg { background-color: var(--sidebar-bg); }
+  .sidebar-border { border-color: var(--sidebar-border); }
 }

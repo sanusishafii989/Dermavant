@@ -37,7 +37,7 @@ export function Modal({ open, onClose, title, children, className }: ModalProps)
       <button
         type="button"
         aria-label="Close modal overlay"
-        className="absolute inset-0 bg-dark/80 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
         onClick={onClose}
       />
       <div
@@ -48,7 +48,7 @@ export function Modal({ open, onClose, title, children, className }: ModalProps)
       >
         <div className="mb-4 flex items-start justify-between gap-4">
           {title ? (
-            <h2 id="modal-title" className="text-lg font-semibold text-white">
+            <h2 id="modal-title" className="text-lg font-semibold text-[var(--text-primary)]">
               {title}
             </h2>
           ) : (

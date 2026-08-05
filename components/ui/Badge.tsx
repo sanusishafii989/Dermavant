@@ -8,12 +8,12 @@ export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
 }
 
 const variantStyles: Record<BadgeVariant, string> = {
-  default: "bg-white/10 text-white",
-  cyan: "bg-cyan/20 text-cyan",
-  gold: "bg-gold/20 text-gold",
-  success: "bg-emerald-500/20 text-emerald-300",
-  warning: "bg-amber-500/20 text-amber-300",
-  danger: "bg-red-500/20 text-red-300",
+  default: "bg-[var(--bg-input)] text-[var(--text-secondary)]",
+  cyan: "bg-[var(--accent-cyan)]/15 text-[var(--accent-cyan)]",
+  gold: "bg-[var(--accent-gold)]/15 text-[var(--accent-gold)]",
+  success: "bg-emerald-500/15 text-emerald-500",
+  warning: "bg-amber-500/15 text-amber-500",
+  danger: "bg-red-500/15 text-red-400",
 };
 
 export function Badge({

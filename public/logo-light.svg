@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 48" fill="none">
+  <!-- Hexagon with medical cross -->
+  <g transform="translate(0, 0)">
+    <polygon
+      points="24,2 44,14 44,34 24,46 4,34 4,14"
+      fill="none"
+      stroke="#0D9488"
+      stroke-width="2"
+      stroke-linejoin="round"
+    />
+    <rect x="17" y="14" width="14" height="20" rx="2" fill="#0D9488" />
+    <rect x="10" y="21" width="28" height="6" rx="2" fill="#0D9488" />
+  </g>
+  <!-- Aetheris text -->
+  <text x="58" y="28" font-family="system-ui, -apple-system, sans-serif" font-size="20" font-weight="700" fill="#0A1628" letter-spacing="0.5">Aetheris</text>
+  <!-- Health subtitle -->
+  <text x="58" y="42" font-family="system-ui, -apple-system, sans-serif" font-size="9" font-weight="600" fill="#0D9488" letter-spacing="2">HEALTH</text>
+</svg>

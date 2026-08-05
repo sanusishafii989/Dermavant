@@ -15,12 +15,12 @@ export function PortalDashboardShell({
   children,
 }: PortalDashboardShellProps) {
   return (
-    <div className="flex min-h-screen bg-dark">
+    <div className="flex min-h-screen bg-[var(--bg-primary)]">
       <Sidebar
         title={title}
         links={links}
         footer={
-          <div className="flex items-center justify-between gap-3 px-2">
+          <div className="flex items-center gap-3">
             <NotificationBell />
             <UserButton />
           </div>
