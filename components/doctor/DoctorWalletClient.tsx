@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Modal } from "@/components/ui/Modal";
 import { Badge } from "@/components/ui/Badge";
-import { TrendingUp, Clock, CheckCircle, ArrowDownToLine } from "lucide-react";
+import { TrendingUp, Clock, CheckCircle, ArrowDownToLine, Percent } from "lucide-react";
 
 interface WithdrawalItem {
   id: string;
@@ -144,6 +144,24 @@ export function DoctorWalletClient({
           <button className="ml-3 underline" onClick={() => setSuccess("")}>Dismiss</button>
         </div>
       ) : null}
+
+      {/* Commission info */}
+      <Card className="border border-cyan/20 bg-cyan/5">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan/15 text-cyan">
+            <Percent className="h-5 w-5" />
+          </div>
+          <div>
+            <p className="text-xs uppercase tracking-[0.2em] text-cyan">Platform commission</p>
+            <p className="text-sm text-white/80">
+              Aetheris Health charges <span className="font-semibold text-white">10%</span> commission on each consultation.
+              Gross earnings: <span className="font-semibold text-white">₦{initialEarnings.toLocaleString()}</span> ·
+              Platform fee: <span className="font-semibold text-gold">₦{Math.round(initialEarnings * 0.1).toLocaleString()}</span> ·
+              Net earnings: <span className="font-semibold text-emerald-400">₦{Math.round(initialEarnings * 0.9).toLocaleString()}</span>
+            </p>
+          </div>
+        </div>
+      </Card>
 
       {/* Stats */}
       <div className="grid gap-4 sm:grid-cols-3">

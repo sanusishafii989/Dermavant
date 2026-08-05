@@ -35,6 +35,7 @@ function SignUpContent() {
   const [role, setRole] = useState<UserRole>(
     isUserRole(initialRole) && initialRole !== "admin" ? initialRole : "patient"
   );
+  const [agreed, setAgreed] = useState(false);
 
   const redirectUrl = useMemo(() => ROLE_DASHBOARD[role], [role]);
 
@@ -69,12 +70,37 @@ function SignUpContent() {
             </select>
           </div>
 
-          <SignUp
-            appearance={clerkAppearance}
-            unsafeMetadata={{ role }}
-            fallbackRedirectUrl={redirectUrl}
-            signInUrl={`/sign-in?portal=${role}`}
-          />
+          {/* Terms agreement */}
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+            <label className="flex items-start gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={agreed}
+                onChange={(e) => setAgreed(e.target.checked)}
+                className="mt-1 h-4 w-4 rounded border-white/20 bg-white/5 text-cyan focus:ring-cyan"
+              />
+              <span className="text-sm text-white/70">
+                I have read and agree to the{" "}
+                <a href="/terms" target="_blank" className="text-cyan underline hover:text-cyan/80">Terms &amp; Conditions</a>{" "}
+                and{" "}
+                <a href="/privacy" target="_blank" className="text-cyan underline hover:text-cyan/80">Privacy Policy</a>.
+                I understand that Aetheris Health charges a 10% commission on doctor consultations and 5% on pharmacy orders.
+              </span>
+            </label>
+          </div>
+
+          {agreed ? (
+            <SignUp
+              appearance={clerkAppearance}
+              unsafeMetadata={{ role }}
+              fallbackRedirectUrl={redirectUrl}
+              signInUrl={`/sign-in?portal=${role}`}
+            />
+          ) : (
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-center text-sm text-white/50">
+              Please review and accept the Terms &amp; Conditions to continue.
+            </div>
+          )}
         </Card>
       </div>
     </div>
