@@ -23,6 +23,7 @@ import {
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { LandingNav } from "@/components/landing/LandingNav";
 import { LandingContactForm } from "@/components/landing/LandingContactForm";
 
 const SERVICES = [
@@ -128,45 +129,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-[var(--bg-primary)]">
       {/* Navbar */}
-      <nav className="sticky top-0 z-50 border-b border-[var(--border)] bg-[var(--bg-primary)]/80 backdrop-blur-md">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-          <Link href="/" className="flex items-center gap-2">
-            <Image
-              src="/logo.svg"
-              alt={companyName}
-              width={140}
-              height={28}
-              priority
-              className="dark:block hidden"
-            />
-            <Image
-              src="/logo-light.svg"
-              alt={companyName}
-              width={140}
-              height={28}
-              priority
-              className="dark:hidden block"
-            />
-          </Link>
-
-          <div className="hidden items-center gap-6 md:flex">
-            <a href="#services" className="text-sm font-medium text-[var(--text-secondary)] transition-colors hover:text-[var(--accent-cyan)]">Services</a>
-            <a href="#how-it-works" className="text-sm font-medium text-[var(--text-secondary)] transition-colors hover:text-[var(--accent-cyan)]">How It Works</a>
-            <a href="#about" className="text-sm font-medium text-[var(--text-secondary)] transition-colors hover:text-[var(--accent-cyan)]">About</a>
-            <a href="#contact" className="text-sm font-medium text-[var(--text-secondary)] transition-colors hover:text-[var(--accent-cyan)]">Contact</a>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <ThemeToggle />
-            <Link href="/sign-in" className="hidden sm:block">
-              <Button variant="ghost" size="sm">Sign In</Button>
-            </Link>
-            <Link href="/sign-up" className="hidden sm:block">
-              <Button variant="primary" size="sm">Get Started</Button>
-            </Link>
-          </div>
-        </div>
-      </nav>
+      <LandingNav />
 
       {/* Hero */}
       <section className="relative overflow-hidden">

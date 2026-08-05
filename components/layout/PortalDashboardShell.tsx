@@ -20,13 +20,16 @@ export function PortalDashboardShell({
         title={title}
         links={links}
         footer={
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <NotificationBell />
             <UserButton />
           </div>
         }
       />
-      <main className="flex-1 overflow-auto p-6 md:p-8">{children}</main>
+      {/* pt-16 on mobile to account for the top bar, md:pt-0 for desktop */}
+      <main className="flex-1 overflow-auto p-4 pt-20 md:p-6 md:pt-6 lg:p-8">
+        {children}
+      </main>
     </div>
   );
 }
