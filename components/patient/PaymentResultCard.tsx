@@ -89,10 +89,10 @@ export function PaymentResultCard({ mode }: Props) {
         </div>
 
         <div
-          className={`rounded-2xl border px-4 py-4 text-sm ${
+          className={`rounded-2xl border px-4 py-4 text-sm font-medium ${
             status === "success"
-              ? "border-emerald-400/30 bg-emerald-500/10 text-emerald-100"
-              : "border-rose-400/30 bg-rose-500/10 text-rose-100"
+              ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
+              : "border-rose-500/30 bg-rose-500/10 text-rose-700 dark:text-rose-300"
           }`}
         >
           {message}

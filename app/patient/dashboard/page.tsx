@@ -19,19 +19,19 @@ const serviceCards = [
     title: "Book Specialist",
     description: "Choose a specialist and reserve your visit in a single flow.",
     href: "/patient/dashboard/book-specialist",
-    accent: "border-gold/40 bg-[var(--accent-gold)]/10",
+    accent: "border-[var(--accent-gold)]/40 bg-[var(--accent-gold)]/10",
   },
   {
     title: "Nearby Doctors",
     description: "Find medical professionals close to your current location.",
-    href: "/patient/dashboard/nearby-doctors",
+    href: "/patient/dashboard/book-specialist",
     accent: "border-[var(--accent-cyan)]/40 bg-[var(--accent-cyan)]/10",
   },
   {
     title: "Nearby Pharmacies",
     description: "Locate nearby licensed partners and quick-access prescriptions.",
-    href: "/patient/dashboard/nearby-pharmacies",
-    accent: "border-gold/40 bg-[var(--accent-gold)]/10",
+    href: "/patient/pharmacy",
+    accent: "border-[var(--accent-gold)]/40 bg-[var(--accent-gold)]/10",
   },
   {
     title: "Medical History",
@@ -42,20 +42,20 @@ const serviceCards = [
   {
     title: "Clinical AI Suite",
     description: "Use advanced AI tools to summarize and guide ongoing care.",
-    href: "/patient/dashboard/clinical-ai-suite",
-    accent: "border-gold/40 bg-[var(--accent-gold)]/10",
+    href: "/patient/dashboard/start-ai-consultation",
+    accent: "border-[var(--accent-gold)]/40 bg-[var(--accent-gold)]/10",
   },
   {
     title: "Global E-Pharmacy",
     description: "Browse essential medicines and trusted partner fulfillment.",
-    href: "/patient/dashboard/global-e-pharmacy",
+    href: "/patient/pharmacy",
     accent: "border-[var(--accent-cyan)]/40 bg-[var(--accent-cyan)]/10",
   },
   {
     title: "Emergency Services",
     description: "Quick access to urgent response, emergency support, and escalation.",
-    href: "/patient/dashboard/emergency-services",
-    accent: "border-gold/40 bg-[var(--accent-gold)]/10",
+    href: "/patient/dashboard/wallet",
+    accent: "border-[var(--accent-gold)]/40 bg-[var(--accent-gold)]/10",
   },
 ];
 
