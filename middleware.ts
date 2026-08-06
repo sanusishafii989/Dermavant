@@ -1,4 +1,4 @@
-import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { clerkMiddleware } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import {
   getRoleFromClaims,
@@ -7,17 +7,19 @@ import {
   type UserRole,
 } from "@/lib/roles";
 
-const isPublicRoute = createRouteMatcher([
-  "/",
-  "/sign-in(.*)",
-  "/sign-up(.*)",
-  "/terms(.*)",
-  "/privacy(.*)",
-  "/api/webhooks(.*)",
-  "/api/dev(.*)",
-  "/api/contact(.*)",
-  "/api/support(.*)",
-]);
+// Simple public route check without createRouteMatcher (deprecated, crashes on Vercel edge)
+function isPublicRoute(pathname: string): boolean {
+  if (pathname === "/") return true;
+  if (pathname.startsWith("/sign-in")) return true;
+  if (pathname.startsWith("/sign-up")) return true;
+  if (pathname.startsWith("/terms")) return true;
+  if (pathname.startsWith("/privacy")) return true;
+  if (pathname.startsWith("/api/webhooks")) return true;
+  if (pathname.startsWith("/api/dev")) return true;
+  if (pathname.startsWith("/api/contact")) return true;
+  if (pathname.startsWith("/api/support")) return true;
+  return false;
+}
 
 function getRequiredRoleForPath(pathname: string): UserRole | null {
   const p = pathname.toLowerCase();
@@ -39,16 +41,11 @@ export default clerkMiddleware(async (auth, req) => {
   const pathname = req.nextUrl.pathname;
   const isApiRoute = pathname.startsWith("/api/");
 
-  if (isPublicRoute(req)) {
+  if (isPublicRoute(pathname)) {
     return NextResponse.next();
   }
 
   const { userId, sessionClaims, redirectToSignIn } = await auth();
-
-  // Try to get role from session claims first (no API call needed)
-  const roleFromClaims = getRoleFromClaims(
-    sessionClaims as Record<string, unknown> | null | undefined
-  );
 
   const requiredRole = getRequiredRoleForPath(pathname);
   if (!requiredRole) {
@@ -65,7 +62,10 @@ export default clerkMiddleware(async (auth, req) => {
     return redirectToSignIn({ returnBackUrl: req.url });
   }
 
-  // If we have a role from claims, use it
+  const roleFromClaims = getRoleFromClaims(
+    sessionClaims as Record<string, unknown> | null | undefined
+  );
+
   if (roleFromClaims && isUserRole(roleFromClaims)) {
     if (roleFromClaims === requiredRole) {
       return NextResponse.next();
@@ -81,11 +81,8 @@ export default clerkMiddleware(async (auth, req) => {
     if (ROLE_DASHBOARD[roleFromClaims]) {
       return NextResponse.redirect(new URL(ROLE_DASHBOARD[roleFromClaims], req.url));
     }
-
-    return redirectToSignIn({ returnBackUrl: req.url });
   }
 
-  // No role in claims — allow through, API routes will handle auth
   return NextResponse.next();
 });
 
