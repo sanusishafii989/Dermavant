@@ -1,14 +1,14 @@
 import { patientNavLinks } from "@/lib/portal-nav";
-import { PlaceholderPage } from "@/components/PlaceholderPage";
+import { PortalDashboardShell } from "@/components/layout/PortalDashboardShell";
+import { PatientConsultationClient } from "@/components/patient/PatientConsultationClient";
 
 export const dynamic = "force-dynamic";
 
 export default function PatientConsultationPage() {
   return (
-    <PlaceholderPage
-      title="Consultation"
-      description="This section will let patients begin and manage consultations once built."
-      links={patientNavLinks}
-    />
+    <PortalDashboardShell title="Patient Portal" links={patientNavLinks}>
+      <PatientConsultationClient />
+    </PortalDashboardShell>
   );
 }
+

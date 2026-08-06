@@ -12,4 +12,7 @@ export { Wallet } from "./Wallet";
 export { MedicalRecord } from "./MedicalRecord";
 export { WalletTransaction } from "./WalletTransaction";
 export { ContactMessage } from "./ContactMessage";
+export { AuditLog } from "./AuditLog";
+export { SupportTicket } from "./SupportTicket";
+
 
