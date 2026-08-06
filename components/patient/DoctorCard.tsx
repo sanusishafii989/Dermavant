@@ -25,19 +25,19 @@ interface DoctorCardProps {
 
 export function DoctorCard({ doctor, selected = false, onSelect }: DoctorCardProps) {
   return (
-    <Card className={`h-full border ${selected ? "border-cyan/50 bg-cyan/10" : "border-white/10 bg-white/5"}`}>
+    <Card className={`h-full border ${selected ? "border-cyan/50 bg-[var(--accent-cyan)]/10" : "border-[var(--border)] bg-[var(--bg-card)]"}`}>
       <div className="flex h-full flex-col gap-4">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <p className="text-xs uppercase tracking-[0.25em] text-cyan">{doctor.specialization}</p>
-            <h3 className="mt-1 text-lg font-semibold text-white">{doctor.user?.fullName || "Doctor"}</h3>
+            <p className="text-xs uppercase tracking-[0.25em] text-[var(--accent-cyan)]">{doctor.specialization}</p>
+            <h3 className="mt-1 text-lg font-semibold text-[var(--text-primary)]">{doctor.user?.fullName || "Doctor"}</h3>
           </div>
           <Badge variant={doctor.available_today ? "cyan" : "gold"}>
             {doctor.available_today ? "Available today" : "Pending availability"}
           </Badge>
         </div>
 
-        <div className="space-y-2 text-sm text-white/70">
+        <div className="space-y-2 text-sm text-[var(--text-secondary)]">
           <p>Hospital: {doctor.hospital}</p>
           <p>Experience: {doctor.experience} years</p>
           <p>Fee: {doctor.consultation_fee.toLocaleString()} NGN</p>

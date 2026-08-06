@@ -166,19 +166,19 @@ export function PharmacyCatalogue() {
 
   return (
     <div className="space-y-6">
-      <Card className="border border-white/10 bg-white/5">
+      <Card className="border border-[var(--border)] bg-[var(--bg-card)]">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-cyan">Partner catalogue</p>
-            <h1 className="mt-2 text-3xl font-semibold text-white">Your medicines</h1>
-            <p className="mt-2 max-w-2xl text-sm text-white/70">
+            <p className="text-xs uppercase tracking-[0.2em] text-[var(--accent-cyan)]">Partner catalogue</p>
+            <h1 className="mt-2 text-3xl font-semibold text-[var(--text-primary)]">Your medicines</h1>
+            <p className="mt-2 max-w-2xl text-sm text-[var(--text-secondary)]">
               Manage your pharmacy inventory. Add, edit, or delist medicines.
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <div className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white/70">
-              <div className="text-xs uppercase tracking-[0.2em] text-white/50">Inventory</div>
-              <div className="mt-1 text-xl font-semibold text-white">{totalInventory}</div>
+            <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-input)] px-4 py-3 text-sm text-[var(--text-secondary)]">
+              <div className="text-xs uppercase tracking-[0.2em] text-[var(--text-muted)]">Inventory</div>
+              <div className="mt-1 text-xl font-semibold text-[var(--text-primary)]">{totalInventory}</div>
             </div>
             <Button variant="secondary" onClick={() => void loadMedicines()} disabled={loading}>
               <RefreshCw className="mr-2 h-4 w-4" />
@@ -199,20 +199,20 @@ export function PharmacyCatalogue() {
       ) : null}
 
       {loading ? (
-        <Card className="p-6 text-white/70">Loading medicines…</Card>
+        <Card className="p-6 text-[var(--text-secondary)]">Loading medicines…</Card>
       ) : medicines.length === 0 ? (
-        <Card className="p-6 text-center text-white/70">
-          <Package className="mx-auto h-12 w-12 text-cyan/40" />
+        <Card className="p-6 text-center text-[var(--text-secondary)]">
+          <Package className="mx-auto h-12 w-12 text-[var(--accent-cyan)]/40" />
           <p className="mt-3">No medicines yet. Click &ldquo;Add medicine&rdquo; to create your first listing.</p>
         </Card>
       ) : (
         <div className="grid gap-4 lg:grid-cols-2">
           {medicines.map((medicine) => (
-            <Card key={medicine._id} className="border border-white/10 bg-white/5 p-5">
+            <Card key={medicine._id} className="border border-[var(--border)] bg-[var(--bg-card)] p-5">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <h2 className="text-lg font-semibold text-white">{medicine.name}</h2>
-                  <p className="mt-1 text-sm text-cyan">{medicine.brand || "General brand"}</p>
+                  <h2 className="text-lg font-semibold text-[var(--text-primary)]">{medicine.name}</h2>
+                  <p className="mt-1 text-sm text-[var(--accent-cyan)]">{medicine.brand || "General brand"}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <Badge variant={medicine.status === "active" ? "success" : "default"}>
@@ -221,18 +221,18 @@ export function PharmacyCatalogue() {
                 </div>
               </div>
 
-              <div className="mt-4 flex flex-wrap gap-2 text-xs text-white/60">
-                <span className="rounded-full border border-white/10 bg-black/20 px-2.5 py-1">{medicine.category || "General"}</span>
-                <span className="rounded-full border border-white/10 bg-black/20 px-2.5 py-1">Qty: {medicine.quantity}</span>
-                <span className="rounded-full border border-white/10 bg-black/20 px-2.5 py-1">₦{medicine.price.toLocaleString()}</span>
+              <div className="mt-4 flex flex-wrap gap-2 text-xs text-[var(--text-secondary)]">
+                <span className="rounded-full border border-[var(--border)] bg-[var(--bg-input)] px-2.5 py-1">{medicine.category || "General"}</span>
+                <span className="rounded-full border border-[var(--border)] bg-[var(--bg-input)] px-2.5 py-1">Qty: {medicine.quantity}</span>
+                <span className="rounded-full border border-[var(--border)] bg-[var(--bg-input)] px-2.5 py-1">₦{medicine.price.toLocaleString()}</span>
                 {medicine.expiry_date ? (
-                  <span className="rounded-full border border-white/10 bg-black/20 px-2.5 py-1">
+                  <span className="rounded-full border border-[var(--border)] bg-[var(--bg-input)] px-2.5 py-1">
                     Exp: {new Date(medicine.expiry_date).toLocaleDateString("en-NG", { month: "short", year: "numeric" })}
                   </span>
                 ) : null}
               </div>
 
-              {medicine.description ? <p className="mt-4 text-sm text-white/70">{medicine.description}</p> : null}
+              {medicine.description ? <p className="mt-4 text-sm text-[var(--text-secondary)]">{medicine.description}</p> : null}
 
               <div className="mt-4 flex gap-2">
                 <Button size="sm" variant="secondary" onClick={() => openEditModal(medicine)}>
@@ -263,9 +263,9 @@ export function PharmacyCatalogue() {
           </div>
           <Input label="Expiry date" type="date" value={form.expiry_date} onChange={(e) => setForm({ ...form, expiry_date: e.target.value })} required />
           <div>
-            <label className="mb-2 block text-sm font-medium text-white/80">Description</label>
+            <label className="mb-2 block text-sm font-medium text-[var(--text-primary)]">Description</label>
             <textarea
-              className="w-full resize-none rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-white placeholder:text-white/40 focus:border-cyan focus:outline-none focus:ring-2 focus:ring-cyan/20"
+              className="w-full resize-none rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-4 py-2.5 text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-cyan focus:outline-none focus:ring-2 focus:ring-cyan/20"
               rows={3}
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
@@ -285,8 +285,8 @@ export function PharmacyCatalogue() {
       <Modal open={showDeleteModal} onClose={() => setShowDeleteModal(false)} title="Delist medicine">
         {deletingItem ? (
           <div className="space-y-4">
-            <p className="text-white/80">
-              Are you sure you want to delist <span className="font-semibold text-white">{deletingItem.name}</span>?
+            <p className="text-[var(--text-primary)]">
+              Are you sure you want to delist <span className="font-semibold text-[var(--text-primary)]">{deletingItem.name}</span>?
               It will no longer be visible to patients but remains in your records.
             </p>
             <div className="flex justify-end gap-3">

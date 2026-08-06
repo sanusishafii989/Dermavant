@@ -18,14 +18,14 @@ export function MedicalProfileCard({ vitals, onExportPDF }: MedicalProfileCardPr
 
   return (
     <Card className="border border-cyan/20 bg-gradient-to-br from-cyan/10 via-navy/30 to-dark p-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-white/10 pb-4">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-[var(--border)] pb-4">
         <div className="flex items-center gap-3">
-          <div className="rounded-xl border border-cyan/30 bg-cyan/10 p-2.5 text-cyan">
+          <div className="rounded-xl border border-[var(--accent-cyan)]/30 bg-[var(--accent-cyan)]/10 p-2.5 text-[var(--accent-cyan)]">
             <Activity className="h-6 w-6" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-white">Patient Vitals & Health Profile</h2>
-            <p className="text-xs text-white/60">Persistent clinical summary</p>
+            <h2 className="text-xl font-bold text-[var(--text-primary)]">Patient Vitals & Health Profile</h2>
+            <p className="text-xs text-[var(--text-secondary)]">Persistent clinical summary</p>
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -47,70 +47,70 @@ export function MedicalProfileCard({ vitals, onExportPDF }: MedicalProfileCardPr
       </div>
 
       <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-cyan">
+        <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
+          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[var(--accent-cyan)]">
             <Heart className="h-4 w-4" />
             <span>Biometrics</span>
           </div>
-          <div className="mt-2 space-y-1 text-sm text-white/80">
+          <div className="mt-2 space-y-1 text-sm text-[var(--text-primary)]">
             <p>Height: {vitals.height ? `${vitals.height} cm` : "Not specified"}</p>
             <p>Weight: {vitals.weight ? `${vitals.weight} kg` : "Not specified"}</p>
           </div>
         </div>
 
-        <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-gold">
+        <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
+          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[var(--accent-gold)]">
             <AlertTriangle className="h-4 w-4" />
             <span>Allergies</span>
           </div>
-          <div className="mt-2 text-sm text-white/80">
+          <div className="mt-2 text-sm text-[var(--text-primary)]">
             {vitals.allergies && vitals.allergies.length > 0 ? (
               <div className="flex flex-wrap gap-1">
                 {vitals.allergies.map((allergy, i) => (
-                  <span key={i} className="rounded bg-gold/10 px-2 py-0.5 text-xs text-gold">
+                  <span key={i} className="rounded bg-[var(--accent-gold)]/10 px-2 py-0.5 text-xs text-[var(--accent-gold)]">
                     {allergy}
                   </span>
                 ))}
               </div>
             ) : (
-              <p className="text-xs text-white/50">No known allergies</p>
+              <p className="text-xs text-[var(--text-muted)]">No known allergies</p>
             )}
           </div>
         </div>
 
-        <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-cyan">
+        <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
+          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[var(--accent-cyan)]">
             <Shield className="h-4 w-4" />
             <span>Chronic Conditions</span>
           </div>
-          <div className="mt-2 text-sm text-white/80">
+          <div className="mt-2 text-sm text-[var(--text-primary)]">
             {vitals.chronicConditions && vitals.chronicConditions.length > 0 ? (
               <div className="flex flex-wrap gap-1">
                 {vitals.chronicConditions.map((cond, i) => (
-                  <span key={i} className="rounded bg-cyan/10 px-2 py-0.5 text-xs text-cyan">
+                  <span key={i} className="rounded bg-[var(--accent-cyan)]/10 px-2 py-0.5 text-xs text-[var(--accent-cyan)]">
                     {cond}
                   </span>
                 ))}
               </div>
             ) : (
-              <p className="text-xs text-white/50">None recorded</p>
+              <p className="text-xs text-[var(--text-muted)]">None recorded</p>
             )}
           </div>
         </div>
 
-        <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-white/70">
+        <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
+          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
             <UserCheck className="h-4 w-4" />
             <span>Emergency Contact</span>
           </div>
-          <div className="mt-2 text-sm text-white/80">
+          <div className="mt-2 text-sm text-[var(--text-primary)]">
             {vitals.emergencyContact ? (
               <div>
-                <p className="font-medium text-white">{vitals.emergencyContact.name}</p>
-                <p className="text-xs text-white/60">{vitals.emergencyContact.phone}</p>
+                <p className="font-medium text-[var(--text-primary)]">{vitals.emergencyContact.name}</p>
+                <p className="text-xs text-[var(--text-secondary)]">{vitals.emergencyContact.phone}</p>
               </div>
             ) : (
-              <p className="text-xs text-white/50">Not configured</p>
+              <p className="text-xs text-[var(--text-muted)]">Not configured</p>
             )}
           </div>
         </div>

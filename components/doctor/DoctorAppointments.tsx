@@ -122,8 +122,8 @@ export function DoctorAppointments() {
       <Card>
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-cyan">Appointments</p>
-            <h1 className="mt-1 text-2xl font-semibold text-white">Manage your consultations</h1>
+            <p className="text-xs uppercase tracking-[0.2em] text-[var(--accent-cyan)]">Appointments</p>
+            <h1 className="mt-1 text-2xl font-semibold text-[var(--text-primary)]">Manage your consultations</h1>
           </div>
           <Button variant="secondary" size="sm" onClick={() => void loadAppointments()}>
             Refresh
@@ -139,8 +139,8 @@ export function DoctorAppointments() {
             onClick={() => setFilter(status)}
             className={`rounded-xl px-4 py-2 text-sm font-medium transition-colors ${
               filter === status
-                ? "bg-cyan text-dark"
-                : "border border-white/10 bg-white/5 text-white/70 hover:border-cyan/40 hover:text-white"
+                ? "bg-[var(--accent-cyan)] text-white"
+                : "border border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-secondary)] hover:border-[var(--accent-cyan)]/40 hover:text-[var(--text-primary)]"
             }`}
           >
             {status === "all" ? "All" : STATUS_CONFIG[status]?.label || status}
@@ -156,9 +156,9 @@ export function DoctorAppointments() {
       ) : null}
 
       {loading ? (
-        <Card className="p-6 text-white/70">Loading appointments…</Card>
+        <Card className="p-6 text-[var(--text-secondary)]">Loading appointments…</Card>
       ) : filtered.length === 0 ? (
-        <Card className="p-6 text-white/70">No appointments found.</Card>
+        <Card className="p-6 text-[var(--text-secondary)]">No appointments found.</Card>
       ) : (
         <div className="space-y-4">
           {filtered.map((apt) => {
@@ -170,22 +170,22 @@ export function DoctorAppointments() {
                 <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                   <div className="flex-1 space-y-3">
                     <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan/15 text-cyan">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--accent-cyan)]/15 text-[var(--accent-cyan)]">
                         {TYPE_ICONS[apt.type] || <Video className="h-4 w-4" />}
                       </div>
                       <div>
-                        <h3 className="font-semibold text-white">{apt.patient_name}</h3>
-                        <p className="text-sm text-white/60">{apt.patient_email}</p>
+                        <h3 className="font-semibold text-[var(--text-primary)]">{apt.patient_name}</h3>
+                        <p className="text-sm text-[var(--text-secondary)]">{apt.patient_email}</p>
                       </div>
                     </div>
 
-                    <div className="flex flex-wrap gap-4 text-sm text-white/70">
+                    <div className="flex flex-wrap gap-4 text-sm text-[var(--text-secondary)]">
                       <span className="flex items-center gap-2">
-                        <Calendar className="h-4 w-4 text-cyan" />
+                        <Calendar className="h-4 w-4 text-[var(--accent-cyan)]" />
                         {formatDate(apt.date)}
                       </span>
                       <span className="flex items-center gap-2">
-                        <Clock className="h-4 w-4 text-cyan" />
+                        <Clock className="h-4 w-4 text-[var(--accent-cyan)]" />
                         {apt.time}
                       </span>
                       <span className="flex items-center gap-2 capitalize">
@@ -250,11 +250,11 @@ export function DoctorAppointments() {
       >
         {confirmAction ? (
           <div className="space-y-4">
-            <p className="text-white/80">
+            <p className="text-[var(--text-primary)]">
               Are you sure you want to mark the appointment with{" "}
-              <span className="font-semibold text-white">{confirmAction.appointment.patient_name}</span> on{" "}
-              <span className="font-semibold text-white">{formatDate(confirmAction.appointment.date)}</span> as{" "}
-              <span className="font-semibold text-cyan">{STATUS_CONFIG[confirmAction.status]?.label}</span>?
+              <span className="font-semibold text-[var(--text-primary)]">{confirmAction.appointment.patient_name}</span> on{" "}
+              <span className="font-semibold text-[var(--text-primary)]">{formatDate(confirmAction.appointment.date)}</span> as{" "}
+              <span className="font-semibold text-[var(--accent-cyan)]">{STATUS_CONFIG[confirmAction.status]?.label}</span>?
             </p>
             <div className="flex justify-end gap-3">
               <Button variant="ghost" size="sm" onClick={() => setConfirmAction(null)}>

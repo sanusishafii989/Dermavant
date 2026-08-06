@@ -15,10 +15,10 @@ export default async function BookSpecialistPage() {
   return (
     <PortalDashboardShell title="Patient Portal" links={patientNavLinks}>
       <div className="space-y-6">
-        <div className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-[0_20px_64px_rgba(0,0,0,0.35)] backdrop-blur-sm">
-          <p className="text-xs uppercase tracking-[0.3em] text-cyan">Book Specialist</p>
-          <h1 className="mt-2 text-3xl font-semibold text-white">Care booking for {fullName}</h1>
-          <p className="mt-3 max-w-3xl text-white/70">
+        <div className="rounded-3xl border border-[var(--border)] bg-[var(--bg-card)] p-6 shadow-[0_20px_64px_rgba(0,0,0,0.35)] backdrop-blur-sm">
+          <p className="text-xs uppercase tracking-[0.3em] text-[var(--accent-cyan)]">Book Specialist</p>
+          <h1 className="mt-2 text-3xl font-semibold text-[var(--text-primary)]">Care booking for {fullName}</h1>
+          <p className="mt-3 max-w-3xl text-[var(--text-secondary)]">
             Choose the specialist you need, pick a date and time, and confirm your appointment.
           </p>
         </div>

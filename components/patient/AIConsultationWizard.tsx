@@ -69,15 +69,15 @@ export function AIConsultationWizard() {
       <Card className="max-w-5xl">
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <p className="text-xs uppercase tracking-[0.32em] text-cyan">Step 1</p>
-            <h2 className="mt-2 text-2xl font-semibold text-white">Describe your skin symptoms</h2>
-            <p className="mt-2 text-sm text-white/70">
+            <p className="text-xs uppercase tracking-[0.32em] text-[var(--accent-cyan)]">Step 1</p>
+            <h2 className="mt-2 text-2xl font-semibold text-[var(--text-primary)]">Describe your skin symptoms</h2>
+            <p className="mt-2 text-sm text-[var(--text-secondary)]">
               Mention rash location, appearance, duration, itching or pain, and any changes over time.
             </p>
           </div>
 
           <div>
-            <label htmlFor="symptoms" className="mb-2 block text-sm font-medium text-white/80">
+            <label htmlFor="symptoms" className="mb-2 block text-sm font-medium text-[var(--text-primary)]">
               Skin symptoms
             </label>
             <textarea
@@ -85,7 +85,7 @@ export function AIConsultationWizard() {
               value={symptoms}
               onChange={(event) => setSymptoms(event.target.value)}
               rows={8}
-              className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder:text-white/40 outline-none focus:border-cyan focus:ring-2 focus:ring-cyan/20"
+              className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-4 py-3 text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none focus:border-cyan focus:ring-2 focus:ring-cyan/20"
               placeholder="e.g. red itchy patch behind my left knee for 3 days, slightly scaly and spreading, no fever"
             />
           </div>
@@ -94,7 +94,7 @@ export function AIConsultationWizard() {
             <Button type="submit" variant="gold" size="lg" disabled={isLoading}>
               {isLoading ? "Analyzing…" : "Start dermatology consultation"}
             </Button>
-            <p className="text-sm text-white/70">
+            <p className="text-sm text-[var(--text-secondary)]">
               This is a dermatology-focused text consultation for visible skin, hair, and nail symptoms.
             </p>
           </div>
@@ -110,44 +110,44 @@ export function AIConsultationWizard() {
       {result ? (
         <Card className="max-w-5xl space-y-6">
           <div>
-            <p className="text-xs uppercase tracking-[0.32em] text-cyan">Consultation result</p>
-            <h2 className="mt-2 text-2xl font-semibold text-white">Dermatology summary</h2>
+            <p className="text-xs uppercase tracking-[0.32em] text-[var(--accent-cyan)]">Consultation result</p>
+            <h2 className="mt-2 text-2xl font-semibold text-[var(--text-primary)]">Dermatology summary</h2>
           </div>
 
           <div className="space-y-4">
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-              <p className="text-sm uppercase tracking-[0.24em] text-cyan">Clinical summary</p>
-              <p className="mt-2 text-sm text-white/80">{result.clinicalSummary}</p>
+            <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
+              <p className="text-sm uppercase tracking-[0.24em] text-[var(--accent-cyan)]">Clinical summary</p>
+              <p className="mt-2 text-sm text-[var(--text-primary)]">{result.clinicalSummary}</p>
             </div>
 
             <div className="space-y-4">
-              <p className="text-sm uppercase tracking-[0.24em] text-cyan">Possible dermatology conditions</p>
+              <p className="text-sm uppercase tracking-[0.24em] text-[var(--accent-cyan)]">Possible dermatology conditions</p>
               {result.possibleConditions.map((condition) => (
-                <div key={condition.condition} className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                <div key={condition.condition} className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
                   <div className="flex items-center justify-between gap-4">
-                    <p className="text-lg font-semibold text-white">{condition.condition}</p>
-                    <span className="rounded-full bg-cyan/10 px-3 py-1 text-xs uppercase tracking-[0.24em] text-cyan">
+                    <p className="text-lg font-semibold text-[var(--text-primary)]">{condition.condition}</p>
+                    <span className="rounded-full bg-[var(--accent-cyan)]/10 px-3 py-1 text-xs uppercase tracking-[0.24em] text-[var(--accent-cyan)]">
                       {(condition.confidence * 100).toFixed(0)}%
                     </span>
                   </div>
-                  <p className="mt-2 text-sm text-white/80">{condition.reasoning}</p>
+                  <p className="mt-2 text-sm text-[var(--text-primary)]">{condition.reasoning}</p>
                 </div>
               ))}
             </div>
 
             <div className="grid gap-4 md:grid-cols-2">
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                <p className="text-sm uppercase tracking-[0.24em] text-cyan">Confidence score</p>
-                <p className="mt-2 text-3xl font-semibold text-white">{(result.confidenceScore * 100).toFixed(0)}%</p>
-                <p className="mt-1 text-sm text-white/70">Based on the symptom description.</p>
+              <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
+                <p className="text-sm uppercase tracking-[0.24em] text-[var(--accent-cyan)]">Confidence score</p>
+                <p className="mt-2 text-3xl font-semibold text-[var(--text-primary)]">{(result.confidenceScore * 100).toFixed(0)}%</p>
+                <p className="mt-1 text-sm text-[var(--text-secondary)]">Based on the symptom description.</p>
               </div>
 
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                <p className="text-sm uppercase tracking-[0.24em] text-cyan">Immediate care</p>
-                <p className="mt-2 text-lg font-semibold text-white">
+              <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
+                <p className="text-sm uppercase tracking-[0.24em] text-[var(--accent-cyan)]">Immediate care</p>
+                <p className="mt-2 text-lg font-semibold text-[var(--text-primary)]">
                   {result.needsImmediateProfessionalCare ? "Yes" : "No"}
                 </p>
-                <p className="mt-1 text-sm text-white/70">
+                <p className="mt-1 text-sm text-[var(--text-secondary)]">
                   {result.needsImmediateProfessionalCare
                     ? "Please seek a healthcare professional without delay."
                     : "Monitor symptoms and follow the next steps."}
@@ -155,14 +155,14 @@ export function AIConsultationWizard() {
               </div>
             </div>
 
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-              <p className="text-sm uppercase tracking-[0.24em] text-cyan">Recommended next steps</p>
-              <p className="mt-2 text-sm text-white/80">{result.recommendedNextSteps}</p>
+            <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
+              <p className="text-sm uppercase tracking-[0.24em] text-[var(--accent-cyan)]">Recommended next steps</p>
+              <p className="mt-2 text-sm text-[var(--text-primary)]">{result.recommendedNextSteps}</p>
             </div>
 
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-              <p className="text-sm uppercase tracking-[0.24em] text-cyan">Follow-up guidance</p>
-              <p className="mt-2 text-sm text-white/80">{result.followUpGuidance}</p>
+            <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
+              <p className="text-sm uppercase tracking-[0.24em] text-[var(--accent-cyan)]">Follow-up guidance</p>
+              <p className="mt-2 text-sm text-[var(--text-primary)]">{result.followUpGuidance}</p>
             </div>
           </div>
         </Card>

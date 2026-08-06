@@ -21,8 +21,8 @@ const config: Config = {
         mono: ["var(--font-geist-mono)", "monospace"],
       },
       boxShadow: {
-        glass: "0 8px 32px rgba(0, 8, 20, 0.45)",
-        "glass-lg": "0 16px 48px rgba(0, 8, 20, 0.55)",
+        glass: "var(--shadow)",
+        "glass-lg": "var(--shadow-lg)",
       },
       backdropBlur: {
         glass: "12px",
@@ -36,16 +36,30 @@ const config: Config = {
     plugin(({ addComponents }) => {
       addComponents({
         ".glass-card": {
-          "@apply rounded-2xl border border-white/10 bg-white/5 backdrop-blur-glass shadow-glass":
-            {},
+          "border-radius": "1rem",
+          "border": "1px solid var(--border)",
+          "background-color": "var(--bg-card)",
+          "backdrop-filter": "blur(12px)",
+          "box-shadow": "var(--shadow)",
         },
         ".glass-card-hover": {
-          "@apply glass-card transition-all duration-200 hover:border-cyan/30 hover:bg-white/[0.07] hover:shadow-glass-lg":
-            {},
+          "border-radius": "1rem",
+          "border": "1px solid var(--border)",
+          "background-color": "var(--bg-card)",
+          "backdrop-filter": "blur(12px)",
+          "box-shadow": "var(--shadow)",
+          "transition": "all 200ms",
+        },
+        ".glass-card-hover:hover": {
+          "border-color": "var(--accent-cyan)",
+          "box-shadow": "var(--shadow-lg)",
         },
         ".glass-panel": {
-          "@apply rounded-2xl border border-white/10 bg-navy/40 backdrop-blur-glass shadow-glass":
-            {},
+          "border-radius": "1rem",
+          "border": "1px solid var(--sidebar-border)",
+          "background-color": "var(--sidebar-bg)",
+          "backdrop-filter": "blur(12px)",
+          "box-shadow": "var(--shadow)",
         },
       });
     }),

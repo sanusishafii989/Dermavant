@@ -82,17 +82,17 @@ export function PaymentResultCard({ mode }: Props) {
     <Card className="max-w-3xl">
       <div className="space-y-4">
         <div>
-          <p className="text-xs uppercase tracking-[0.3em] text-cyan">Payment update</p>
-          <h1 className="mt-1 text-2xl font-semibold text-white">
+          <p className="text-xs uppercase tracking-[0.3em] text-[var(--accent-cyan)]">Payment update</p>
+          <h1 className="mt-1 text-2xl font-semibold text-[var(--text-primary)]">
             {status === "success" ? "Payment successful" : status === "failed" ? "Payment issue" : "Checking payment status"}
           </h1>
         </div>
 
         <div
-          className={`rounded-2xl border px-4 py-4 text-sm ${
+          className={`rounded-2xl border px-4 py-4 text-sm font-medium ${
             status === "success"
-              ? "border-emerald-400/30 bg-emerald-500/10 text-emerald-100"
-              : "border-rose-400/30 bg-rose-500/10 text-rose-100"
+              ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
+              : "border-rose-500/30 bg-rose-500/10 text-rose-700 dark:text-rose-300"
           }`}
         >
           {message}

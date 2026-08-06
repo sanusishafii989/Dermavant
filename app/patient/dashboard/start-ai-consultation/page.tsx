@@ -21,13 +21,13 @@ export default async function StartAIConsultationPage() {
             <div className="flex items-center gap-4">
               <Avatar src={user?.imageUrl} name={fullName} size="lg" />
               <div>
-                <p className="text-xs uppercase tracking-[0.32em] text-cyan">Dermatology AI Consultation</p>
-                <h1 className="mt-1 text-3xl font-bold text-white">Describe your skin symptoms</h1>
-                <p className="mt-2 text-sm text-white/70">Enter the visible rash, lesion, or skin change details below.</p>
+                <p className="text-xs uppercase tracking-[0.32em] text-[var(--accent-cyan)]">Dermatology AI Consultation</p>
+                <h1 className="mt-1 text-3xl font-bold text-[var(--text-primary)]">Describe your skin symptoms</h1>
+                <p className="mt-2 text-sm text-[var(--text-secondary)]">Enter the visible rash, lesion, or skin change details below.</p>
               </div>
             </div>
-            <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/70">
-              <p className="font-medium text-white">Your consultation assistant is dermatology-focused.</p>
+            <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] px-4 py-3 text-sm text-[var(--text-secondary)]">
+              <p className="font-medium text-[var(--text-primary)]">Your consultation assistant is dermatology-focused.</p>
               <p className="mt-1">It supports text-first triage for skin, hair, and nail concerns.</p>
             </div>
           </div>

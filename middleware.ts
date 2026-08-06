@@ -73,6 +73,7 @@ const isPublicRoute = createRouteMatcher([
   "/privacy(.*)",
   "/api/webhooks(.*)",
   "/api/dev(.*)",
+  "/api/contact(.*)",
 ]);
 
 function getRequiredRoleForPath(pathname: string): UserRole | null {

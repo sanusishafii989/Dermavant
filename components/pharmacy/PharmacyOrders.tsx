@@ -116,8 +116,8 @@ export function PharmacyOrders() {
       <Card>
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-cyan">Orders</p>
-            <h1 className="mt-1 text-2xl font-semibold text-white">Manage pharmacy orders</h1>
+            <p className="text-xs uppercase tracking-[0.2em] text-[var(--accent-cyan)]">Orders</p>
+            <h1 className="mt-1 text-2xl font-semibold text-[var(--text-primary)]">Manage pharmacy orders</h1>
           </div>
           <Button variant="secondary" size="sm" onClick={() => void loadOrders()}>Refresh</Button>
         </div>
@@ -130,8 +130,8 @@ export function PharmacyOrders() {
             onClick={() => setFilter(status)}
             className={`rounded-xl px-4 py-2 text-sm font-medium transition-colors capitalize ${
               filter === status
-                ? "bg-cyan text-dark"
-                : "border border-white/10 bg-white/5 text-white/70 hover:border-cyan/40 hover:text-white"
+                ? "bg-[var(--accent-cyan)] text-white"
+                : "border border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-secondary)] hover:border-[var(--accent-cyan)]/40 hover:text-[var(--text-primary)]"
             }`}
           >
             {status} <span className="ml-1 text-xs opacity-70">{counts[status as keyof typeof counts]}</span>
@@ -144,9 +144,9 @@ export function PharmacyOrders() {
       ) : null}
 
       {loading ? (
-        <Card className="p-6 text-white/70">Loading orders…</Card>
+        <Card className="p-6 text-[var(--text-secondary)]">Loading orders…</Card>
       ) : filtered.length === 0 ? (
-        <Card className="p-6 text-white/70">No orders found.</Card>
+        <Card className="p-6 text-[var(--text-secondary)]">No orders found.</Card>
       ) : (
         <div className="space-y-4">
           {filtered.map((order) => {
@@ -159,41 +159,41 @@ export function PharmacyOrders() {
                 <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                   <div className="flex-1 space-y-3">
                     <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan/15 text-cyan">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--accent-cyan)]/15 text-[var(--accent-cyan)]">
                         <ClipboardList className="h-4 w-4" />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-white">{order.patient_name}</h3>
-                        <p className="text-sm text-white/60">{order.patient_email}</p>
+                        <h3 className="font-semibold text-[var(--text-primary)]">{order.patient_name}</h3>
+                        <p className="text-sm text-[var(--text-secondary)]">{order.patient_email}</p>
                       </div>
                     </div>
 
-                    <div className="flex flex-wrap gap-2 text-sm text-white/60">
-                      <span className="rounded-full border border-white/10 bg-black/20 px-2.5 py-1">
+                    <div className="flex flex-wrap gap-2 text-sm text-[var(--text-secondary)]">
+                      <span className="rounded-full border border-[var(--border)] bg-[var(--bg-input)] px-2.5 py-1">
                         {new Date(order.created_at).toLocaleDateString("en-NG", { weekday: "short", month: "short", day: "numeric" })}
                       </span>
-                      <span className="rounded-full border border-white/10 bg-black/20 px-2.5 py-1">
+                      <span className="rounded-full border border-[var(--border)] bg-[var(--bg-input)] px-2.5 py-1">
                         {order.items.length} item{order.items.length !== 1 ? "s" : ""}
                       </span>
-                      <span className="rounded-full border border-white/10 bg-black/20 px-2.5 py-1">
+                      <span className="rounded-full border border-[var(--border)] bg-[var(--bg-input)] px-2.5 py-1">
                         ₦{order.total.toLocaleString()}
                       </span>
                     </div>
 
-                    <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
-                      <p className="mb-2 text-xs uppercase tracking-[0.2em] text-white/50">Items</p>
+                    <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-3">
+                      <p className="mb-2 text-xs uppercase tracking-[0.2em] text-[var(--text-muted)]">Items</p>
                       <div className="space-y-1">
                         {order.items.map((item, i) => (
                           <div key={i} className="flex justify-between text-sm">
-                            <span className="text-white/80">{item.name} × {item.qty}</span>
-                            <span className="text-white/60">₦{(item.unit_price * item.qty).toLocaleString()}</span>
+                            <span className="text-[var(--text-primary)]">{item.name} × {item.qty}</span>
+                            <span className="text-[var(--text-secondary)]">₦{(item.unit_price * item.qty).toLocaleString()}</span>
                           </div>
                         ))}
                       </div>
                     </div>
 
                     {order.delivery_address ? (
-                      <p className="text-sm text-white/60">📍 {order.delivery_address}</p>
+                      <p className="text-sm text-[var(--text-secondary)]">📍 {order.delivery_address}</p>
                     ) : null}
 
                     <div className="flex flex-wrap gap-2">
@@ -238,9 +238,9 @@ export function PharmacyOrders() {
       <Modal open={!!statusModal} onClose={() => setStatusModal(null)} title="Confirm status update">
         {statusModal ? (
           <div className="space-y-4">
-            <p className="text-white/80">
-              Update order for <span className="font-semibold text-white">{statusModal.order.patient_name}</span> to{" "}
-              <span className="font-semibold text-cyan">{DELIVERY_CONFIG[statusModal.status]?.label}</span>?
+            <p className="text-[var(--text-primary)]">
+              Update order for <span className="font-semibold text-[var(--text-primary)]">{statusModal.order.patient_name}</span> to{" "}
+              <span className="font-semibold text-[var(--accent-cyan)]">{DELIVERY_CONFIG[statusModal.status]?.label}</span>?
             </p>
             <div className="flex justify-end gap-3">
               <Button variant="ghost" size="sm" onClick={() => setStatusModal(null)}>Cancel</Button>

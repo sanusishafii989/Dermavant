@@ -167,12 +167,12 @@ export function ConsultationRoom({ appointmentId, patientName, doctorName, type,
       {/* Header */}
       <Card className="flex shrink-0 items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-cyan/15 text-cyan">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--accent-cyan)]/15 text-[var(--accent-cyan)]">
             {type === "video" ? <Video className="h-6 w-6" /> : type === "voice" ? <Phone className="h-6 w-6" /> : <MessageSquare className="h-6 w-6" />}
           </div>
           <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-cyan">Consultation room</p>
-            <h1 className="mt-1 text-xl font-semibold text-white">
+            <p className="text-xs uppercase tracking-[0.2em] text-[var(--accent-cyan)]">Consultation room</p>
+            <h1 className="mt-1 text-xl font-semibold text-[var(--text-primary)]">
               {otherPartyLabel}: {otherParty}
             </h1>
           </div>
@@ -199,35 +199,35 @@ export function ConsultationRoom({ appointmentId, patientName, doctorName, type,
         <Card className="flex flex-col p-0 overflow-hidden">
           {type === "chat" ? (
             <div className="flex h-full flex-col items-center justify-center gap-4 text-center">
-              <MessageSquare className="h-16 w-16 text-cyan/40" />
-              <p className="text-white/60">Text-only consultation. Use the chat panel on the right to communicate.</p>
+              <MessageSquare className="h-16 w-16 text-[var(--accent-cyan)]/40" />
+              <p className="text-[var(--text-secondary)]">Text-only consultation. Use the chat panel on the right to communicate.</p>
             </div>
           ) : (
             <>
               {/* Video grid */}
               <div className="flex flex-1 flex-col gap-2 overflow-hidden p-2">
                 {/* Remote video (other party) */}
-                <div className="relative flex flex-1 items-center justify-center overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-navy/40 to-dark">
+                <div className="relative flex flex-1 items-center justify-center overflow-hidden rounded-2xl border border-[var(--border)] bg-gradient-to-br from-[var(--bg-secondary)]/40 to-[var(--bg-primary)]">
                   {callActive ? (
                     <div className="flex flex-col items-center gap-3">
-                      <div className="flex h-24 w-24 items-center justify-center rounded-full bg-cyan/20 text-3xl font-bold text-cyan">
+                      <div className="flex h-24 w-24 items-center justify-center rounded-full bg-[var(--accent-cyan)]/20 text-3xl font-bold text-[var(--accent-cyan)]">
                         {otherParty.charAt(0).toUpperCase()}
                       </div>
-                      <p className="text-white/80">{otherParty}</p>
-                      {type === "voice" ? <Mic className="h-5 w-5 text-cyan" /> : null}
+                      <p className="text-[var(--text-primary)]">{otherParty}</p>
+                      {type === "voice" ? <Mic className="h-5 w-5 text-[var(--accent-cyan)]" /> : null}
                     </div>
                   ) : (
                     <div className="flex flex-col items-center gap-3">
-                      <div className="flex h-20 w-20 items-center justify-center rounded-full bg-white/5">
-                        <VideoOff className="h-8 w-8 text-white/30" />
+                      <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[var(--bg-card)]">
+                        <VideoOff className="h-8 w-8 text-[var(--text-muted)]" />
                       </div>
-                      <p className="text-white/40">Waiting to connect…</p>
+                      <p className="text-[var(--text-muted)]">Waiting to connect…</p>
                     </div>
                   )}
                 </div>
 
                 {/* Local video (self) — real webcam */}
-                <div className="relative flex h-40 items-center justify-center overflow-hidden rounded-2xl border border-white/10 bg-dark/60">
+                <div className="relative flex h-40 items-center justify-center overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--bg-primary)]/60">
                   {callActive && videoOn ? (
                     <video
                       ref={localVideoRef}
@@ -238,22 +238,22 @@ export function ConsultationRoom({ appointmentId, patientName, doctorName, type,
                     />
                   ) : (
                     <div className="flex flex-col items-center gap-2">
-                      <div className={`flex h-16 w-16 items-center justify-center rounded-full ${videoOn ? "bg-cyan/15" : "bg-white/5"} text-xl font-bold ${videoOn ? "text-cyan" : "text-white/30"}`}>
+                      <div className={`flex h-16 w-16 items-center justify-center rounded-full ${videoOn ? "bg-[var(--accent-cyan)]/15" : "bg-[var(--bg-card)]"} text-xl font-bold ${videoOn ? "text-[var(--accent-cyan)]" : "text-[var(--text-muted)]"}`}>
                         {role === "doctor" ? "D" : "P"}
                       </div>
-                      <p className="text-xs text-white/50">You ({role})</p>
-                      {!callActive ? <p className="text-xs text-white/30">Start call to enable camera</p> : null}
+                      <p className="text-xs text-[var(--text-muted)]">You ({role})</p>
+                      {!callActive ? <p className="text-xs text-[var(--text-muted)]">Start call to enable camera</p> : null}
                     </div>
                   )}
                 </div>
               </div>
 
               {/* Call controls */}
-              <div className="flex shrink-0 items-center justify-center gap-3 border-t border-white/10 p-4">
+              <div className="flex shrink-0 items-center justify-center gap-3 border-t border-[var(--border)] p-4">
                 {type === "video" ? (
                   <button
                     onClick={toggleVideo}
-                    className={`flex h-12 w-12 items-center justify-center rounded-full transition-colors ${videoOn ? "bg-white/10 text-white hover:bg-white/20" : "bg-white/5 text-white/40"}`}
+                    className={`flex h-12 w-12 items-center justify-center rounded-full transition-colors ${videoOn ? "bg-[var(--bg-input)] text-[var(--text-primary)] hover:bg-[var(--bg-input)]" : "bg-[var(--bg-card)] text-[var(--text-muted)]"}`}
                     title={videoOn ? "Turn off camera" : "Turn on camera"}
                   >
                     {videoOn ? <Video className="h-5 w-5" /> : <VideoOff className="h-5 w-5" />}
@@ -262,7 +262,7 @@ export function ConsultationRoom({ appointmentId, patientName, doctorName, type,
 
                 <button
                   onClick={toggleMic}
-                  className={`flex h-12 w-12 items-center justify-center rounded-full transition-colors ${micOn ? "bg-white/10 text-white hover:bg-white/20" : "bg-rose-500/20 text-rose-400"}`}
+                  className={`flex h-12 w-12 items-center justify-center rounded-full transition-colors ${micOn ? "bg-[var(--bg-input)] text-[var(--text-primary)] hover:bg-[var(--bg-input)]" : "bg-rose-500/20 text-rose-400"}`}
                   title={micOn ? "Mute" : "Unmute"}
                 >
                   {micOn ? <Mic className="h-5 w-5" /> : <MicOff className="h-5 w-5" />}
@@ -271,7 +271,7 @@ export function ConsultationRoom({ appointmentId, patientName, doctorName, type,
                 {type === "video" ? (
                   <button
                     onClick={() => setScreenShare(!screenShare)}
-                    className={`flex h-12 w-12 items-center justify-center rounded-full transition-colors ${screenShare ? "bg-cyan text-dark" : "bg-white/10 text-white hover:bg-white/20"}`}
+                    className={`flex h-12 w-12 items-center justify-center rounded-full transition-colors ${screenShare ? "bg-[var(--accent-cyan)] text-white" : "bg-[var(--bg-input)] text-[var(--text-primary)] hover:bg-[var(--bg-input)]"}`}
                     title="Share screen"
                   >
                     <ScreenShare className="h-5 w-5" />
@@ -281,7 +281,7 @@ export function ConsultationRoom({ appointmentId, patientName, doctorName, type,
                 {callActive ? (
                   <button
                     onClick={endCall}
-                    className="flex h-12 w-16 items-center justify-center rounded-full bg-rose-500 text-white transition-colors hover:bg-rose-600"
+                    className="flex h-12 w-16 items-center justify-center rounded-full bg-rose-500 text-[var(--text-primary)] transition-colors hover:bg-rose-600"
                     title="End call"
                   >
                     <PhoneOff className="h-5 w-5" />
@@ -299,9 +299,9 @@ export function ConsultationRoom({ appointmentId, patientName, doctorName, type,
 
         {/* Chat panel */}
         <Card className="flex flex-col p-0">
-          <div className="shrink-0 border-b border-white/10 p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-cyan">Chat</p>
-            <h2 className="mt-1 text-sm font-semibold text-white">Consultation messages</h2>
+          <div className="shrink-0 border-b border-[var(--border)] p-4">
+            <p className="text-xs uppercase tracking-[0.2em] text-[var(--accent-cyan)]">Chat</p>
+            <h2 className="mt-1 text-sm font-semibold text-[var(--text-primary)]">Consultation messages</h2>
           </div>
 
           <div ref={scrollRef} className="flex-1 overflow-y-auto p-4">
@@ -309,7 +309,7 @@ export function ConsultationRoom({ appointmentId, patientName, doctorName, type,
               {messages.map((msg, i) => {
                 if (msg.role === "system") {
                   return (
-                    <div key={i} className="rounded-xl border border-white/5 bg-white/5 p-2 text-center text-xs text-white/50">
+                    <div key={i} className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-2 text-center text-xs text-[var(--text-muted)]">
                       {msg.content}
                     </div>
                   );
@@ -317,10 +317,10 @@ export function ConsultationRoom({ appointmentId, patientName, doctorName, type,
                 const isMe = msg.role === role;
                 return (
                   <div key={i} className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
-                    <div className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm ${isMe ? "bg-cyan text-dark" : "border border-white/10 bg-white/5 text-white"}`}>
-                      {!isMe ? <p className="mb-1 text-xs font-medium text-cyan">{msg.role === "doctor" ? doctorName : patientName}</p> : null}
+                    <div className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm ${isMe ? "bg-[var(--accent-cyan)] text-white" : "border border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-primary)]"}`}>
+                      {!isMe ? <p className="mb-1 text-xs font-medium text-[var(--accent-cyan)]">{msg.role === "doctor" ? doctorName : patientName}</p> : null}
                       <p>{msg.content}</p>
-                      {msg.time ? <p className={`mt-1 text-xs ${isMe ? "text-dark/50" : "text-white/40"}`}>{new Date(msg.time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</p> : null}
+                      {msg.time ? <p className={`mt-1 text-xs ${isMe ? "text-[var(--text-muted)]" : "text-[var(--text-muted)]"}`}>{new Date(msg.time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</p> : null}
                     </div>
                   </div>
                 );
@@ -328,10 +328,10 @@ export function ConsultationRoom({ appointmentId, patientName, doctorName, type,
             </div>
           </div>
 
-          <div className="shrink-0 border-t border-white/10 p-3">
+          <div className="shrink-0 border-t border-[var(--border)] p-3">
             <div className="flex items-end gap-2">
               <textarea
-                className="flex-1 resize-none rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-white/40 focus:border-cyan focus:outline-none focus:ring-2 focus:ring-cyan/20"
+                className="flex-1 resize-none rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-cyan focus:outline-none focus:ring-2 focus:ring-cyan/20"
                 rows={1}
                 placeholder="Type a message…"
                 value={input}

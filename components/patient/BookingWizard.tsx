@@ -151,17 +151,17 @@ export function BookingWizard({ patientName }: { patientName: string }) {
       <Card className="max-w-5xl">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="text-xs uppercase tracking-[0.3em] text-cyan">Booking flow</p>
-            <h2 className="mt-1 text-2xl font-semibold text-white">Select a specialist</h2>
+            <p className="text-xs uppercase tracking-[0.3em] text-[var(--accent-cyan)]">Booking flow</p>
+            <h2 className="mt-1 text-2xl font-semibold text-[var(--text-primary)]">Select a specialist</h2>
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2 lg:min-w-[420px]">
             <div>
-              <label className="mb-2 block text-sm text-white/80">Specialty</label>
+              <label className="mb-2 block text-sm text-[var(--text-primary)]">Specialty</label>
               <select
                 value={specialization}
                 onChange={(event) => setSpecialization(event.target.value)}
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-white outline-none focus:border-cyan"
+                className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-4 py-2.5 text-[var(--text-primary)] outline-none focus:border-cyan"
               >
                 <option value="all">All specialties</option>
                 {specializations.map((item) => (
@@ -173,12 +173,12 @@ export function BookingWizard({ patientName }: { patientName: string }) {
             </div>
 
             <div>
-              <label className="mb-2 block text-sm text-white/80">Visit time</label>
+              <label className="mb-2 block text-sm text-[var(--text-primary)]">Visit time</label>
               <input
                 type="time"
                 value={selectedTime}
                 onChange={(event) => setSelectedTime(event.target.value)}
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-white outline-none focus:border-cyan"
+                className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-4 py-2.5 text-[var(--text-primary)] outline-none focus:border-cyan"
               />
             </div>
           </div>
@@ -195,12 +195,12 @@ export function BookingWizard({ patientName }: { patientName: string }) {
           ))}
         </div>
 
-        {isLoading ? <p className="mt-4 text-sm text-white/70">Loading specialist directory…</p> : null}
+        {isLoading ? <p className="mt-4 text-sm text-[var(--text-secondary)]">Loading specialist directory…</p> : null}
 
         <div className="mt-6 grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-            <p className="text-sm font-semibold text-white">Selected appointment</p>
-            <div className="mt-3 space-y-3 text-sm text-white/70">
+          <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
+            <p className="text-sm font-semibold text-[var(--text-primary)]">Selected appointment</p>
+            <div className="mt-3 space-y-3 text-sm text-[var(--text-secondary)]">
               <p>Doctor: {selectedDoctor?.user?.fullName || "No doctor selected"}</p>
               <p>Specialization: {selectedDoctor?.specialization || "—"}</p>
               <p>Preferred date: {selectedDate}</p>
@@ -209,8 +209,8 @@ export function BookingWizard({ patientName }: { patientName: string }) {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-            <label className="mb-2 block text-sm text-white/80">Choose date</label>
+          <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
+            <label className="mb-2 block text-sm text-[var(--text-primary)]">Choose date</label>
             <Input
               type="date"
               value={selectedDate}
@@ -232,13 +232,13 @@ export function BookingWizard({ patientName }: { patientName: string }) {
         </div>
 
         {feedback ? (
-          <div className="mt-4 rounded-2xl border border-cyan/30 bg-cyan/10 px-4 py-3 text-sm text-white">
+          <div className="mt-4 rounded-2xl border border-[var(--accent-cyan)]/30 bg-[var(--accent-cyan)]/10 px-4 py-3 text-sm text-[var(--text-primary)]">
             {feedback}
           </div>
         ) : null}
 
         {appointmentId ? (
-          <div className="mt-4 rounded-2xl border border-gold/30 bg-gold/10 px-4 py-3 text-sm text-white">
+          <div className="mt-4 rounded-2xl border border-gold/30 bg-[var(--accent-gold)]/10 px-4 py-3 text-sm text-[var(--text-primary)]">
             Appointment created successfully. MongoDB appointment record stored with payment status pending.
           </div>
         ) : null}

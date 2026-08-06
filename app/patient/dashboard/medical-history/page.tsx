@@ -70,8 +70,8 @@ export default function MedicalHistoryPage() {
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-white">Medical History & Vitals</h1>
-            <p className="text-xs text-white/60">
+            <h1 className="text-2xl font-bold text-[var(--text-primary)]">Medical History & Vitals</h1>
+            <p className="text-xs text-[var(--text-secondary)]">
               Aggregated timeline of AI triages, doctor consultations, prescriptions, and health vitals.
             </p>
           </div>
@@ -99,8 +99,8 @@ export default function MedicalHistoryPage() {
         )}
 
         {loading ? (
-          <Card className="p-12 text-center text-white/60">
-            <RefreshCw className="mx-auto h-8 w-8 animate-spin text-cyan" />
+          <Card className="p-12 text-center text-[var(--text-secondary)]">
+            <RefreshCw className="mx-auto h-8 w-8 animate-spin text-[var(--accent-cyan)]" />
             <p className="mt-3 text-sm font-medium">Loading clinical record timeline...</p>
           </Card>
         ) : (
@@ -110,7 +110,7 @@ export default function MedicalHistoryPage() {
 
             {/* History Timeline */}
             <div className="mt-8">
-              <h2 className="text-lg font-bold text-white mb-4">Clinical Care Timeline</h2>
+              <h2 className="text-lg font-bold text-[var(--text-primary)] mb-4">Clinical Care Timeline</h2>
               <MedicalHistoryTimeline items={items} />
             </div>
           </>

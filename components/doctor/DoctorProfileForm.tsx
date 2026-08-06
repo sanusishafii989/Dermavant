@@ -89,7 +89,7 @@ export function DoctorProfileForm() {
 
   if (loading) {
     return (
-      <Card className="p-6 text-white/70">Loading profile…</Card>
+      <Card className="p-6 text-[var(--text-secondary)]">Loading profile…</Card>
     );
   }
 
@@ -108,8 +108,8 @@ export function DoctorProfileForm() {
         <form onSubmit={handleSave} className="space-y-5">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-cyan">Professional information</p>
-              <h2 className="mt-1 text-xl font-semibold text-white">Edit your details</h2>
+              <p className="text-xs uppercase tracking-[0.2em] text-[var(--accent-cyan)]">Professional information</p>
+              <h2 className="mt-1 text-xl font-semibold text-[var(--text-primary)]">Edit your details</h2>
             </div>
             <div className="flex items-center gap-2">
               {profile.status === "verified" ? (
@@ -156,9 +156,9 @@ export function DoctorProfileForm() {
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium text-white/80">Bio</label>
+            <label className="mb-2 block text-sm font-medium text-[var(--text-primary)]">Bio</label>
             <textarea
-              className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-white placeholder:text-white/40 transition-colors focus:border-cyan focus:outline-none focus:ring-2 focus:ring-cyan/20"
+              className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-4 py-2.5 text-[var(--text-primary)] placeholder:text-[var(--text-muted)] transition-colors focus:border-cyan focus:outline-none focus:ring-2 focus:ring-cyan/20"
               rows={4}
               value={profile.bio}
               onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
@@ -166,15 +166,15 @@ export function DoctorProfileForm() {
             />
           </div>
 
-          <div className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 p-4">
+          <div className="flex items-center justify-between rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
             <div>
-              <p className="font-medium text-white">Available today</p>
-              <p className="text-sm text-white/60">Toggle to show patients you are available for bookings today</p>
+              <p className="font-medium text-[var(--text-primary)]">Available today</p>
+              <p className="text-sm text-[var(--text-secondary)]">Toggle to show patients you are available for bookings today</p>
             </div>
             <button
               type="button"
               onClick={() => setProfile({ ...profile, available_today: !profile.available_today })}
-              className={`relative h-7 w-14 rounded-full transition-colors ${profile.available_today ? "bg-cyan" : "bg-white/20"}`}
+              className={`relative h-7 w-14 rounded-full transition-colors ${profile.available_today ? "bg-cyan" : "bg-[var(--bg-input)]"}`}
             >
               <span
                 className={`absolute top-1 h-5 w-5 rounded-full bg-white transition-transform ${profile.available_today ? "left-8" : "left-1"}`}

@@ -207,15 +207,15 @@ export function LocationEditor({
     <Card className="max-w-4xl space-y-6">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <p className="text-xs uppercase tracking-[0.18em] text-cyan">Location</p>
-          <h2 className="mt-2 text-2xl font-bold text-white">{title}</h2>
+          <p className="text-xs uppercase tracking-[0.18em] text-[var(--accent-cyan)]">Location</p>
+          <h2 className="mt-2 text-2xl font-bold text-[var(--text-primary)]">{title}</h2>
         </div>
-        <div className="rounded-full border border-cyan/40 bg-cyan/10 px-3 py-1 text-xs text-cyan">
+        <div className="rounded-full border border-[var(--accent-cyan)]/40 bg-[var(--accent-cyan)]/10 px-3 py-1 text-xs text-[var(--accent-cyan)]">
           Live map pin
         </div>
       </div>
 
-      <p className="text-sm text-white/70">{description}</p>
+      <p className="text-sm text-[var(--text-secondary)]">{description}</p>
 
       <div className="flex flex-col gap-3 md:flex-row">
         <div className="flex-1">
@@ -237,7 +237,7 @@ export function LocationEditor({
         </div>
       </div>
 
-      <div className="relative overflow-hidden rounded-2xl border border-white/10" style={{ height: "400px", zIndex: 0 }}>
+      <div className="relative overflow-hidden rounded-2xl border border-[var(--border)]" style={{ height: "400px", zIndex: 0 }}>
         <MapContainer
           center={[markerPosition.lat, markerPosition.lng]}
           zoom={13}
@@ -258,10 +258,10 @@ export function LocationEditor({
         </MapContainer>
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/5 p-4">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
         <div>
-          <p className="text-xs uppercase tracking-[0.2em] text-white/50">Current pin</p>
-          <p className="mt-1 text-sm text-white/80">
+          <p className="text-xs uppercase tracking-[0.2em] text-[var(--text-muted)]">Current pin</p>
+          <p className="mt-1 text-sm text-[var(--text-primary)]">
             {Number(latitude).toFixed(5)}, {Number(longitude).toFixed(5)}
           </p>
         </div>
@@ -270,7 +270,7 @@ export function LocationEditor({
         </Button>
       </div>
 
-      <p className="text-sm text-cyan/80">{status}</p>
+      <p className="text-sm text-[var(--accent-cyan)]/80">{status}</p>
     </Card>
   );
 }

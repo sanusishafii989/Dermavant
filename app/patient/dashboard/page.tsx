@@ -13,49 +13,49 @@ const serviceCards = [
     title: "Start AI Consultation",
     description: "Open your guided clinical assistant for symptom triage and next steps.",
     href: "/patient/dashboard/start-ai-consultation",
-    accent: "border-cyan/40 bg-cyan/10",
+    accent: "border-[var(--accent-cyan)]/40 bg-[var(--accent-cyan)]/10",
   },
   {
     title: "Book Specialist",
     description: "Choose a specialist and reserve your visit in a single flow.",
     href: "/patient/dashboard/book-specialist",
-    accent: "border-gold/40 bg-gold/10",
+    accent: "border-[var(--accent-gold)]/40 bg-[var(--accent-gold)]/10",
   },
   {
     title: "Nearby Doctors",
     description: "Find medical professionals close to your current location.",
-    href: "/patient/dashboard/nearby-doctors",
-    accent: "border-cyan/40 bg-cyan/10",
+    href: "/patient/dashboard/book-specialist",
+    accent: "border-[var(--accent-cyan)]/40 bg-[var(--accent-cyan)]/10",
   },
   {
     title: "Nearby Pharmacies",
     description: "Locate nearby licensed partners and quick-access prescriptions.",
-    href: "/patient/dashboard/nearby-pharmacies",
-    accent: "border-gold/40 bg-gold/10",
+    href: "/patient/pharmacy",
+    accent: "border-[var(--accent-gold)]/40 bg-[var(--accent-gold)]/10",
   },
   {
     title: "Medical History",
     description: "Review care records, reports, and treatment milestones.",
     href: "/patient/dashboard/medical-history",
-    accent: "border-cyan/40 bg-cyan/10",
+    accent: "border-[var(--accent-cyan)]/40 bg-[var(--accent-cyan)]/10",
   },
   {
     title: "Clinical AI Suite",
     description: "Use advanced AI tools to summarize and guide ongoing care.",
-    href: "/patient/dashboard/clinical-ai-suite",
-    accent: "border-gold/40 bg-gold/10",
+    href: "/patient/dashboard/start-ai-consultation",
+    accent: "border-[var(--accent-gold)]/40 bg-[var(--accent-gold)]/10",
   },
   {
     title: "Global E-Pharmacy",
     description: "Browse essential medicines and trusted partner fulfillment.",
-    href: "/patient/dashboard/global-e-pharmacy",
-    accent: "border-cyan/40 bg-cyan/10",
+    href: "/patient/pharmacy",
+    accent: "border-[var(--accent-cyan)]/40 bg-[var(--accent-cyan)]/10",
   },
   {
     title: "Emergency Services",
     description: "Quick access to urgent response, emergency support, and escalation.",
-    href: "/patient/dashboard/emergency-services",
-    accent: "border-gold/40 bg-gold/10",
+    href: "/patient/dashboard/wallet",
+    accent: "border-[var(--accent-gold)]/40 bg-[var(--accent-gold)]/10",
   },
 ];
 
@@ -74,8 +74,8 @@ export default async function PatientDashboardPage() {
             <div className="flex items-center gap-4">
               <Avatar src={user?.imageUrl} name={fullName} size="lg" />
               <div>
-                <p className="text-xs uppercase tracking-[0.32em] text-cyan">Welcome back</p>
-                <h1 className="mt-1 text-3xl font-bold text-white">{fullName}</h1>
+                <p className="text-xs uppercase tracking-[0.32em] text-[var(--accent-cyan)]">Welcome back</p>
+                <h1 className="mt-1 text-3xl font-bold text-[var(--text-primary)]">{fullName}</h1>
                 <div className="mt-2 flex flex-wrap gap-2">
                   <Badge variant="cyan">patient</Badge>
                   <Badge variant="gold">AI care portal</Badge>
@@ -83,8 +83,8 @@ export default async function PatientDashboardPage() {
               </div>
             </div>
 
-            <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/70">
-              <p className="font-medium text-white">Today&apos;s care snapshot</p>
+            <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] px-4 py-3 text-sm text-[var(--text-secondary)]">
+              <p className="font-medium text-[var(--text-primary)]">Today&apos;s care snapshot</p>
               <p className="mt-1">Your dashboard shell is active and ready for future care flows.</p>
             </div>
           </div>
@@ -99,14 +99,14 @@ export default async function PatientDashboardPage() {
               >
                 <div className="flex h-full flex-col justify-between gap-5">
                   <div>
-                    <div className="mb-3 inline-flex rounded-full bg-white/5 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-cyan">
+                    <div className="mb-3 inline-flex rounded-full bg-[var(--bg-card)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--accent-cyan)]">
                       Service
                     </div>
-                    <h2 className="text-lg font-semibold text-white">{item.title}</h2>
-                    <p className="mt-2 text-sm text-white/70">{item.description}</p>
+                    <h2 className="text-lg font-semibold text-[var(--text-primary)]">{item.title}</h2>
+                    <p className="mt-2 text-sm text-[var(--text-secondary)]">{item.description}</p>
                   </div>
 
-                  <div className="flex items-center justify-between text-sm text-cyan">
+                  <div className="flex items-center justify-between text-sm text-[var(--accent-cyan)]">
                     <span>Open</span>
                     <span aria-hidden="true">→</span>
                   </div>
