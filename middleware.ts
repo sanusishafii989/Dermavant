@@ -1,4 +1,4 @@
-import { clerkMiddleware, createRouteMatcher, clerkClient } from "@clerk/nextjs/server";
+import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import {
   getRoleFromClaims,
@@ -6,64 +6,6 @@ import {
   ROLE_DASHBOARD,
   type UserRole,
 } from "@/lib/roles";
-async function resolveUserRole(
-  userId: string | null | undefined,
-  sessionClaims: Record<string, unknown> | null | undefined
-): Promise<UserRole | null> {
-  const roleFromClaims = getRoleFromClaims(sessionClaims);
-  if (roleFromClaims) {
-    return roleFromClaims;
-  }
-
-  if (!userId) {
-    return null;
-  }
-
-  // 1. Resolve role from Clerk user metadata
-  try {
-    const client = await clerkClient();
-    const user = await client.users.getUser(userId);
-
-    const publicRole = (user as any).publicMetadata?.role;
-    if (isUserRole(publicRole)) {
-      return publicRole as any;
-    }
-
-    const unsafeRole = (user as any).unsafeMetadata?.role;
-    if (isUserRole(unsafeRole)) {
-      try {
-        await client.users.updateUserMetadata(userId, {
-          publicMetadata: { role: unsafeRole },
-        });
-      } catch {
-        // ignore sync error
-      }
-      return unsafeRole as any;
-    }
-
-    const public_metadata = (user as any).public_metadata?.role;
-    if (isUserRole(public_metadata)) {
-      return public_metadata as any;
-    }
-  } catch (error) {
-    if (process.env.NODE_ENV !== "production") {
-      console.warn("[MIDDLEWARE] Failed to resolve Clerk user role from API:", error);
-    }
-  }
-
-  // 2. Fallback for authenticated users missing role metadata: default to "patient"
-  const defaultRole: UserRole = "patient";
-  try {
-    const client = await clerkClient();
-    await client.users.updateUserMetadata(userId, {
-      publicMetadata: { role: defaultRole },
-    });
-  } catch {
-    // ignore
-  }
-
-  return defaultRole;
-}
 
 const isPublicRoute = createRouteMatcher([
   "/",
@@ -74,6 +16,7 @@ const isPublicRoute = createRouteMatcher([
   "/api/webhooks(.*)",
   "/api/dev(.*)",
   "/api/contact(.*)",
+  "/api/support(.*)",
 ]);
 
 function getRequiredRoleForPath(pathname: string): UserRole | null {
@@ -96,28 +39,20 @@ export default clerkMiddleware(async (auth, req) => {
   const pathname = req.nextUrl.pathname;
   const isApiRoute = pathname.startsWith("/api/");
 
-  const isPublicRequest = isPublicRoute(req);
-  if (isPublicRequest) {
+  if (isPublicRoute(req)) {
     return NextResponse.next();
   }
 
   const { userId, sessionClaims, redirectToSignIn } = await auth();
 
-  const userRole = await resolveUserRole(
-    userId,
+  // Try to get role from session claims first (no API call needed)
+  const roleFromClaims = getRoleFromClaims(
     sessionClaims as Record<string, unknown> | null | undefined
   );
 
-  if (process.env.NODE_ENV !== "production") {
-    console.log("[MIDDLEWARE AUTH]", {
-      pathname,
-      userId,
-      userRole,
-      sessionClaimsKeys: sessionClaims ? Object.keys(sessionClaims) : null,
-      publicMetadata: sessionClaims?.publicMetadata,
-      metadata: sessionClaims?.metadata,
-      public_metadata: sessionClaims?.public_metadata,
-    });
+  const requiredRole = getRequiredRoleForPath(pathname);
+  if (!requiredRole) {
+    return NextResponse.next();
   }
 
   if (!userId) {
@@ -127,16 +62,15 @@ export default clerkMiddleware(async (auth, req) => {
         headers: { "Content-Type": "application/json" },
       });
     }
-
     return redirectToSignIn({ returnBackUrl: req.url });
   }
 
-  const requiredRole = getRequiredRoleForPath(pathname);
-  if (!requiredRole) {
-    return NextResponse.next();
-  }
+  // If we have a role from claims, use it
+  if (roleFromClaims && isUserRole(roleFromClaims)) {
+    if (roleFromClaims === requiredRole) {
+      return NextResponse.next();
+    }
 
-  if (!userRole) {
     if (isApiRoute) {
       return new Response(JSON.stringify({ error: "Forbidden" }), {
         status: 403,
@@ -144,25 +78,15 @@ export default clerkMiddleware(async (auth, req) => {
       });
     }
 
-    return NextResponse.redirect(new URL("/", req.url));
+    if (ROLE_DASHBOARD[roleFromClaims]) {
+      return NextResponse.redirect(new URL(ROLE_DASHBOARD[roleFromClaims], req.url));
+    }
+
+    return redirectToSignIn({ returnBackUrl: req.url });
   }
 
-  if (userRole === requiredRole) {
-    return NextResponse.next();
-  }
-
-  if (isApiRoute) {
-    return new Response(JSON.stringify({ error: "Forbidden" }), {
-      status: 403,
-      headers: { "Content-Type": "application/json" },
-    });
-  }
-
-  if (ROLE_DASHBOARD[userRole]) {
-    return NextResponse.redirect(new URL(ROLE_DASHBOARD[userRole], req.url));
-  }
-
-  return redirectToSignIn({ returnBackUrl: req.url });
+  // No role in claims — allow through, API routes will handle auth
+  return NextResponse.next();
 });
 
 export const config = {
