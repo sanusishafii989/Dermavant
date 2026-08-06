@@ -44,7 +44,10 @@ export function Modal({ open, onClose, title, children, className }: ModalProps)
         role="dialog"
         aria-modal="true"
         aria-labelledby={title ? "modal-title" : undefined}
-        className={cn("glass-panel relative z-10 w-full max-w-lg p-6", className)}
+        className={cn(
+          "glass-panel relative z-10 w-full max-w-lg p-4 sm:p-6 max-h-[85vh] overflow-y-auto custom-scrollbar",
+          className
+        )}
       >
         <div className="mb-4 flex items-start justify-between gap-4">
           {title ? (
