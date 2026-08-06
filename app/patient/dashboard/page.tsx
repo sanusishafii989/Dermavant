@@ -24,13 +24,13 @@ const serviceCards = [
   {
     title: "Nearby Doctors",
     description: "Find medical professionals close to your current location.",
-    href: "/patient/dashboard/book-specialist",
+    href: "/patient/dashboard/nearby-doctors",
     accent: "border-[var(--accent-cyan)]/40 bg-[var(--accent-cyan)]/10",
   },
   {
     title: "Nearby Pharmacies",
     description: "Locate nearby licensed partners and quick-access prescriptions.",
-    href: "/patient/pharmacy",
+    href: "/patient/dashboard/nearby-pharmacies",
     accent: "border-[var(--accent-gold)]/40 bg-[var(--accent-gold)]/10",
   },
   {
@@ -54,7 +54,7 @@ const serviceCards = [
   {
     title: "Emergency Services",
     description: "Quick access to urgent response, emergency support, and escalation.",
-    href: "/patient/dashboard/wallet",
+    href: "/patient/dashboard/emergency-services",
     accent: "border-[var(--accent-gold)]/40 bg-[var(--accent-gold)]/10",
   },
 ];

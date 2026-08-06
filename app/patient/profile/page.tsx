@@ -1,5 +1,5 @@
-import { patientNavLinks } from "@/lib/portal-nav";
 import { PortalDashboardShell } from "@/components/layout/PortalDashboardShell";
+import { patientNavLinks } from "@/lib/portal-nav";
 import { PatientProfileForm } from "@/components/patient/PatientProfileForm";
 
 export const dynamic = "force-dynamic";
@@ -7,17 +7,13 @@ export const dynamic = "force-dynamic";
 export default function PatientProfilePage() {
   return (
     <PortalDashboardShell title="Patient Portal" links={patientNavLinks}>
-      <div className="space-y-6">
-        <div className="rounded-2xl border border-cyan/30 bg-cyan/10 p-5">
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-cyan">Medical Profile</p>
-          <h1 className="mt-1 text-2xl sm:text-3xl font-bold text-white">Manage Your Health Profile</h1>
-          <p className="mt-1 text-sm text-white/70">
-            Keep your vital statistics, allergies, medications, and emergency contact information up to date.
-          </p>
+      <div className="mx-auto max-w-5xl space-y-6">
+        <div className="rounded-2xl border border-[var(--accent-cyan)]/30 bg-[var(--accent-cyan)]/5 p-5">
+          <p className="text-xs uppercase tracking-[0.2em] text-[var(--accent-cyan)]">Patient profile</p>
+          <h1 className="mt-2 text-3xl font-bold text-[var(--text-primary)]">Manage your health profile</h1>
         </div>
         <PatientProfileForm />
       </div>
     </PortalDashboardShell>
   );
 }
-

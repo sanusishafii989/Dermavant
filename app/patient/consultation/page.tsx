@@ -1,14 +1,13 @@
-import { patientNavLinks } from "@/lib/portal-nav";
 import { PortalDashboardShell } from "@/components/layout/PortalDashboardShell";
-import { PatientConsultationClient } from "@/components/patient/PatientConsultationClient";
+import { patientNavLinks } from "@/lib/portal-nav";
+import { PatientConsultations } from "@/components/patient/PatientConsultations";
 
 export const dynamic = "force-dynamic";
 
 export default function PatientConsultationPage() {
   return (
     <PortalDashboardShell title="Patient Portal" links={patientNavLinks}>
-      <PatientConsultationClient />
+      <PatientConsultations />
     </PortalDashboardShell>
   );
 }
-
