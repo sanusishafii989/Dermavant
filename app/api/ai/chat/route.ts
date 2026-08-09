@@ -90,9 +90,11 @@ export async function POST(req: Request) {
 
     const body = await req.json();
     const symptoms = String(body.symptoms || body.symptom || "").trim();
-    if (!symptoms) {
+    const image = body.image as string | undefined;
+
+    if (!symptoms && !image) {
       return NextResponse.json(
-        { ok: false, error: "Symptoms text is required" },
+        { ok: false, error: "Symptoms text or an image is required" },
         { status: 400 }
       );
     }
@@ -147,15 +149,25 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: false, error: "Patient profile not found" }, { status: 404 });
     }
 
-    const knowledgeContext = await getRelevantKnowledgeContext(symptoms, 3);
-    const prompt = buildDermatologyPrompt(symptoms, knowledgeContext);
+    const knowledgeContext = await getRelevantKnowledgeContext(symptoms || "skin condition from image", 3);
+    const prompt = buildDermatologyPrompt(symptoms || "Please analyze the visible skin condition in the uploaded image.", knowledgeContext);
     const client = new Groq({ apiKey: GROQ_API_KEY });
 
+    const useVision = !!image;
+    const visionModel = "meta-llama/llama-4-scout-17b-16e-instruct";
+
+    const userContent = useVision
+      ? [
+          { type: "text", text: prompt },
+          { type: "image_url", image_url: { url: image } },
+        ]
+      : prompt;
+
     const completion = await client.chat.completions.create({
-      model: GROQ_MODEL,
+      model: useVision ? visionModel : GROQ_MODEL,
       temperature: 0.2,
       max_tokens: 800,
-      response_format: { type: "json_object" },
+      ...(useVision ? {} : { response_format: { type: "json_object" } }),
       messages: [
         {
           role: "system",
@@ -164,10 +176,10 @@ export async function POST(req: Request) {
         },
         {
           role: "user",
-          content: prompt,
+          content: userContent as any,
         },
       ],
-    });
+    } as any);
 
     const content = (completion.choices[0]?.message as { content?: unknown } | undefined)?.content;
     const rawText =

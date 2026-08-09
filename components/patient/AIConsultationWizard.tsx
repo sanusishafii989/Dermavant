@@ -1,9 +1,10 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useRef, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { Input } from "@/components/ui/Input";
+import { Mic, MicOff, Volume2, VolumeX, Image as ImageIcon, X, Stethoscope } from "lucide-react";
+import { useVoiceChat } from "@/lib/hooks/useVoiceChat";
 
 type PossibleCondition = {
   condition: string;
@@ -25,6 +26,12 @@ export function AIConsultationWizard() {
   const [result, setResult] = useState<ConsultationResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const { isListening, isSpeaking, ttsEnabled, startListening, stopListening, speak, toggleTts, speechSupported, ttsSupported } = useVoiceChat({
+    onTranscript: (text) => setSymptoms(text),
+  });
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -32,8 +39,8 @@ export function AIConsultationWizard() {
     setResult(null);
 
     const trimmed = symptoms.trim();
-    if (!trimmed) {
-      setFeedback("Please describe your skin symptoms before submitting.");
+    if (!trimmed && !selectedImage) {
+      setFeedback("Please describe your skin symptoms or upload an image before submitting.");
       return;
     }
 
@@ -42,7 +49,7 @@ export function AIConsultationWizard() {
       const response = await fetch("/api/ai/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ symptoms: trimmed }),
+        body: JSON.stringify({ symptoms: trimmed || "Please analyze the uploaded skin image.", image: selectedImage || undefined }),
       });
 
       const contentType = response.headers.get("content-type") || "";
@@ -57,6 +64,10 @@ export function AIConsultationWizard() {
       }
 
       setResult(body.report);
+      if (ttsEnabled) {
+        const summary = body.report.clinicalSummary + ". " + body.report.recommendedNextSteps;
+        speak(summary);
+      }
     } catch (error: any) {
       setFeedback(error?.message || "Unable to complete the consultation.");
     } finally {
@@ -64,17 +75,101 @@ export function AIConsultationWizard() {
     }
   }
 
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      setFeedback("Please upload an image file");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => setSelectedImage(reader.result as string);
+    reader.readAsDataURL(file);
+  };
+
+  const handleMicClick = () => {
+    if (isListening) {
+      stopListening();
+    } else {
+      setSymptoms("");
+      startListening();
+    }
+  };
+
   return (
     <div className="space-y-6">
       <Card className="max-w-5xl">
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <p className="text-xs uppercase tracking-[0.32em] text-[var(--accent-cyan)]">Step 1</p>
-            <h2 className="mt-2 text-2xl font-semibold text-[var(--text-primary)]">Describe your skin symptoms</h2>
-            <p className="mt-2 text-sm text-[var(--text-secondary)]">
-              Mention rash location, appearance, duration, itching or pain, and any changes over time.
-            </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs uppercase tracking-[0.32em] text-[var(--accent-cyan)]">Step 1</p>
+              <h2 className="mt-2 text-2xl font-semibold text-[var(--text-primary)]">Describe your skin symptoms</h2>
+              <p className="mt-2 text-sm text-[var(--text-secondary)]">
+                Mention rash location, appearance, duration, itching or pain, and any changes over time.
+              </p>
+            </div>
+            {/* Voice + TTS + Image buttons */}
+            <div className="flex items-center gap-2">
+              {speechSupported ? (
+                <button
+                  type="button"
+                  onClick={handleMicClick}
+                  className={`flex h-10 w-10 items-center justify-center rounded-xl border transition-colors ${
+                    isListening
+                      ? "border-rose-500/40 bg-rose-500/10 text-rose-500 animate-pulse"
+                      : "border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-secondary)] hover:text-[var(--accent-cyan)]"
+                  }`}
+                  title={isListening ? "Stop listening" : "Voice input"}
+                >
+                  {isListening ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
+                </button>
+              ) : null}
+              {ttsSupported ? (
+                <button
+                  type="button"
+                  onClick={toggleTts}
+                  className={`flex h-10 w-10 items-center justify-center rounded-xl border transition-colors ${
+                    ttsEnabled
+                      ? "border-[var(--accent-cyan)]/40 bg-[var(--accent-cyan)]/10 text-[var(--accent-cyan)]"
+                      : "border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-secondary)]"
+                  }`}
+                  title={ttsEnabled ? "Disable voice output" : "Enable voice output"}
+                >
+                  {ttsEnabled ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
+                </button>
+              ) : null}
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-secondary)] transition-colors hover:text-[var(--accent-cyan)]"
+                title="Upload skin image"
+              >
+                <ImageIcon className="h-5 w-5" />
+              </button>
+              <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+            </div>
           </div>
+
+          {isListening ? (
+            <p className="text-xs text-rose-500 animate-pulse">🎤 Listening… Describe your symptoms aloud</p>
+          ) : null}
+          {isSpeaking ? (
+            <p className="text-xs text-[var(--accent-cyan)]">🔊 AI is speaking…</p>
+          ) : null}
+
+          {/* Image preview */}
+          {selectedImage ? (
+            <div className="flex items-center gap-4 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
+              <img src={selectedImage} alt="Skin condition" className="h-24 w-24 rounded-xl object-cover" />
+              <div className="flex-1">
+                <p className="text-sm font-medium text-[var(--text-primary)]">Skin image uploaded</p>
+                <p className="text-xs text-[var(--text-secondary)]">The AI will analyze this image alongside your symptoms.</p>
+              </div>
+              <button type="button" onClick={() => setSelectedImage(null)} className="text-[var(--text-muted)] hover:text-rose-500">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+          ) : null}
 
           <div>
             <label htmlFor="symptoms" className="mb-2 block text-sm font-medium text-[var(--text-primary)]">
@@ -85,7 +180,7 @@ export function AIConsultationWizard() {
               value={symptoms}
               onChange={(event) => setSymptoms(event.target.value)}
               rows={8}
-              className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-4 py-3 text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none focus:border-cyan focus:ring-2 focus:ring-cyan/20"
+              className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-4 py-3 text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none focus:border-[var(--accent-cyan)] focus:ring-2 focus:ring-[var(--accent-cyan)]/20"
               placeholder="e.g. red itchy patch behind my left knee for 3 days, slightly scaly and spreading, no fever"
             />
           </div>
@@ -95,12 +190,12 @@ export function AIConsultationWizard() {
               {isLoading ? "Analyzing…" : "Start dermatology consultation"}
             </Button>
             <p className="text-sm text-[var(--text-secondary)]">
-              This is a dermatology-focused text consultation for visible skin, hair, and nail symptoms.
+              🎙️ Voice input · 🔊 Voice output · 🖼️ Image upload supported
             </p>
           </div>
 
           {feedback ? (
-            <div className="rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-100">
+            <div className="rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-700 dark:text-red-300">
               {feedback}
             </div>
           ) : null}
@@ -141,16 +236,11 @@ export function AIConsultationWizard() {
                 <p className="mt-2 text-3xl font-semibold text-[var(--text-primary)]">{(result.confidenceScore * 100).toFixed(0)}%</p>
                 <p className="mt-1 text-sm text-[var(--text-secondary)]">Based on the symptom description.</p>
               </div>
-
               <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
                 <p className="text-sm uppercase tracking-[0.24em] text-[var(--accent-cyan)]">Immediate care</p>
-                <p className="mt-2 text-lg font-semibold text-[var(--text-primary)]">
-                  {result.needsImmediateProfessionalCare ? "Yes" : "No"}
-                </p>
+                <p className="mt-2 text-lg font-semibold text-[var(--text-primary)]">{result.needsImmediateProfessionalCare ? "Yes" : "No"}</p>
                 <p className="mt-1 text-sm text-[var(--text-secondary)]">
-                  {result.needsImmediateProfessionalCare
-                    ? "Please seek a healthcare professional without delay."
-                    : "Monitor symptoms and follow the next steps."}
+                  {result.needsImmediateProfessionalCare ? "Please seek a healthcare professional without delay." : "Monitor symptoms and follow the next steps."}
                 </p>
               </div>
             </div>
