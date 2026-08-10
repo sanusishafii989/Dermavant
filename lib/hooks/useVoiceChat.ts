@@ -11,9 +11,15 @@ export function useVoiceChat({ onTranscript, onAIResponse }: UseVoiceChatOptions
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [voiceEnabled, setVoiceEnabled] = useState(false);
-  const [ ttsEnabled, setTtsEnabled] = useState(false);
+  const [ttsEnabled, setTtsEnabled] = useState(false);
   const recognitionRef = useRef<any>(null);
   const transcriptRef = useRef("");
+  const ttsEnabledRef = useRef(false);
+
+  // Keep ref in sync with state so speak() always reads current value
+  useEffect(() => {
+    ttsEnabledRef.current = ttsEnabled;
+  }, [ttsEnabled]);
 
   // Initialize speech recognition
   useEffect(() => {
@@ -52,6 +58,13 @@ export function useVoiceChat({ onTranscript, onAIResponse }: UseVoiceChatOptions
     }
   }, [onTranscript]);
 
+  // Load voices early (Chrome needs this)
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.speechSynthesis) {
+      window.speechSynthesis.getVoices();
+    }
+  }, []);
+
   const startListening = useCallback(() => {
     if (!recognitionRef.current) return;
     transcriptRef.current = "";
@@ -74,26 +87,43 @@ export function useVoiceChat({ onTranscript, onAIResponse }: UseVoiceChatOptions
   }, []);
 
   const speak = useCallback((text: string) => {
-    if (!ttsEnabled || typeof window === "undefined" || !window.speechSynthesis) return;
-    
+    // Read from ref, not state — avoids stale closure
+    if (!ttsEnabledRef.current) return;
+    if (typeof window === "undefined" || !window.speechSynthesis) return;
+
     // Strip markdown for speech
     const cleanText = text
       .replace(/[#*_`>-]/g, "")
       .replace(/\n+/g, ". ")
+      .replace(/\*\*/g, "")
       .trim();
 
+    if (!cleanText) return;
+
+    // Cancel any ongoing speech
     window.speechSynthesis.cancel();
+
     const utterance = new SpeechSynthesisUtterance(cleanText);
     utterance.rate = 1.0;
     utterance.pitch = 1.0;
-    
+    utterance.volume = 1.0;
+
+    // Try to use a good English voice
+    const voices = window.speechSynthesis.getVoices();
+    const englishVoice = voices.find((v) => v.lang.startsWith("en") && v.name.includes("Google")) || voices.find((v) => v.lang.startsWith("en"));
+    if (englishVoice) utterance.voice = englishVoice;
+
     utterance.onstart = () => setIsSpeaking(true);
     utterance.onend = () => setIsSpeaking(false);
     utterance.onerror = () => setIsSpeaking(false);
 
-    window.speechSynthesis.speak(utterance);
+    // Small delay to ensure cancel completes
+    setTimeout(() => {
+      window.speechSynthesis.speak(utterance);
+    }, 100);
+
     onAIResponse?.(text);
-  }, [ttsEnabled, onAIResponse]);
+  }, [onAIResponse]);
 
   const stopSpeaking = useCallback(() => {
     if (typeof window !== "undefined" && window.speechSynthesis) {
