@@ -179,7 +179,7 @@ export function ConsultationRoom({ appointmentId, patientName, doctorName, type,
         </div>
         <div className="flex items-center gap-2">
           {callActive ? (
-            <Badge variant="success">● Live · {formatDuration(callDuration)}</Badge>
+            <Badge variant="success">Live · {formatDuration(callDuration)}</Badge>
           ) : (
             <Badge variant="warning">Not connected</Badge>
           )}
@@ -190,7 +190,7 @@ export function ConsultationRoom({ appointmentId, patientName, doctorName, type,
       {/* Camera error */}
       {cameraError ? (
         <div className="rounded-2xl border border-amber-400/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
-          ⚠ {cameraError}
+          {cameraError}
         </div>
       ) : null}
 

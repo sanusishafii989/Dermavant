@@ -153,21 +153,12 @@ export async function POST(req: Request) {
     const prompt = buildDermatologyPrompt(symptoms || "Please analyze the visible skin condition in the uploaded image.", knowledgeContext);
     const client = new Groq({ apiKey: GROQ_API_KEY });
 
-    const useVision = !!image;
-    const visionModel = "meta-llama/llama-4-scout-17b-16e-instruct";
-
-    const userContent = useVision
-      ? [
-          { type: "text", text: prompt },
-          { type: "image_url", image_url: { url: image } },
-        ]
-      : prompt;
-
+    // Use text-only model (llama-4-scout not available on this Groq account)
     const completion = await client.chat.completions.create({
-      model: useVision ? visionModel : GROQ_MODEL,
+      model: GROQ_MODEL,
       temperature: 0.2,
       max_tokens: 800,
-      ...(useVision ? {} : { response_format: { type: "json_object" } }),
+      response_format: { type: "json_object" },
       messages: [
         {
           role: "system",
@@ -176,10 +167,10 @@ export async function POST(req: Request) {
         },
         {
           role: "user",
-          content: userContent as any,
+          content: prompt,
         },
       ],
-    } as any);
+    });
 
     const content = (completion.choices[0]?.message as { content?: unknown } | undefined)?.content;
     const rawText =

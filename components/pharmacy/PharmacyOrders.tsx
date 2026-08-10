@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { Modal } from "@/components/ui/Modal";
-import { ClipboardList, Package, Truck, CheckCircle, XCircle } from "lucide-react";
+import { ClipboardList, Package, Truck, CheckCircle, XCircle, MapPin } from "lucide-react";
 
 interface OrderItem {
   medicine_id: string;
@@ -193,7 +193,7 @@ export function PharmacyOrders() {
                     </div>
 
                     {order.delivery_address ? (
-                      <p className="text-sm text-[var(--text-secondary)]">📍 {order.delivery_address}</p>
+                      <p className="flex items-center gap-1 text-sm text-[var(--text-secondary)]"><MapPin className="h-3.5 w-3.5" /> {order.delivery_address}</p>
                     ) : null}
 
                     <div className="flex flex-wrap gap-2">

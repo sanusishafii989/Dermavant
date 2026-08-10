@@ -159,10 +159,10 @@ export function ResearchChat() {
           </div>
         </div>
         {isListening ? (
-          <p className="mt-2 text-xs text-rose-500 animate-pulse">🎤 Listening… Speak your question</p>
+          <p className="mt-2 flex items-center gap-1 text-xs text-rose-500 animate-pulse"><Mic className="h-3 w-3" /> Listening — Speak your question</p>
         ) : null}
         {isSpeaking ? (
-          <p className="mt-2 text-xs text-[var(--accent-cyan)]">🔊 AI is speaking…</p>
+          <p className="mt-2 flex items-center gap-1 text-xs text-[var(--accent-cyan)]"><Volume2 className="h-3 w-3" /> AI is speaking</p>
         ) : null}
       </Card>
 
@@ -174,7 +174,11 @@ export function ResearchChat() {
               <div className="text-center">
                 <Stethoscope className="mx-auto h-12 w-12 text-[var(--accent-cyan)]/40" />
                 <p className="mt-4 text-[var(--text-secondary)]">Ask about clinical guidelines, differential diagnoses, drug interactions, or treatment protocols.</p>
-                <p className="mt-2 text-xs text-[var(--text-muted)]">🎙️ Voice input · 🔊 Voice output · 🖼️ Image upload available</p>
+                <p className="mt-2 flex flex-wrap items-center gap-3 text-xs text-[var(--text-muted)]">
+                  <span className="flex items-center gap-1"><Mic className="h-3 w-3" /> Voice input</span>
+                  <span className="flex items-center gap-1"><Volume2 className="h-3 w-3" /> Voice output</span>
+                  <span className="flex items-center gap-1"><ImageIcon className="h-3 w-3" /> Image upload</span>
+                </p>
               </div>
               <div className="grid w-full max-w-2xl gap-2 sm:grid-cols-2">
                 {SUGGESTED_PROMPTS.map((prompt) => (
@@ -278,7 +282,7 @@ export function ResearchChat() {
             </Button>
           </div>
           <p className="mt-2 px-2 text-xs text-[var(--text-muted)]">
-            AI-generated responses should be verified against primary sources. Press Enter to send, Shift+Enter for new line. 🎙️ Voice · 🖼️ Image supported.
+            AI-generated responses should be verified against primary sources. Press Enter to send, Shift+Enter for new line. Voice and image supported.
           </p>
         </Card>
       </div>

@@ -151,10 +151,10 @@ export function AIConsultationWizard() {
           </div>
 
           {isListening ? (
-            <p className="text-xs text-rose-500 animate-pulse">🎤 Listening… Describe your symptoms aloud</p>
+            <p className="flex items-center gap-1 text-xs text-rose-500 animate-pulse"><Mic className="h-3 w-3" /> Listening — Describe your symptoms aloud</p>
           ) : null}
           {isSpeaking ? (
-            <p className="text-xs text-[var(--accent-cyan)]">🔊 AI is speaking…</p>
+            <p className="flex items-center gap-1 text-xs text-[var(--accent-cyan)]"><Volume2 className="h-3 w-3" /> AI is speaking</p>
           ) : null}
 
           {/* Image preview */}
@@ -189,9 +189,11 @@ export function AIConsultationWizard() {
             <Button type="submit" variant="gold" size="lg" disabled={isLoading}>
               {isLoading ? "Analyzing…" : "Start dermatology consultation"}
             </Button>
-            <p className="text-sm text-[var(--text-secondary)]">
-              🎙️ Voice input · 🔊 Voice output · 🖼️ Image upload supported
-            </p>
+            <div className="flex flex-wrap items-center gap-3 text-sm text-[var(--text-secondary)]">
+              <span className="flex items-center gap-1"><Mic className="h-3.5 w-3.5" /> Voice input</span>
+              <span className="flex items-center gap-1"><Volume2 className="h-3.5 w-3.5" /> Voice output</span>
+              <span className="flex items-center gap-1"><ImageIcon className="h-3.5 w-3.5" /> Image upload</span>
+            </div>
           </div>
 
           {feedback ? (

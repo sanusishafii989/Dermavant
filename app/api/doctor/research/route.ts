@@ -58,25 +58,13 @@ export async function POST(req: Request) {
       );
     }
 
-    // Build messages for Groq — if image present, use vision model
-    const visionModel = "meta-llama/llama-4-scout-17b-16e-instruct";
-    const useVision = !!image;
-
+    // Use text-only model (vision model not available on this Groq account)
     const groqMessages: any[] = [
       { role: "system", content: RESEARCH_SYSTEM_PROMPT },
-      ...messages.map((msg: { role: string; content: string }) => {
-        // If this is the last user message and we have an image, attach it
-        if (useVision && msg.role === "user" && msg === messages[messages.length - 1]) {
-          return {
-            role: "user",
-            content: [
-              { type: "text", text: msg.content },
-              { type: "image_url", image_url: { url: image } },
-            ],
-          };
-        }
-        return { role: msg.role, content: msg.content };
-      }),
+      ...messages.map((msg: { role: string; content: string }) => ({
+        role: msg.role,
+        content: msg.content,
+      })),
     ];
 
     const groqResponse = await fetch("https://api.groq.com/openai/v1/chat/completions", {
@@ -86,7 +74,7 @@ export async function POST(req: Request) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: useVision ? visionModel : GROQ_MODEL,
+        model: GROQ_MODEL,
         temperature: 0.3,
         max_tokens: 1200,
         messages: groqMessages,
