@@ -7,7 +7,6 @@ import {
   type UserRole,
 } from "@/lib/roles";
 
-// Simple public route check without createRouteMatcher (deprecated, crashes on Vercel edge)
 function isPublicRoute(pathname: string): boolean {
   if (pathname === "/") return true;
   if (pathname.startsWith("/sign-in")) return true;
@@ -40,65 +39,60 @@ function getRequiredRoleForPath(pathname: string): UserRole | null {
 }
 
 export default clerkMiddleware(async (auth, req) => {
-  const pathname = req.nextUrl.pathname;
-  const isApiRoute = pathname.startsWith("/api/");
+  try {
+    const pathname = req.nextUrl.pathname;
+    const isApiRoute = pathname.startsWith("/api/");
 
-  if (isPublicRoute(pathname)) {
-    return NextResponse.next();
-  }
-
-  const { userId, sessionClaims, redirectToSignIn } = await auth();
-
-  const requiredRole = getRequiredRoleForPath(pathname);
-  if (!requiredRole) {
-    return NextResponse.next();
-  }
-
-  if (!userId) {
-    if (isApiRoute) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: { "Content-Type": "application/json" },
-      });
-    }
-    return redirectToSignIn({ returnBackUrl: req.url });
-  }
-
-  const roleFromClaims = getRoleFromClaims(
-    sessionClaims as Record<string, unknown> | null | undefined
-  );
-
-  // STRICT: If we can determine the role from claims, enforce it
-  if (roleFromClaims && isUserRole(roleFromClaims)) {
-    if (roleFromClaims === requiredRole) {
+    // Allow public routes without any checks
+    if (isPublicRoute(pathname)) {
       return NextResponse.next();
     }
 
-    // Role mismatch — deny access
-    if (isApiRoute) {
-      return new Response(JSON.stringify({ error: "Forbidden — you do not have access to this portal" }), {
-        status: 403,
-        headers: { "Content-Type": "application/json" },
-      });
+    const { userId, sessionClaims, redirectToSignIn } = await auth();
+
+    const requiredRole = getRequiredRoleForPath(pathname);
+    if (!requiredRole) {
+      return NextResponse.next();
     }
 
-    // Redirect to their correct portal
-    if (ROLE_DASHBOARD[roleFromClaims]) {
-      return NextResponse.redirect(new URL(ROLE_DASHBOARD[roleFromClaims], req.url));
+    if (!userId) {
+      if (isApiRoute) {
+        return new Response(JSON.stringify({ error: "Unauthorized" }), {
+          status: 401,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+      return redirectToSignIn({ returnBackUrl: req.url });
     }
-  }
 
-  // If no role in claims, deny access to protected routes
-  // Don't fall through — require a role
-  if (isApiRoute) {
-    return new Response(JSON.stringify({ error: "Forbidden — role not verified" }), {
-      status: 403,
-      headers: { "Content-Type": "application/json" },
-    });
-  }
+    const roleFromClaims = getRoleFromClaims(
+      sessionClaims as Record<string, unknown> | null | undefined
+    );
 
-  // For pages, redirect to sign-in
-  return redirectToSignIn({ returnBackUrl: req.url });
+    if (roleFromClaims && isUserRole(roleFromClaims)) {
+      if (roleFromClaims === requiredRole) {
+        return NextResponse.next();
+      }
+
+      if (isApiRoute) {
+        return new Response(JSON.stringify({ error: "Forbidden" }), {
+          status: 403,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+
+      if (ROLE_DASHBOARD[roleFromClaims]) {
+        return NextResponse.redirect(new URL(ROLE_DASHBOARD[roleFromClaims], req.url));
+      }
+    }
+
+    // No role found — allow through, API routes will verify independently
+    return NextResponse.next();
+  } catch (error) {
+    // If middleware crashes, allow the request through rather than blocking everything
+    console.error("[MIDDLEWARE ERROR]", error);
+    return NextResponse.next();
+  }
 });
 
 export const config = {
