@@ -14,5 +14,6 @@ export { WalletTransaction } from "./WalletTransaction";
 export { ContactMessage } from "./ContactMessage";
 export { AuditLog } from "./AuditLog";
 export { SupportTicket } from "./SupportTicket";
+export { ChatHistory } from "./ChatHistory";
 
 

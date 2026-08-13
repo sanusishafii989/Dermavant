@@ -25,12 +25,31 @@ export function ResearchChat() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [conversationId, setConversationId] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { isListening, isSpeaking, ttsEnabled, startListening, stopListening, speak, stopSpeaking, toggleTts, speechSupported, ttsSupported } = useVoiceChat({
     onTranscript: (text) => setInput(text),
   });
+
+  // Load chat history on mount
+  useEffect(() => {
+    const loadHistory = async () => {
+      try {
+        const res = await fetch("/api/doctor/research");
+        const data = await res.json();
+        if (data.ok && data.conversations?.length > 0) {
+          const latest = data.conversations[0];
+          setConversationId(latest.id);
+          setMessages(latest.messages.map((m: any) => ({ role: m.role, content: m.content })));
+        }
+      } catch {
+        // silent — start fresh
+      }
+    };
+    void loadHistory();
+  }, []);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -57,12 +76,14 @@ export function ResearchChat() {
         body: JSON.stringify({
           messages: newMessages.map((msg) => ({ role: msg.role, content: msg.content })),
           image: image || undefined,
+          conversationId: conversationId || undefined,
         }),
       });
 
       const data = await res.json();
       if (data.ok) {
         const responseText = data.response;
+        if (data.conversationId) setConversationId(data.conversationId);
         setMessages([...newMessages, { role: "assistant", content: responseText }]);
         if (ttsEnabled) speak(responseText);
       } else {
@@ -121,6 +142,15 @@ export function ResearchChat() {
           </div>
           {/* Voice + TTS toggles */}
           <div className="flex items-center gap-2">
+            {messages.length > 0 ? (
+              <button
+                onClick={() => { setMessages([]); setConversationId(null); }}
+                className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2 text-xs font-medium text-[var(--text-secondary)] transition-colors hover:text-[var(--accent-cyan)]"
+                title="Start new conversation"
+              >
+                New chat
+              </button>
+            ) : null}
             {speechSupported ? (
               <button
                 onClick={handleMicClick}

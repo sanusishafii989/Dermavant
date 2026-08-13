@@ -1,7 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
-import { User } from "@/models";
+import { User, ChatHistory } from "@/models";
 
 const RESEARCH_SYSTEM_PROMPT = `You are a medical research assistant for licensed healthcare professionals on the Aetheris Health platform.
 
@@ -22,12 +22,9 @@ export async function POST(req: Request) {
     const GROQ_API_KEY = process.env.GROQ_API_KEY?.trim();
     const GROQ_MODEL = process.env.GROQ_MODEL?.trim() || "llama-3.3-70b-versatile";
 
-    console.log("[DOCTOR RESEARCH] Key prefix:", GROQ_API_KEY?.substring(0, 12) + "...", "Model:", GROQ_MODEL);
-
     if (!GROQ_API_KEY) {
-      console.error("[DOCTOR RESEARCH] GROQ_API_KEY not found in process.env");
       return NextResponse.json(
-        { ok: false, error: "Groq API key is not configured. Check .env.local for GROQ_API_KEY." },
+        { ok: false, error: "Groq API key is not configured." },
         { status: 500 }
       );
     }
@@ -39,7 +36,7 @@ export async function POST(req: Request) {
 
     const body = await req.json();
     const messages = body.messages;
-    const image = body.image;
+    const conversationId = body.conversationId;
 
     if (!Array.isArray(messages) || messages.length === 0) {
       return NextResponse.json(
@@ -58,7 +55,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // Use text-only model (vision model not available on this Groq account)
     const groqMessages: any[] = [
       { role: "system", content: RESEARCH_SYSTEM_PROMPT },
       ...messages.map((msg: { role: string; content: string }) => ({
@@ -100,15 +96,84 @@ export async function POST(req: Request) {
       );
     }
 
-    return NextResponse.json({ ok: true, response: responseText });
+    // Save chat history
+    const lastUserMsg = messages[messages.length - 1];
+    const title = lastUserMsg?.content?.slice(0, 50) || "Research conversation";
+
+    if (conversationId) {
+      // Append to existing conversation
+      await ChatHistory.updateOne(
+        { _id: conversationId, user_id: userDoc._id } as any,
+        {
+          $push: {
+            messages: {
+              $each: [
+                { role: "user", content: lastUserMsg.content },
+                { role: "assistant", content: responseText },
+              ],
+            },
+          },
+        }
+      ).catch(() => {});
+    } else {
+      // Create new conversation
+      const newChat = await ChatHistory.create({
+        user_id: userDoc._id,
+        role: "doctor",
+        title,
+        messages: [
+          { role: "user", content: lastUserMsg.content },
+          { role: "assistant", content: responseText },
+        ],
+      } as any).catch(() => null);
+
+      return NextResponse.json({
+        ok: true,
+        response: responseText,
+        conversationId: newChat?._id?.toString?.() || newChat?._id,
+      });
+    }
+
+    return NextResponse.json({ ok: true, response: responseText, conversationId });
   } catch (error: any) {
     console.error("[DOCTOR RESEARCH] Error:", error?.message || String(error));
     return NextResponse.json(
-      {
-        ok: false,
-        error: error?.message || "Failed to process research query",
-        details: error?.message || String(error),
-      },
+      { ok: false, error: error?.message || "Failed to process research query" },
+      { status: 500 }
+    );
+  }
+}
+
+// GET — load chat history
+export async function GET() {
+  try {
+    const { userId } = await auth();
+    if (!userId) return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
+
+    await connectDB();
+
+    const userDoc = await User.findOne({ clerkId: userId }).lean();
+    if (!userDoc || userDoc.role !== "doctor") {
+      return NextResponse.json({ ok: false, error: "Only doctors can access research history" }, { status: 403 });
+    }
+
+    const conversations = await ChatHistory.find({ user_id: userDoc._id, role: "doctor" } as any)
+      .sort({ updated_at: -1 })
+      .limit(20)
+      .lean();
+
+    return NextResponse.json({
+      ok: true,
+      conversations: conversations.map((c) => ({
+        id: c._id.toString(),
+        title: c.title,
+        messages: c.messages || [],
+        updatedAt: c.updated_at,
+      })),
+    });
+  } catch (error: any) {
+    return NextResponse.json(
+      { ok: false, error: "Failed to load chat history" },
       { status: 500 }
     );
   }

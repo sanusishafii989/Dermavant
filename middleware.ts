@@ -18,6 +18,8 @@ function isPublicRoute(pathname: string): boolean {
   if (pathname.startsWith("/api/dev")) return true;
   if (pathname.startsWith("/api/contact")) return true;
   if (pathname.startsWith("/api/support")) return true;
+  if (pathname.startsWith("/api/partners")) return true;
+  if (pathname.startsWith("/api/doctors")) return true;
   return false;
 }
 
@@ -66,24 +68,37 @@ export default clerkMiddleware(async (auth, req) => {
     sessionClaims as Record<string, unknown> | null | undefined
   );
 
+  // STRICT: If we can determine the role from claims, enforce it
   if (roleFromClaims && isUserRole(roleFromClaims)) {
     if (roleFromClaims === requiredRole) {
       return NextResponse.next();
     }
 
+    // Role mismatch — deny access
     if (isApiRoute) {
-      return new Response(JSON.stringify({ error: "Forbidden" }), {
+      return new Response(JSON.stringify({ error: "Forbidden — you do not have access to this portal" }), {
         status: 403,
         headers: { "Content-Type": "application/json" },
       });
     }
 
+    // Redirect to their correct portal
     if (ROLE_DASHBOARD[roleFromClaims]) {
       return NextResponse.redirect(new URL(ROLE_DASHBOARD[roleFromClaims], req.url));
     }
   }
 
-  return NextResponse.next();
+  // If no role in claims, deny access to protected routes
+  // Don't fall through — require a role
+  if (isApiRoute) {
+    return new Response(JSON.stringify({ error: "Forbidden — role not verified" }), {
+      status: 403,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
+  // For pages, redirect to sign-in
+  return redirectToSignIn({ returnBackUrl: req.url });
 });
 
 export const config = {
