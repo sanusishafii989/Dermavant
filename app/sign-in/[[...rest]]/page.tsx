@@ -1,8 +1,6 @@
 "use client";
 
-import dynamic from "next/dynamic";
-// Load Clerk SignIn only on the client to avoid hydration mismatches
-const SignIn = dynamic(() => import("@clerk/nextjs").then((m) => m.SignIn), { ssr: false });
+import { SignIn } from "@clerk/nextjs";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import { Card } from "@/components/ui/Card";
