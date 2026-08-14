@@ -48,15 +48,12 @@ export default clerkMiddleware(async (auth, req) => {
   }
 
   const requiredRole = getRequiredRoleForPath(pathname);
-  
-  // Not a protected route — allow
   if (!requiredRole) {
     return NextResponse.next();
   }
 
   const { userId, sessionClaims, redirectToSignIn } = await auth();
 
-  // Not logged in — redirect to sign-in
   if (!userId) {
     if (isApiRoute) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
@@ -67,60 +64,29 @@ export default clerkMiddleware(async (auth, req) => {
     return redirectToSignIn({ returnBackUrl: req.url });
   }
 
-  // Get role from Clerk session claims
+  // Get role from session claims only (no Clerk API calls in middleware)
   const userRole = getRoleFromClaims(
     sessionClaims as Record<string, unknown> | null | undefined
   );
 
-  // If we have a confirmed role, enforce it strictly
   if (userRole && isUserRole(userRole)) {
-    // Role matches — allow access
     if (userRole === requiredRole) {
       return NextResponse.next();
     }
 
-    // Role does NOT match — block and redirect to their correct portal
+    // Role mismatch — redirect to correct portal
     if (isApiRoute) {
-      return new Response(JSON.stringify({ error: "Forbidden — access denied for your role" }), {
+      return new Response(JSON.stringify({ error: "Forbidden" }), {
         status: 403,
         headers: { "Content-Type": "application/json" },
       });
     }
 
-    // Redirect to their own portal
-    const correctDashboard = ROLE_DASHBOARD[userRole];
-    return NextResponse.redirect(new URL(correctDashboard, req.url));
+    return NextResponse.redirect(new URL(ROLE_DASHBOARD[userRole], req.url));
   }
 
-  // No role in claims — try Clerk publicMetadata as fallback
-  // This handles the case where session claims don't have the role yet
-  try {
-    const { clerkClient } = await import("@clerk/nextjs/server");
-    const client = await clerkClient();
-    const clerkUser = await client.users.getUser(userId);
-    const publicRole = (clerkUser as any).publicMetadata?.role;
-
-    if (isUserRole(publicRole)) {
-      if (publicRole === requiredRole) {
-        return NextResponse.next();
-      }
-
-      if (isApiRoute) {
-        return new Response(JSON.stringify({ error: "Forbidden" }), {
-          status: 403,
-          headers: { "Content-Type": "application/json" },
-        });
-      }
-
-      const correctDashboard = ROLE_DASHBOARD[publicRole as UserRole];
-      return NextResponse.redirect(new URL(correctDashboard, req.url));
-    }
-  } catch {
-    // Clerk API call failed — allow through as last resort
-    // API routes will still verify role independently
-  }
-
-  // No role found anywhere — allow through, API routes handle it
+  // No role in claims — allow through
+  // Server-side page checks (currentUser().publicMetadata.role) will handle enforcement
   return NextResponse.next();
 });
 
