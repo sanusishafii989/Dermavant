@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { currentUser } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 import { PortalDashboardShell } from "@/components/layout/PortalDashboardShell";
 import { Avatar } from "@/components/ui/Avatar";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { patientNavLinks } from "@/lib/portal-nav";
+import { ROLE_DASHBOARD } from "@/lib/roles";
 
 export const dynamic = "force-dynamic";
 
@@ -61,6 +63,13 @@ const serviceCards = [
 
 export default async function PatientDashboardPage() {
   const user = await currentUser();
+
+  // Enforce role — redirect if not a patient
+  const userRole = (user as any)?.publicMetadata?.role;
+  if (userRole && userRole !== "patient") {
+    redirect(ROLE_DASHBOARD[userRole as keyof typeof ROLE_DASHBOARD] || "/");
+  }
+
   const fullName =
     user?.fullName ||
     [user?.firstName, user?.lastName].filter(Boolean).join(" ") ||

@@ -1,9 +1,11 @@
 import { currentUser } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 import { PortalDashboardShell } from "@/components/layout/PortalDashboardShell";
 import { Avatar } from "@/components/ui/Avatar";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { doctorNavLinks } from "@/lib/portal-nav";
+import { ROLE_DASHBOARD } from "@/lib/roles";
 import { connectDB } from "@/lib/db";
 import { Appointment, Doctor, Patient, Payment, User } from "@/models";
 import Link from "next/link";
@@ -49,6 +51,13 @@ function formatDate(dateStr: string) {
 
 export default async function DoctorDashboardPage() {
   const user = await currentUser();
+
+  // Enforce role — redirect if not a doctor
+  const userRole = (user as any)?.publicMetadata?.role;
+  if (userRole && userRole !== "doctor") {
+    redirect(ROLE_DASHBOARD[userRole as keyof typeof ROLE_DASHBOARD] || "/");
+  }
+
   const fullName =
     user?.fullName ||
     [user?.firstName, user?.lastName].filter(Boolean).join(" ") ||

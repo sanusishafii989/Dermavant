@@ -39,38 +39,69 @@ function getRequiredRoleForPath(pathname: string): UserRole | null {
 }
 
 export default clerkMiddleware(async (auth, req) => {
+  const pathname = req.nextUrl.pathname;
+  const isApiRoute = pathname.startsWith("/api/");
+
+  // Public routes — always allow
+  if (isPublicRoute(pathname)) {
+    return NextResponse.next();
+  }
+
+  const requiredRole = getRequiredRoleForPath(pathname);
+  
+  // Not a protected route — allow
+  if (!requiredRole) {
+    return NextResponse.next();
+  }
+
+  const { userId, sessionClaims, redirectToSignIn } = await auth();
+
+  // Not logged in — redirect to sign-in
+  if (!userId) {
+    if (isApiRoute) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+    return redirectToSignIn({ returnBackUrl: req.url });
+  }
+
+  // Get role from Clerk session claims
+  const userRole = getRoleFromClaims(
+    sessionClaims as Record<string, unknown> | null | undefined
+  );
+
+  // If we have a confirmed role, enforce it strictly
+  if (userRole && isUserRole(userRole)) {
+    // Role matches — allow access
+    if (userRole === requiredRole) {
+      return NextResponse.next();
+    }
+
+    // Role does NOT match — block and redirect to their correct portal
+    if (isApiRoute) {
+      return new Response(JSON.stringify({ error: "Forbidden — access denied for your role" }), {
+        status: 403,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    // Redirect to their own portal
+    const correctDashboard = ROLE_DASHBOARD[userRole];
+    return NextResponse.redirect(new URL(correctDashboard, req.url));
+  }
+
+  // No role in claims — try Clerk publicMetadata as fallback
+  // This handles the case where session claims don't have the role yet
   try {
-    const pathname = req.nextUrl.pathname;
-    const isApiRoute = pathname.startsWith("/api/");
+    const { clerkClient } = await import("@clerk/nextjs/server");
+    const client = await clerkClient();
+    const clerkUser = await client.users.getUser(userId);
+    const publicRole = (clerkUser as any).publicMetadata?.role;
 
-    // Allow public routes without any checks
-    if (isPublicRoute(pathname)) {
-      return NextResponse.next();
-    }
-
-    const { userId, sessionClaims, redirectToSignIn } = await auth();
-
-    const requiredRole = getRequiredRoleForPath(pathname);
-    if (!requiredRole) {
-      return NextResponse.next();
-    }
-
-    if (!userId) {
-      if (isApiRoute) {
-        return new Response(JSON.stringify({ error: "Unauthorized" }), {
-          status: 401,
-          headers: { "Content-Type": "application/json" },
-        });
-      }
-      return redirectToSignIn({ returnBackUrl: req.url });
-    }
-
-    const roleFromClaims = getRoleFromClaims(
-      sessionClaims as Record<string, unknown> | null | undefined
-    );
-
-    if (roleFromClaims && isUserRole(roleFromClaims)) {
-      if (roleFromClaims === requiredRole) {
+    if (isUserRole(publicRole)) {
+      if (publicRole === requiredRole) {
         return NextResponse.next();
       }
 
@@ -81,18 +112,16 @@ export default clerkMiddleware(async (auth, req) => {
         });
       }
 
-      if (ROLE_DASHBOARD[roleFromClaims]) {
-        return NextResponse.redirect(new URL(ROLE_DASHBOARD[roleFromClaims], req.url));
-      }
+      const correctDashboard = ROLE_DASHBOARD[publicRole as UserRole];
+      return NextResponse.redirect(new URL(correctDashboard, req.url));
     }
-
-    // No role found — allow through, API routes will verify independently
-    return NextResponse.next();
-  } catch (error) {
-    // If middleware crashes, allow the request through rather than blocking everything
-    console.error("[MIDDLEWARE ERROR]", error);
-    return NextResponse.next();
+  } catch {
+    // Clerk API call failed — allow through as last resort
+    // API routes will still verify role independently
   }
+
+  // No role found anywhere — allow through, API routes handle it
+  return NextResponse.next();
 });
 
 export const config = {
