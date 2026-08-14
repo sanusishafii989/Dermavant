@@ -1,6 +1,6 @@
 import crypto from "crypto";
 import { connectDB } from "@/lib/db";
-import { Appointment, Payment, PharmacyOrder, Wallet, WalletTransaction, Patient, User } from "@/models";
+import { Appointment, Payment, PharmacyOrder, Wallet, WalletTransaction, Patient, User, Medicine } from "@/models";
 
 export function getPaystackSecret(): string {
   return process.env.PAYSTACK_SECRET_KEY || "";
@@ -151,6 +151,7 @@ export async function markPharmacyOrderPaid(params: {
     return order;
   }
 
+  // Mark order as paid
   await PharmacyOrder.updateOne(
     { _id: order._id as any },
     {
@@ -160,6 +161,49 @@ export async function markPharmacyOrderPaid(params: {
       },
     }
   );
+
+  // Reduce medicine quantities in stock
+  for (const item of order.items) {
+    await Medicine.updateOne(
+      { _id: item.medicine_id } as any,
+      { $inc: { quantity: -item.qty } }
+    ).catch(() => {});
+  }
+
+  // Credit partner wallet with 95% (5% platform commission)
+  const PHARMACY_COMMISSION_RATE = 5;
+  const partnerEarnings = Math.round(order.total * (100 - PHARMACY_COMMISSION_RATE) / 100);
+
+  let partnerWallet = await Wallet.findOne({ ownerId: order.partner_id as any });
+  if (!partnerWallet) {
+    partnerWallet = await Wallet.create({
+      ownerId: order.partner_id,
+      ownerRole: "partner",
+      balance: 0,
+      currency: "NGN",
+    } as any);
+  }
+  partnerWallet.balance += partnerEarnings;
+  await partnerWallet.save();
+
+  // Record the transaction
+  await WalletTransaction.create({
+    wallet_id: partnerWallet._id,
+    patient_id: order.patient_id,
+    type: "pharmacy_purchase",
+    amount: partnerEarnings,
+    direction: "credit",
+    currency: "NGN",
+    status: "completed",
+    reference: `PHARM-SALE-${order.order_id}-${Date.now()}`,
+    description: `Pharmacy order ${order.order_id} — ${order.items.length} items`,
+    metadata: {
+      order_id: order.order_id,
+      gross_amount: order.total,
+      commission_rate: PHARMACY_COMMISSION_RATE,
+      commission_amount: order.total - partnerEarnings,
+    },
+  } as any).catch(() => {});
 
   return PharmacyOrder.findOne({ _id: order._id } as any).lean();
 }
