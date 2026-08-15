@@ -1,7 +1,8 @@
 import { ClerkProvider } from "@clerk/nextjs";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
+import { RegisterSW } from "@/components/pwa/RegisterSW";
 import "leaflet/dist/leaflet.css";
 import "./globals.css";
 
@@ -19,6 +20,27 @@ export const metadata: Metadata = {
   title: "Aetheris Health — AI-Powered Digital Healthcare Ecosystem",
   description:
     "Connecting patients to instant dermatological triage, licensed doctors, and verified medicine — all in one platform.",
+  manifest: "/manifest.json",
+  icons: {
+    icon: [
+      { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-16.png", sizes: "16x16", type: "image/png" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Aetheris Health",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#023047",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export default function RootLayout({
@@ -46,7 +68,10 @@ export default function RootLayout({
           />
         </head>
         <body className="min-h-full flex flex-col bg-[var(--bg-primary)] text-[var(--text-primary)]">
-          <ThemeProvider>{children}</ThemeProvider>
+          <ThemeProvider>
+            {children}
+            <RegisterSW />
+          </ThemeProvider>
         </body>
       </html>
     </ClerkProvider>

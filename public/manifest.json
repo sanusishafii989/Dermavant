@@ -1,0 +1,54 @@
+{
+  "name": "Aetheris Health — AI-Powered Digital Healthcare Ecosystem",
+  "short_name": "Aetheris",
+  "description": "Connecting patients to instant dermatological triage, licensed doctors, and verified medicine — all in one platform.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#023047",
+  "background_color": "#000814",
+  "categories": ["health", "medical", "healthcare"],
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Patient Portal",
+      "url": "/patient/dashboard",
+      "description": "Access patient dashboard"
+    },
+    {
+      "name": "Doctor Portal",
+      "url": "/doctor/dashboard",
+      "description": "Access doctor dashboard"
+    },
+    {
+      "name": "Pharmacy Portal",
+      "url": "/pharmacy/dashboard",
+      "description": "Access pharmacy dashboard"
+    }
+  ]
+}
