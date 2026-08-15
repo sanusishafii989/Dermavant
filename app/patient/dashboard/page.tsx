@@ -45,12 +45,6 @@ const serviceCards = [
     accent: "border-[var(--accent-cyan)]/40 bg-[var(--accent-cyan)]/10",
   },
   {
-    title: "Clinical AI Suite",
-    description: "View your AI triage reports and consultation history.",
-    href: "/patient/consultation",
-    accent: "border-[var(--accent-gold)]/40 bg-[var(--accent-gold)]/10",
-  },
-  {
     title: "Global E-Pharmacy",
     description: "Browse essential medicines and trusted partner fulfillment.",
     href: "/patient/pharmacy",
