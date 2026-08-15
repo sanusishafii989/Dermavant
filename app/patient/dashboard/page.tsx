@@ -46,8 +46,8 @@ const serviceCards = [
   },
   {
     title: "Clinical AI Suite",
-    description: "Use advanced AI tools to summarize and guide ongoing care.",
-    href: "/patient/dashboard/start-ai-consultation",
+    description: "View your AI triage reports and consultation history.",
+    href: "/patient/consultation",
     accent: "border-[var(--accent-gold)]/40 bg-[var(--accent-gold)]/10",
   },
   {
