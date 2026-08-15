@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { DoctorCard } from "@/components/patient/DoctorCard";
+import { Video, Phone, MessageSquare } from "lucide-react";
 
 type DoctorSummary = {
   id: string;
@@ -30,6 +31,7 @@ export function BookingWizard({ patientName }: { patientName: string }) {
   const [selectedDoctorId, setSelectedDoctorId] = useState<string>("");
   const [selectedDate, setSelectedDate] = useState(() => new Date().toISOString().split("T")[0]);
   const [selectedTime, setSelectedTime] = useState("09:00");
+  const [consultationType, setConsultationType] = useState<"video" | "voice" | "chat">("video");
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
@@ -101,7 +103,7 @@ export function BookingWizard({ patientName }: { patientName: string }) {
           doctorId: selectedDoctor.id,
           date: selectedDate,
           time: selectedTime,
-          type: "video",
+          type: consultationType,
         }),
       });
 
@@ -205,6 +207,8 @@ export function BookingWizard({ patientName }: { patientName: string }) {
               <p>Specialization: {selectedDoctor?.specialization || "—"}</p>
               <p>Preferred date: {selectedDate}</p>
               <p>Preferred time: {selectedTime}</p>
+              <p>Consultation type: <span className="capitalize">{consultationType}</span></p>
+              <p>Fee: ₦{selectedDoctor?.consultation_fee?.toLocaleString() || "—"}</p>
               <p>Payment status: pending</p>
             </div>
           </div>
@@ -216,6 +220,31 @@ export function BookingWizard({ patientName }: { patientName: string }) {
               value={selectedDate}
               onChange={(event) => setSelectedDate(event.target.value)}
             />
+
+            <div className="mt-4">
+              <label className="mb-2 block text-sm text-[var(--text-primary)]">Consultation type</label>
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { value: "video", label: "Video", icon: <Video className="h-4 w-4" /> },
+                  { value: "voice", label: "Voice", icon: <Phone className="h-4 w-4" /> },
+                  { value: "chat", label: "Chat", icon: <MessageSquare className="h-4 w-4" /> },
+                ].map((opt) => (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => setConsultationType(opt.value as "video" | "voice" | "chat")}
+                    className={`flex flex-col items-center gap-1 rounded-xl border px-3 py-2.5 text-xs font-medium transition-colors ${
+                      consultationType === opt.value
+                        ? "border-[var(--accent-cyan)] bg-[var(--accent-cyan)]/10 text-[var(--accent-cyan)]"
+                        : "border-[var(--border)] bg-[var(--bg-input)] text-[var(--text-secondary)] hover:border-[var(--accent-cyan)]/40"
+                    }`}
+                  >
+                    {opt.icon}
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
 
             <div className="mt-4">
               <Button

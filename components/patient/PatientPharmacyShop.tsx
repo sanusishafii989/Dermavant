@@ -23,6 +23,8 @@ export type MedicineItem = {
 
 export default function PatientPharmacyShop() {
   const [query, setQuery] = useState("");
+  const [deliveryAddress, setDeliveryAddress] = useState("");
+  const [showCheckoutModal, setShowCheckoutModal] = useState(false);
   const [items, setItems] = useState<MedicineItem[]>([]);
   const [cart, setCart] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(false);
@@ -30,6 +32,20 @@ export default function PatientPharmacyShop() {
   const [error, setError] = useState("");
 
   useEffect(() => {
+    // Load patient's saved address
+    const loadAddress = async () => {
+      try {
+        const res = await fetch("/api/patient/profile");
+        const data = await res.json();
+        if (data.ok && data.profile?.address) {
+          setDeliveryAddress(data.profile.address);
+        }
+      } catch {
+        // silent — user can type address manually
+      }
+    };
+    void loadAddress();
+
     const fetchItems = async () => {
       setLoading(true);
       try {
@@ -109,7 +125,7 @@ export default function PatientPharmacyShop() {
             partnerName: entry.item.partner_name,
           })),
           total: total,
-          deliveryAddress: "Default delivery address",
+          deliveryAddress: deliveryAddress || "Pickup at pharmacy",
           partnerId: cartItems[0]?.item.partner_id,
           callbackUrl: `${window.location.origin}/patient/dashboard/payment/success`,
         }),
@@ -228,8 +244,20 @@ export default function PatientPharmacyShop() {
                   <span>₦{total.toLocaleString()}</span>
                 </div>
               </div>
+
+              <div>
+                <label className="mb-2 block text-sm font-medium text-[var(--text-secondary)]">Delivery address</label>
+                <textarea
+                  className="w-full resize-none rounded-xl border border-[var(--border)] bg-[var(--bg-input)] px-4 py-2.5 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent-cyan)] focus:outline-none"
+                  rows={2}
+                  value={deliveryAddress}
+                  onChange={(e) => setDeliveryAddress(e.target.value)}
+                  placeholder="Enter your delivery address or type 'Pickup at pharmacy'"
+                />
+              </div>
+
               <Button onClick={checkout} disabled={checkoutLoading}>
-                {checkoutLoading ? "Starting payment…" : "Checkout with Paystack"}
+                {checkoutLoading ? "Starting payment..." : "Checkout with Paystack"}
               </Button>
             </div>
           )}

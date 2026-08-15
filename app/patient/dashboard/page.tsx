@@ -7,6 +7,9 @@ import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { patientNavLinks } from "@/lib/portal-nav";
 import { ROLE_DASHBOARD } from "@/lib/roles";
+import { connectDB } from "@/lib/db";
+import { Appointment, Patient, PharmacyOrder, User, Wallet, AIReport } from "@/models";
+import { Calendar, Wallet as WalletIcon, Package, Brain } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -75,6 +78,42 @@ export default async function PatientDashboardPage() {
     [user?.firstName, user?.lastName].filter(Boolean).join(" ") ||
     "Patient";
 
+  // Fetch live data
+  await connectDB();
+  const userDoc = await User.findOne({ clerkId: user?.id }).lean();
+  const patient = userDoc ? await Patient.findOne({ user_id: userDoc._id as any }).lean() : null;
+
+  let upcomingCount = 0;
+  let walletBalance = 0;
+  let activeOrders = 0;
+  let aiReportsCount = 0;
+
+  if (patient) {
+    upcomingCount = await Appointment.countDocuments({
+      patient_id: patient._id as any,
+      consultation_status: "scheduled",
+    } as any);
+
+    const wallet = await Wallet.findOne({ ownerId: userDoc!._id as any }).lean();
+    if (wallet) walletBalance = wallet.balance ?? 0;
+
+    activeOrders = await PharmacyOrder.countDocuments({
+      patient_id: patient._id as any,
+      delivery_status: { $in: ["pending", "processing", "shipped"] },
+    } as any);
+
+    aiReportsCount = await AIReport.countDocuments({
+      patient_id: patient._id as any,
+    } as any);
+  }
+
+  const stats = [
+    { label: "Upcoming", value: upcomingCount, icon: <Calendar className="h-5 w-5" />, color: "text-[var(--accent-cyan)]" },
+    { label: "Wallet", value: `₦${walletBalance.toLocaleString()}`, icon: <WalletIcon className="h-5 w-5" />, color: "text-[var(--accent-gold)]" },
+    { label: "Active orders", value: activeOrders, icon: <Package className="h-5 w-5" />, color: "text-emerald-500" },
+    { label: "AI reports", value: aiReportsCount, icon: <Brain className="h-5 w-5" />, color: "text-[var(--accent-cyan)]" },
+  ];
+
   return (
     <PortalDashboardShell title="Patient Portal" links={patientNavLinks}>
       <div className="space-y-6">
@@ -92,9 +131,16 @@ export default async function PatientDashboardPage() {
               </div>
             </div>
 
-            <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] px-4 py-3 text-sm text-[var(--text-secondary)]">
-              <p className="font-medium text-[var(--text-primary)]">Today&apos;s care snapshot</p>
-              <p className="mt-1">Your dashboard shell is active and ready for future care flows.</p>
+            <div className="grid grid-cols-2 gap-3">
+              {stats.map((stat) => (
+                <div key={stat.label} className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] px-4 py-3">
+                  <div className="flex items-center gap-2">
+                    <span className={stat.color}>{stat.icon}</span>
+                    <p className="text-xs uppercase tracking-[0.15em] text-[var(--text-muted)]">{stat.label}</p>
+                  </div>
+                  <p className="mt-1 text-xl font-bold text-[var(--text-primary)]">{stat.value}</p>
+                </div>
+              ))}
             </div>
           </div>
         </Card>

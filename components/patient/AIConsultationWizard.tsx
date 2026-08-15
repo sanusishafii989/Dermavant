@@ -3,7 +3,7 @@
 import { FormEvent, useRef, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { Mic, MicOff, Volume2, VolumeX, Image as ImageIcon, X, Stethoscope } from "lucide-react";
+import { Mic, MicOff, Volume2, VolumeX, Image as ImageIcon, X, AlertCircle } from "lucide-react";
 import { useVoiceChat } from "@/lib/hooks/useVoiceChat";
 
 type PossibleCondition = {
@@ -259,6 +259,22 @@ export function AIConsultationWizard() {
           </div>
         </Card>
       ) : null}
+
+      {/* Medical disclaimer */}
+      <Card className="border border-amber-500/20 bg-amber-500/5">
+        <div className="flex items-start gap-3">
+          <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-amber-500" />
+          <div>
+            <p className="text-sm font-medium text-[var(--text-primary)]">Medical Disclaimer</p>
+            <p className="mt-1 text-xs text-[var(--text-secondary)]">
+              The AI dermatological triage tool provides preliminary assessments only and is not a medical diagnosis.
+              It does not replace consultation with a licensed healthcare professional. Always seek professional medical
+              advice for diagnosis and treatment. Aetheris Health is not liable for clinical decisions made based solely
+              on AI triage results. This service is intended for adults 18 years and older.
+            </p>
+          </div>
+        </div>
+      </Card>
     </div>
   );
 }

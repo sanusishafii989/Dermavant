@@ -1,14 +1,5 @@
-import { patientNavLinks } from "@/lib/portal-nav";
-import { PlaceholderPage } from "@/components/PlaceholderPage";
+import { redirect } from "next/navigation";
 
-export const dynamic = "force-dynamic";
-
-export default function PatientWalletPage() {
-  return (
-    <PlaceholderPage
-      title="Wallet"
-      description="Your wallet details and balances will be available here soon."
-      links={patientNavLinks}
-    />
-  );
+export default function PatientWalletRedirect() {
+  redirect("/patient/dashboard/wallet");
 }
