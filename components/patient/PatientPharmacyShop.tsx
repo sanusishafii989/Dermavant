@@ -25,6 +25,8 @@ export default function PatientPharmacyShop() {
   const [query, setQuery] = useState("");
   const [deliveryAddress, setDeliveryAddress] = useState("");
   const [showCheckoutModal, setShowCheckoutModal] = useState(false);
+  const [walletBalance, setWalletBalance] = useState(0);
+  const [payWithWallet, setPayWithWallet] = useState(false);
   const [items, setItems] = useState<MedicineItem[]>([]);
   const [cart, setCart] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(false);
@@ -32,19 +34,22 @@ export default function PatientPharmacyShop() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    // Load patient's saved address
-    const loadAddress = async () => {
+    // Load patient's saved address and wallet balance
+    const loadProfile = async () => {
+      try {
+        const res = await fetch("/api/patient/wallet");
+        const data = await res.json();
+        if (data.ok) setWalletBalance(data.balance || 0);
+      } catch {}
       try {
         const res = await fetch("/api/patient/profile");
         const data = await res.json();
         if (data.ok && data.profile?.address) {
           setDeliveryAddress(data.profile.address);
         }
-      } catch {
-        // silent — user can type address manually
-      }
+      } catch {}
     };
-    void loadAddress();
+    void loadProfile();
 
     const fetchItems = async () => {
       setLoading(true);
@@ -111,6 +116,56 @@ export default function PatientPharmacyShop() {
     setError("");
 
     try {
+      // If paying with wallet, create order first then pay from wallet
+      if (payWithWallet && walletBalance >= total) {
+        // Create the order via Paystack init (creates PharmacyOrder in DB)
+        const initResponse = await fetch("/api/payment/paystack/init", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            purpose: "pharmacy_order",
+            items: cartItems.map((entry) => ({
+              medicineId: entry.item._id,
+              name: entry.item.name,
+              qty: entry.qty,
+              unitPrice: entry.item.price,
+              partnerId: entry.item.partner_id,
+              partnerName: entry.item.partner_name,
+            })),
+            total: total,
+            deliveryAddress: deliveryAddress || "Pickup at pharmacy",
+            partnerId: cartItems[0]?.item.partner_id,
+            callbackUrl: `${window.location.origin}/patient/dashboard/payment/success`,
+          }),
+        });
+
+        const initData = await initResponse.json();
+        if (!initData.ok) {
+          setError(initData.error || "Failed to create order.");
+          return;
+        }
+
+        // Now pay from wallet using the order reference
+        const walletResponse = await fetch("/api/payment/wallet", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            type: "pharmacy",
+            orderId: initData.reference.replace(/^pharm_/, "").replace(/_\d+$/, ""),
+          }),
+        });
+
+        const walletData = await walletResponse.json();
+        if (walletData.ok) {
+          window.location.href = walletData.redirectUrl;
+          return;
+        } else {
+          setError(walletData.error || "Wallet payment failed");
+          return;
+        }
+      }
+
+      // Pay with Paystack
       const response = await fetch("/api/payment/paystack/init", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -256,8 +311,28 @@ export default function PatientPharmacyShop() {
                 />
               </div>
 
+              {/* Wallet payment option */}
+              <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-input)] p-3">
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={payWithWallet}
+                    onChange={(e) => setPayWithWallet(e.target.checked)}
+                    className="h-4 w-4 rounded border-[var(--border)] text-[var(--accent-cyan)]"
+                    disabled={walletBalance < total}
+                  />
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-[var(--text-primary)]">Pay from wallet</p>
+                    <p className="text-xs text-[var(--text-secondary)]">
+                      Balance: ₦{walletBalance.toLocaleString()}
+                      {walletBalance < total ? ` (insufficient — need ₦${total.toLocaleString()})` : payWithWallet ? " — will be debited instantly" : ""}
+                    </p>
+                  </div>
+                </label>
+              </div>
+
               <Button onClick={checkout} disabled={checkoutLoading}>
-                {checkoutLoading ? "Starting payment..." : "Checkout with Paystack"}
+                {checkoutLoading ? "Starting payment..." : payWithWallet ? "Pay from wallet" : "Checkout with Paystack"}
               </Button>
             </div>
           )}

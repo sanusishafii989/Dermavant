@@ -32,6 +32,8 @@ export function BookingWizard({ patientName }: { patientName: string }) {
   const [selectedDate, setSelectedDate] = useState(() => new Date().toISOString().split("T")[0]);
   const [selectedTime, setSelectedTime] = useState("09:00");
   const [consultationType, setConsultationType] = useState<"video" | "voice" | "chat">("video");
+  const [walletBalance, setWalletBalance] = useState(0);
+  const [payWithWallet, setPayWithWallet] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
@@ -69,6 +71,16 @@ export function BookingWizard({ patientName }: { patientName: string }) {
     };
 
     loadDoctors();
+
+    // Load wallet balance
+    const loadWallet = async () => {
+      try {
+        const res = await fetch("/api/patient/wallet");
+        const data = await res.json();
+        if (data.ok) setWalletBalance(data.balance || 0);
+      } catch {}
+    };
+    void loadWallet();
   }, [specialization]);
 
   useEffect(() => {
@@ -117,6 +129,28 @@ export function BookingWizard({ patientName }: { patientName: string }) {
         throw new Error(appointmentPayload.details || appointmentPayload.error || "Booking failed");
       }
 
+      // If paying with wallet, use wallet payment API
+      if (payWithWallet && walletBalance >= selectedDoctor.consultation_fee) {
+        const walletResponse = await fetch("/api/payment/wallet", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            type: "appointment",
+            appointmentId: appointmentPayload.appointmentId,
+          }),
+        });
+
+        const walletData = await walletResponse.json();
+        if (walletData.ok) {
+          setAppointmentId(appointmentPayload.appointmentId || null);
+          window.location.href = walletData.redirectUrl;
+          return;
+        } else {
+          throw new Error(walletData.error || "Wallet payment failed");
+        }
+      }
+
+      // Otherwise use Paystack
       const paymentResponse = await fetch("/api/payment/paystack/init", {
         method: "POST",
         headers: {
@@ -246,6 +280,30 @@ export function BookingWizard({ patientName }: { patientName: string }) {
               </div>
             </div>
 
+            {/* Wallet payment option */}
+            <div className="mt-4 rounded-2xl border border-[var(--border)] bg-[var(--bg-input)] p-3">
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={payWithWallet}
+                  onChange={(e) => setPayWithWallet(e.target.checked)}
+                  className="h-4 w-4 rounded border-[var(--border)] text-[var(--accent-cyan)]"
+                  disabled={walletBalance < (selectedDoctor?.consultation_fee || 0)}
+                />
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-[var(--text-primary)]">Pay from wallet</p>
+                  <p className="text-xs text-[var(--text-secondary)]">
+                    Balance: ₦{walletBalance.toLocaleString()}
+                    {walletBalance < (selectedDoctor?.consultation_fee || 0) && selectedDoctor
+                      ? ` (insufficient — need ₦${selectedDoctor.consultation_fee.toLocaleString()})`
+                      : payWithWallet
+                        ? " — will be debited instantly"
+                        : ""}
+                  </p>
+                </div>
+              </label>
+            </div>
+
             <div className="mt-4">
               <Button
                 variant="gold"
@@ -254,7 +312,7 @@ export function BookingWizard({ patientName }: { patientName: string }) {
                 onClick={handleConfirmBooking}
                 disabled={isSubmitting || !selectedDoctor}
               >
-                {isSubmitting ? "Confirming…" : "Confirm booking"}
+                {isSubmitting ? "Confirming…" : payWithWallet ? "Pay from wallet & confirm" : "Pay with Paystack & confirm"}
               </Button>
             </div>
           </div>
