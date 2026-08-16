@@ -250,6 +250,9 @@ export default function PatientPharmacyShop() {
                         <span>{item.category}</span>
                       </div>
                       <h2 className="mt-2 text-lg font-semibold text-[var(--text-primary)]">{item.name}</h2>
+                      {item.partner_name ? (
+                        <p className="mt-1 text-xs text-[var(--accent-cyan)]">Sold by: {item.partner_name}</p>
+                      ) : null}
                       <p className="mt-2 text-sm text-[var(--text-secondary)]">Stock: {item.quantity > 0 ? item.quantity : "Out of stock"}</p>
                     </div>
                   </div>

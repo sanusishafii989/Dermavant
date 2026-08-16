@@ -10,6 +10,7 @@ import {
   Pill,
   Settings,
   Shield,
+  ShieldCheck,
   ShoppingBag,
   Stethoscope,
   Users,
@@ -36,6 +37,7 @@ export const doctorNavLinks: SidebarLink[] = [
   { href: "/doctor/wallet", label: "Wallet", icon: <Wallet className="h-4 w-4" /> },
   { href: "/doctor/research-chat", label: "Research Chat", icon: <MessageSquare className="h-4 w-4" /> },
   { href: "/doctor/support", label: "Support", icon: <Headphones className="h-4 w-4" /> },
+  { href: "/doctor/kyc", label: "Verification", icon: <ShieldCheck className="h-4 w-4" /> },
   { href: "/doctor/profile", label: "Profile", icon: <Settings className="h-4 w-4" /> },
 ];
 
@@ -45,6 +47,7 @@ export const pharmacyNavLinks: SidebarLink[] = [
   { href: "/pharmacy/orders", label: "Orders", icon: <ClipboardList className="h-4 w-4" /> },
   { href: "/pharmacy/wallet", label: "Wallet", icon: <Wallet className="h-4 w-4" /> },
   { href: "/pharmacy/support", label: "Support", icon: <Headphones className="h-4 w-4" /> },
+  { href: "/pharmacy/kyc", label: "Verification", icon: <ShieldCheck className="h-4 w-4" /> },
   { href: "/pharmacy/profile", label: "Profile", icon: <Settings className="h-4 w-4" /> },
 ];
 
