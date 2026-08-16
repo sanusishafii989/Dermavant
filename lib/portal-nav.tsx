@@ -26,6 +26,7 @@ export const patientNavLinks: SidebarLink[] = [
   { href: "/patient/consultation", label: "Consultation", icon: <Stethoscope className="h-4 w-4" /> },
   { href: "/patient/dashboard/wallet", label: "Wallet", icon: <Wallet className="h-4 w-4" /> },
   { href: "/patient/dashboard/medical-history", label: "Medical History", icon: <History className="h-4 w-4" /> },
+  { href: "/patient/support", label: "Support", icon: <Headphones className="h-4 w-4" /> },
   { href: "/patient/profile", label: "Profile", icon: <Settings className="h-4 w-4" /> },
 ];
 
@@ -34,6 +35,7 @@ export const doctorNavLinks: SidebarLink[] = [
   { href: "/doctor/appointments", label: "Appointments", icon: <Calendar className="h-4 w-4" /> },
   { href: "/doctor/wallet", label: "Wallet", icon: <Wallet className="h-4 w-4" /> },
   { href: "/doctor/research-chat", label: "Research Chat", icon: <MessageSquare className="h-4 w-4" /> },
+  { href: "/doctor/support", label: "Support", icon: <Headphones className="h-4 w-4" /> },
   { href: "/doctor/profile", label: "Profile", icon: <Settings className="h-4 w-4" /> },
 ];
 
@@ -42,6 +44,7 @@ export const pharmacyNavLinks: SidebarLink[] = [
   { href: "/pharmacy/catalogue", label: "Catalogue", icon: <Package className="h-4 w-4" /> },
   { href: "/pharmacy/orders", label: "Orders", icon: <ClipboardList className="h-4 w-4" /> },
   { href: "/pharmacy/wallet", label: "Wallet", icon: <Wallet className="h-4 w-4" /> },
+  { href: "/pharmacy/support", label: "Support", icon: <Headphones className="h-4 w-4" /> },
   { href: "/pharmacy/profile", label: "Profile", icon: <Settings className="h-4 w-4" /> },
 ];
 

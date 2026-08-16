@@ -50,3 +50,41 @@ export async function POST(request: Request) {
     );
   }
 }
+
+export async function GET() {
+  try {
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
+    }
+
+    await connectDB();
+    const user = await User.findOne({ clerkId: userId }).lean();
+    if (!user) {
+      return NextResponse.json({ ok: false, error: "User record not found" }, { status: 404 });
+    }
+
+    const tickets = await SupportTicket.find({ userId: user._id } as any)
+      .sort({ createdAt: -1 })
+      .lean();
+
+    return NextResponse.json({
+      ok: true,
+      tickets: tickets.map((t) => ({
+        _id: t._id.toString(),
+        ticket_id: t._id.toString(),
+        subject: t.subject,
+        message: t.message,
+        category: t.category,
+        status: t.status,
+        created_at: t.createdAt,
+        response: (t as any).response || (t as any).adminResponse || "",
+      })),
+    });
+  } catch (error: any) {
+    return NextResponse.json(
+      { ok: false, error: "Failed to load support tickets" },
+      { status: 500 }
+    );
+  }
+}
