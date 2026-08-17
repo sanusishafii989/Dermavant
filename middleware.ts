@@ -85,9 +85,17 @@ export default clerkMiddleware(async (auth, req) => {
     return NextResponse.redirect(new URL(ROLE_DASHBOARD[userRole], req.url));
   }
 
-  // No role in claims — allow through
-  // Server-side page checks (currentUser().publicMetadata.role) will handle enforcement
-  return NextResponse.next();
+  // No role in claims — block access
+  // User must have a role assigned in Clerk to access any portal
+  if (isApiRoute) {
+    return new Response(JSON.stringify({ error: "Forbidden — role not assigned" }), {
+      status: 403,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
+  // Redirect to sign-in so they can get their role set
+  return redirectToSignIn({ returnBackUrl: req.url });
 });
 
 export const config = {
