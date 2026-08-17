@@ -49,6 +49,8 @@ export async function GET() {
         _id: order._id.toString(),
         patient_name: patientUser?.fullName || "Unknown patient",
         patient_email: patientUser?.email || "",
+        fulfillment_type: (order as any).fulfillment_type || "delivery",
+        patient_confirmed: (order as any).patient_confirmed || false,
       };
     });
 

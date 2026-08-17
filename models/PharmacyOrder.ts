@@ -49,6 +49,13 @@ const PharmacyOrderSchema = new Schema(
     },
     delivery_address: { type: String, default: "" },
     payment_reference: { type: String, default: "" },
+    fulfillment_type: {
+      type: String,
+      enum: ["delivery", "pickup"],
+      default: "delivery",
+    },
+    patient_confirmed: { type: Boolean, default: false },
+    patient_confirmed_at: { type: Date, default: null },
   },
   { timestamps: { createdAt: "created_at", updatedAt: "updated_at" } }
 );

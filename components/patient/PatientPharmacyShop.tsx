@@ -27,6 +27,7 @@ export default function PatientPharmacyShop() {
   const [showCheckoutModal, setShowCheckoutModal] = useState(false);
   const [walletBalance, setWalletBalance] = useState(0);
   const [payWithWallet, setPayWithWallet] = useState(false);
+  const [fulfillmentType, setFulfillmentType] = useState<"delivery" | "pickup">("delivery");
   const [items, setItems] = useState<MedicineItem[]>([]);
   const [cart, setCart] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(false);
@@ -133,7 +134,8 @@ export default function PatientPharmacyShop() {
               partnerName: entry.item.partner_name,
             })),
             total: total,
-            deliveryAddress: deliveryAddress || "Pickup at pharmacy",
+            deliveryAddress: fulfillmentType === "pickup" ? "Pickup at pharmacy" : (deliveryAddress || "Delivery address needed"),
+            fulfillmentType: fulfillmentType,
             partnerId: cartItems[0]?.item.partner_id,
             callbackUrl: `${window.location.origin}/patient/dashboard/payment/success`,
           }),
@@ -304,15 +306,49 @@ export default function PatientPharmacyShop() {
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-medium text-[var(--text-secondary)]">Delivery address</label>
-                <textarea
-                  className="w-full resize-none rounded-xl border border-[var(--border)] bg-[var(--bg-input)] px-4 py-2.5 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent-cyan)] focus:outline-none"
-                  rows={2}
-                  value={deliveryAddress}
-                  onChange={(e) => setDeliveryAddress(e.target.value)}
-                  placeholder="Enter your delivery address or type 'Pickup at pharmacy'"
-                />
+                <label className="mb-2 block text-sm font-medium text-[var(--text-secondary)]">Fulfillment option</label>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setFulfillmentType("delivery")}
+                    className={`rounded-xl border px-3 py-2.5 text-sm font-medium transition-colors ${
+                      fulfillmentType === "delivery"
+                        ? "border-[var(--accent-cyan)] bg-[var(--accent-cyan)]/10 text-[var(--accent-cyan)]"
+                        : "border-[var(--border)] bg-[var(--bg-input)] text-[var(--text-secondary)]"
+                    }`}
+                  >
+                    Delivery
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFulfillmentType("pickup")}
+                    className={`rounded-xl border px-3 py-2.5 text-sm font-medium transition-colors ${
+                      fulfillmentType === "pickup"
+                        ? "border-[var(--accent-cyan)] bg-[var(--accent-cyan)]/10 text-[var(--accent-cyan)]"
+                        : "border-[var(--border)] bg-[var(--bg-input)] text-[var(--text-secondary)]"
+                    }`}
+                  >
+                    Pickup at pharmacy
+                  </button>
+                </div>
               </div>
+
+              {fulfillmentType === "delivery" ? (
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-[var(--text-secondary)]">Delivery address</label>
+                  <textarea
+                    className="w-full resize-none rounded-xl border border-[var(--border)] bg-[var(--bg-input)] px-4 py-2.5 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent-cyan)] focus:outline-none"
+                    rows={2}
+                    value={deliveryAddress}
+                    onChange={(e) => setDeliveryAddress(e.target.value)}
+                    placeholder="Enter your delivery address"
+                  />
+                </div>
+              ) : (
+                <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-input)] p-3 text-sm text-[var(--text-secondary)]">
+                  You will collect your medicines directly at the pharmacy. No delivery address needed.
+                </div>
+              )}
 
               {/* Wallet payment option */}
               <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-input)] p-3">

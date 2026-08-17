@@ -205,6 +205,45 @@ export async function markPharmacyOrderPaid(params: {
     },
   } as any).catch(() => {});
 
+  // Credit 5% commission to company/admin wallet
+  const commissionAmount = order.total - partnerEarnings;
+  if (commissionAmount > 0) {
+    // Find or create the company admin wallet
+    let adminWallet = await Wallet.findOne({ ownerRole: "admin" as any }).lean();
+    if (!adminWallet) {
+      const created = await Wallet.create({
+        ownerId: order.partner_id, // temporary owner, will be updated when admin claims
+        ownerRole: "admin",
+        balance: 0,
+        currency: "NGN",
+      } as any);
+      adminWallet = created.toObject();
+    }
+
+    await Wallet.updateOne(
+      { _id: adminWallet._id as any },
+      { $inc: { balance: commissionAmount } }
+    );
+
+    await WalletTransaction.create({
+      wallet_id: adminWallet._id,
+      patient_id: order.patient_id,
+      type: "bonus",
+      amount: commissionAmount,
+      direction: "credit",
+      currency: "NGN",
+      status: "completed",
+      reference: `COMM-PHARM-${order.order_id}-${Date.now()}`,
+      description: `5% platform commission from pharmacy order ${order.order_id}`,
+      metadata: {
+        order_id: order.order_id,
+        gross_amount: order.total,
+        commission_rate: PHARMACY_COMMISSION_RATE,
+        source: "pharmacy_commission",
+      },
+    } as any).catch(() => {});
+  }
+
   return PharmacyOrder.findOne({ _id: order._id } as any).lean();
 }
 

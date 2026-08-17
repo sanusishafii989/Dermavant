@@ -78,6 +78,7 @@ export async function POST(req: Request) {
         })),
         total: totalAmount,
         delivery_address: deliveryAddress,
+        fulfillment_type: body.fulfillmentType || "delivery",
       } as any);
 
       reference = `pharm_${order.order_id}_${Date.now()}`;
