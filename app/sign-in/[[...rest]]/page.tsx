@@ -25,7 +25,7 @@ function SignInContent() {
         <Card className="flex justify-center p-4">
           <SignIn
             appearance={clerkAppearance}
-            fallbackRedirectUrl={role ? ROLE_DASHBOARD[role] : "/patient/dashboard"}
+            fallbackRedirectUrl="/redirect"
             signUpUrl={role ? `/sign-up?role=${role}` : "/sign-up"}
           />
         </Card>

@@ -11,6 +11,7 @@ function isPublicRoute(pathname: string): boolean {
   if (pathname === "/") return true;
   if (pathname.startsWith("/sign-in")) return true;
   if (pathname.startsWith("/sign-up")) return true;
+  if (pathname.startsWith("/redirect")) return true;
   if (pathname.startsWith("/terms")) return true;
   if (pathname.startsWith("/privacy")) return true;
   if (pathname.startsWith("/api/webhooks")) return true;
@@ -42,7 +43,6 @@ export default clerkMiddleware(async (auth, req) => {
   const pathname = req.nextUrl.pathname;
   const isApiRoute = pathname.startsWith("/api/");
 
-  // Public routes — always allow
   if (isPublicRoute(pathname)) {
     return NextResponse.next();
   }
@@ -64,17 +64,18 @@ export default clerkMiddleware(async (auth, req) => {
     return redirectToSignIn({ returnBackUrl: req.url });
   }
 
-  // Get role from session claims only (no Clerk API calls in middleware)
+  // Get role from session claims
   const userRole = getRoleFromClaims(
     sessionClaims as Record<string, unknown> | null | undefined
   );
 
+  // If we have a confirmed role in claims, enforce it
   if (userRole && isUserRole(userRole)) {
     if (userRole === requiredRole) {
       return NextResponse.next();
     }
 
-    // Role mismatch — redirect to correct portal
+    // Role mismatch — redirect to their correct portal
     if (isApiRoute) {
       return new Response(JSON.stringify({ error: "Forbidden" }), {
         status: 403,
@@ -85,17 +86,10 @@ export default clerkMiddleware(async (auth, req) => {
     return NextResponse.redirect(new URL(ROLE_DASHBOARD[userRole], req.url));
   }
 
-  // No role in claims — block access
-  // User must have a role assigned in Clerk to access any portal
-  if (isApiRoute) {
-    return new Response(JSON.stringify({ error: "Forbidden — role not assigned" }), {
-      status: 403,
-      headers: { "Content-Type": "application/json" },
-    });
-  }
-
-  // Redirect to sign-in so they can get their role set
-  return redirectToSignIn({ returnBackUrl: req.url });
+  // No role in session claims — ALLOW through
+  // Page-level checks will read publicMetadata via currentUser() and redirect if needed
+  // This prevents login loops where claims don't have the role yet
+  return NextResponse.next();
 });
 
 export const config = {
