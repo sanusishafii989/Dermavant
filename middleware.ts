@@ -40,56 +40,55 @@ function getRequiredRoleForPath(pathname: string): UserRole | null {
 }
 
 export default clerkMiddleware(async (auth, req) => {
-  const pathname = req.nextUrl.pathname;
-  const isApiRoute = pathname.startsWith("/api/");
+  try {
+    const pathname = req.nextUrl.pathname;
+    const isApiRoute = pathname.startsWith("/api/");
 
-  if (isPublicRoute(pathname)) {
-    return NextResponse.next();
-  }
-
-  const requiredRole = getRequiredRoleForPath(pathname);
-  if (!requiredRole) {
-    return NextResponse.next();
-  }
-
-  const { userId, sessionClaims, redirectToSignIn } = await auth();
-
-  if (!userId) {
-    if (isApiRoute) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: { "Content-Type": "application/json" },
-      });
-    }
-    return redirectToSignIn({ returnBackUrl: req.url });
-  }
-
-  // Get role from session claims
-  const userRole = getRoleFromClaims(
-    sessionClaims as Record<string, unknown> | null | undefined
-  );
-
-  // If we have a confirmed role in claims, enforce it
-  if (userRole && isUserRole(userRole)) {
-    if (userRole === requiredRole) {
+    if (isPublicRoute(pathname)) {
       return NextResponse.next();
     }
 
-    // Role mismatch — redirect to their correct portal
-    if (isApiRoute) {
-      return new Response(JSON.stringify({ error: "Forbidden" }), {
-        status: 403,
-        headers: { "Content-Type": "application/json" },
-      });
+    const requiredRole = getRequiredRoleForPath(pathname);
+    if (!requiredRole) {
+      return NextResponse.next();
     }
 
-    return NextResponse.redirect(new URL(ROLE_DASHBOARD[userRole], req.url));
-  }
+    const { userId, sessionClaims, redirectToSignIn } = await auth();
 
-  // No role in session claims — ALLOW through
-  // Page-level checks will read publicMetadata via currentUser() and redirect if needed
-  // This prevents login loops where claims don't have the role yet
-  return NextResponse.next();
+    if (!userId) {
+      if (isApiRoute) {
+        return new Response(JSON.stringify({ error: "Unauthorized" }), {
+          status: 401,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+      return redirectToSignIn({ returnBackUrl: req.url });
+    }
+
+    const userRole = getRoleFromClaims(
+      sessionClaims as Record<string, unknown> | null | undefined
+    );
+
+    if (userRole && isUserRole(userRole)) {
+      if (userRole === requiredRole) {
+        return NextResponse.next();
+      }
+
+      if (isApiRoute) {
+        return new Response(JSON.stringify({ error: "Forbidden" }), {
+          status: 403,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+
+      return NextResponse.redirect(new URL(ROLE_DASHBOARD[userRole], req.url));
+    }
+
+    return NextResponse.next();
+  } catch (error) {
+    console.error("[MIDDLEWARE ERROR]", error);
+    return NextResponse.next();
+  }
 });
 
 export const config = {
