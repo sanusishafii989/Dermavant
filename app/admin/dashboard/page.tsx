@@ -13,9 +13,14 @@ export const dynamic = "force-dynamic";
 export default async function AdminDashboardPage() {
   const user = await currentUser();
 
+  // Enforce role — admin only
   const userRole = (user as any)?.publicMetadata?.role;
-  if (userRole && userRole !== "admin") {
-    redirect(ROLE_DASHBOARD[userRole as keyof typeof ROLE_DASHBOARD] || "/");
+  if (userRole !== "admin") {
+    if (userRole && ROLE_DASHBOARD[userRole as keyof typeof ROLE_DASHBOARD]) {
+      redirect(ROLE_DASHBOARD[userRole as keyof typeof ROLE_DASHBOARD]);
+    }
+    // No role or not admin — send to sign-in
+    redirect("/sign-in");
   }
 
   const fullName =
