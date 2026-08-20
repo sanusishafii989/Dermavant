@@ -130,8 +130,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: false, error: envValidation.error }, { status: 500 });
     }
 
-    const callbackBase = callbackUrl || `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/patient/dashboard/payment/success`;
-    const callbackUrlWithReference = new URL(callbackBase, process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000");
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || `https://${req.headers.get("host")}`;
+    const callbackBase = callbackUrl || `${appUrl}/patient/dashboard/payment/success`;
+    const callbackUrlWithReference = new URL(callbackBase, appUrl);
     callbackUrlWithReference.searchParams.set("reference", reference);
     callbackUrlWithReference.searchParams.set("status", "success");
 

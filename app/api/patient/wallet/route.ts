@@ -122,8 +122,9 @@ export async function POST(req: Request) {
 
     const amountInKobo = toKobo(amount);
     const reference = `WLT-TOPUP-${patientDoc._id}-${Date.now()}`;
-    const callbackBase = body.callbackUrl || `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/patient/dashboard/wallet`;
-    const callbackUrl = new URL(callbackBase, process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000");
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || `https://${req.headers.get("host")}`;
+    const callbackBase = body.callbackUrl || `${appUrl}/patient/dashboard/wallet`;
+    const callbackUrl = new URL(callbackBase, appUrl);
     callbackUrl.searchParams.set("reference", reference);
     callbackUrl.searchParams.set("status", "success");
 
