@@ -1,36 +1,30 @@
-import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { clerkMiddleware } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { getRoleFromClaims, isUserRole, ROLE_DASHBOARD, type UserRole } from "@/lib/roles";
 
-const isPublicRoute = createRouteMatcher([
-  "/(.*)",
-]);
-
-const isProtectedRoute = createRouteMatcher([
-  "/patient/(.*)",
-  "/doctor/(.*)",
-  "/pharmacy/(.*)",
-  "/admin/(.*)",
-  "/api/patient/(.*)",
-  "/api/doctor/(.*)",
-  "/api/pharmacy/(.*)",
-  "/api/admin/(.*)",
-]);
+function isProtectedRoute(pathname: string): boolean {
+  return pathname.startsWith("/patient") ||
+    pathname.startsWith("/doctor") ||
+    pathname.startsWith("/pharmacy") ||
+    pathname.startsWith("/admin") ||
+    pathname.startsWith("/api/patient") ||
+    pathname.startsWith("/api/doctor") ||
+    pathname.startsWith("/api/pharmacy") ||
+    pathname.startsWith("/api/admin");
+}
 
 function getRequiredRole(pathname: string): UserRole | null {
-  const p = pathname.toLowerCase();
-  if (p.startsWith("/patient")) return "patient";
-  if (p.startsWith("/doctor")) return "doctor";
-  if (p.startsWith("/pharmacy")) return "partner";
-  if (p.startsWith("/admin")) return "admin";
+  if (pathname.startsWith("/patient")) return "patient";
+  if (pathname.startsWith("/doctor")) return "doctor";
+  if (pathname.startsWith("/pharmacy")) return "partner";
+  if (pathname.startsWith("/admin")) return "admin";
   return null;
 }
 
 export default clerkMiddleware(async (auth, req) => {
   const pathname = req.nextUrl.pathname;
 
-  // Only check protected routes
-  if (!isProtectedRoute(req)) {
+  if (!isProtectedRoute(pathname)) {
     return NextResponse.next();
   }
 
