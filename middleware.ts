@@ -44,6 +44,7 @@ export default clerkMiddleware(async (auth, req) => {
     const pathname = req.nextUrl.pathname;
     const isApiRoute = pathname.startsWith("/api/");
 
+    // Public routes — always allow
     if (isPublicRoute(pathname)) {
       return NextResponse.next();
     }
@@ -65,13 +66,20 @@ export default clerkMiddleware(async (auth, req) => {
       return redirectToSignIn({ returnBackUrl: req.url });
     }
 
+    // Get role from session claims only — no Clerk API calls in middleware
     const userRole = getRoleFromClaims(
       sessionClaims as Record<string, unknown> | null | undefined
     );
 
+    // If role is in claims, enforce it
     if (userRole && isUserRole(userRole)) {
       if (userRole === requiredRole) {
         return NextResponse.next();
+      }
+
+      // Role mismatch — redirect to their correct portal
+      if (!isApiRoute && ROLE_DASHBOARD[userRole]) {
+        return NextResponse.redirect(new URL(ROLE_DASHBOARD[userRole], req.url));
       }
 
       if (isApiRoute) {
@@ -80,13 +88,13 @@ export default clerkMiddleware(async (auth, req) => {
           headers: { "Content-Type": "application/json" },
         });
       }
-
-      return NextResponse.redirect(new URL(ROLE_DASHBOARD[userRole], req.url));
     }
 
+    // No role in claims — allow through, page-level checks handle it
     return NextResponse.next();
   } catch (error) {
-    console.error("[MIDDLEWARE ERROR]", error);
+    // If anything fails, allow the request through
+    // Page-level and API-level checks provide backup security
     return NextResponse.next();
   }
 });
