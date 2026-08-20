@@ -1,9 +1,10 @@
 import { clerkMiddleware } from "@clerk/nextjs/server";
+import { NextResponse } from "next/server";
 
-// Minimal middleware — just let Clerk handle auth
-// No custom role logic in middleware (causes MIDDLEWARE_INVOCATION_FAILED on Vercel)
-// Role enforcement is handled at page level via currentUser() and API level via auth()
-export default clerkMiddleware();
+// Pass an empty async handler — clerkMiddleware() with no args may not be valid
+export default clerkMiddleware(async () => {
+  return NextResponse.next();
+});
 
 export const config = {
   matcher: ["/((?!.*\\..*|_next|_clerk).*)", "/(api|trpc)(.*)"],
