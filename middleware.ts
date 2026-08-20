@@ -1,11 +1,6 @@
-import { clerkMiddleware } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-import {
-  getRoleFromClaims,
-  isUserRole,
-  ROLE_DASHBOARD,
-  type UserRole,
-} from "@/lib/roles";
+import type { NextRequest } from "next/server";
+import { getRoleFromClaims, isUserRole, ROLE_DASHBOARD, type UserRole } from "@/lib/roles";
 
 function isPublicRoute(pathname: string): boolean {
   if (pathname === "/") return true;
@@ -25,24 +20,21 @@ function isPublicRoute(pathname: string): boolean {
 
 function getRequiredRoleForPath(pathname: string): UserRole | null {
   const p = pathname.toLowerCase();
-
   if (p === "/patient" || p.startsWith("/patient/")) return "patient";
   if (p === "/doctor" || p.startsWith("/doctor/")) return "doctor";
   if (p === "/pharmacy" || p.startsWith("/pharmacy/")) return "partner";
   if (p === "/admin" || p.startsWith("/admin/")) return "admin";
-
   if (p === "/api/patient" || p.startsWith("/api/patient/")) return "patient";
   if (p === "/api/doctor" || p.startsWith("/api/doctor/")) return "doctor";
   if (p === "/api/pharmacy" || p.startsWith("/api/pharmacy/")) return "partner";
   if (p === "/api/admin" || p.startsWith("/api/admin/")) return "admin";
-
   return null;
 }
 
-export default clerkMiddleware(async (auth, req) => {
+// Plain middleware — no clerkMiddleware wrapper to avoid Edge Runtime crashes
+export function middleware(req: NextRequest) {
   try {
     const pathname = req.nextUrl.pathname;
-    const isApiRoute = pathname.startsWith("/api/");
 
     // Public routes — always allow
     if (isPublicRoute(pathname)) {
@@ -54,50 +46,58 @@ export default clerkMiddleware(async (auth, req) => {
       return NextResponse.next();
     }
 
-    const { userId, sessionClaims, redirectToSignIn } = await auth();
+    // Read auth info from request headers (Clerk sets these)
+    const userId = req.headers.get("x-clerk-user-id");
+    const sessionClaimsHeader = req.headers.get("x-clerk-session-claims");
 
     if (!userId) {
+      const isApiRoute = pathname.startsWith("/api/");
       if (isApiRoute) {
         return new Response(JSON.stringify({ error: "Unauthorized" }), {
           status: 401,
           headers: { "Content-Type": "application/json" },
         });
       }
-      return redirectToSignIn({ returnBackUrl: req.url });
+      // Redirect to sign-in
+      const signInUrl = new URL("/sign-in", req.url);
+      signInUrl.searchParams.set("redirect_url", req.url);
+      return NextResponse.redirect(signInUrl);
     }
 
-    // Get role from session claims only — no Clerk API calls in middleware
-    const userRole = getRoleFromClaims(
-      sessionClaims as Record<string, unknown> | null | undefined
-    );
+    // Try to get role from session claims
+    let sessionClaims: Record<string, unknown> | null = null;
+    if (sessionClaimsHeader) {
+      try {
+        sessionClaims = JSON.parse(sessionClaimsHeader);
+      } catch {
+        // ignore parse errors
+      }
+    }
 
-    // If role is in claims, enforce it
+    const userRole = getRoleFromClaims(sessionClaims);
+
     if (userRole && isUserRole(userRole)) {
       if (userRole === requiredRole) {
         return NextResponse.next();
       }
 
-      // Role mismatch — redirect to their correct portal
-      if (!isApiRoute && ROLE_DASHBOARD[userRole]) {
-        return NextResponse.redirect(new URL(ROLE_DASHBOARD[userRole], req.url));
-      }
-
+      const isApiRoute = pathname.startsWith("/api/");
       if (isApiRoute) {
         return new Response(JSON.stringify({ error: "Forbidden" }), {
           status: 403,
           headers: { "Content-Type": "application/json" },
         });
       }
+
+      return NextResponse.redirect(new URL(ROLE_DASHBOARD[userRole], req.url));
     }
 
-    // No role in claims — allow through, page-level checks handle it
     return NextResponse.next();
-  } catch (error) {
-    // If anything fails, allow the request through
-    // Page-level and API-level checks provide backup security
+  } catch {
+    // If anything fails, allow through — page/API checks provide backup
     return NextResponse.next();
   }
-});
+}
 
 export const config = {
   matcher: [
