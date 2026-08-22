@@ -12,6 +12,10 @@ import { User, Admin, Wallet } from "@/models";
  * - ADMIN_SEED_SECRET (must be supplied in header X-SEED-SECRET)
  */
 export async function POST(req: Request) {
+  if (process.env.NODE_ENV === "production") {
+    return NextResponse.json({ error: "Dev endpoints are disabled in production" }, { status: 403 });
+  }
+
   if (process.env.DEV_SEED_ADMIN !== "true") {
     return NextResponse.json({ error: "DEV_SEED_ADMIN is not enabled" }, { status: 403 });
   }

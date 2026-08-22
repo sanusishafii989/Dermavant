@@ -22,7 +22,8 @@ export interface SidebarProps {
 }
 
 export function Sidebar({ links, title = "Aetheris Health", footer, className }: SidebarProps) {
-  const pathname = usePathname();
+  const rawPathname = usePathname();
+  const pathname = rawPathname ?? "";
   const [mobileOpen, setMobileOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);

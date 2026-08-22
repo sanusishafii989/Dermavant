@@ -2,7 +2,7 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
 import { getPaystackSecret, toKobo, validatePaystackEnvKeys } from "@/lib/paystack";
-import { Appointment, Doctor, Patient, PharmacyOrder, Partner, User } from "@/models";
+import { Appointment, Doctor, Medicine, Patient, PharmacyOrder, Partner, User } from "@/models";
 
 export async function POST(req: Request) {
   try {
@@ -13,7 +13,6 @@ export async function POST(req: Request) {
 
     const body = await req.json();
     const appointmentIdentifier = body.appointmentId || body.appointment_id;
-    const amount = body.amount;
     const purpose = body.purpose || "appointment_payment";
     const items = body.items || [];
     const deliveryAddress = body.deliveryAddress || "";
@@ -62,20 +61,33 @@ export async function POST(req: Request) {
         return NextResponse.json({ ok: false, error: "All pharmacy order items must belong to the same partner" }, { status: 400 });
       }
 
-      const totalAmount = Number(body.total || 0);
-      if (!Number.isFinite(totalAmount) || totalAmount <= 0) {
-        return NextResponse.json({ ok: false, error: "total amount must be a positive number" }, { status: 400 });
+      // Recalculate total from DB to prevent price tampering
+      const medicineIds = items.map((item: any) => item.medicineId);
+      const dbMedicines = await Medicine.find({ _id: { $in: medicineIds } as any }).lean();
+      const medicineMap = new Map(dbMedicines.map((m: any) => [m._id.toString(), m]));
+
+      let totalAmount = 0;
+      const validatedItems = items.map((item: any) => {
+        const dbMed = medicineMap.get(item.medicineId);
+        const unitPrice = dbMed?.price ?? 0;
+        const qty = Number(item.qty) || 1;
+        totalAmount += unitPrice * qty;
+        return {
+          medicine_id: item.medicineId,
+          name: dbMed?.name || item.name,
+          qty,
+          unit_price: unitPrice,
+        };
+      });
+
+      if (totalAmount <= 0) {
+        return NextResponse.json({ ok: false, error: "Order total must be greater than zero" }, { status: 400 });
       }
 
       const order = await PharmacyOrder.create({
         patient_id: patientDoc._id,
         partner_id: partnerId,
-        items: items.map((item: any) => ({
-          medicine_id: item.medicineId,
-          name: item.name,
-          qty: item.qty,
-          unit_price: item.unitPrice,
-        })),
+        items: validatedItems,
         total: totalAmount,
         delivery_address: deliveryAddress,
         fulfillment_type: body.fulfillmentType || "delivery",
@@ -110,7 +122,7 @@ export async function POST(req: Request) {
       }
 
       const doctorDoc = await Doctor.findById(appointment.doctor_id as any).lean();
-      const consultationFee = amount ?? doctorDoc?.consultation_fee ?? 5000;
+      const consultationFee = doctorDoc?.consultation_fee ?? 5000;
       amountInKobo = toKobo(consultationFee);
       metadata = {
         ...metadata,

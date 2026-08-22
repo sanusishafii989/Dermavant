@@ -21,8 +21,8 @@ export function PaymentResultCard({ mode }: Props) {
   const [orderId, setOrderId] = useState<string | null>(null);
 
   useEffect(() => {
-    const reference = searchParams.get("reference") || "";
-    const paystackStatus = searchParams.get("status") || "";
+    const reference = searchParams?.get("reference") || "";
+    const paystackStatus = searchParams?.get("status") || "";
 
     if (!reference) {
       setStatus("failed");

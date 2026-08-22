@@ -40,7 +40,7 @@ function WalletContent() {
   };
 
   useEffect(() => {
-    const reference = searchParams.get("reference");
+    const reference = searchParams?.get("reference");
     if (reference) {
       const verifyPayment = async () => {
         try {

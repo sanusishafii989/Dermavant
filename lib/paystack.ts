@@ -10,12 +10,12 @@ export function validatePaystackEnvKeys(): { ok: boolean; error?: string } {
   const secret = process.env.PAYSTACK_SECRET_KEY || "";
   const publicKey = process.env.PAYSTACK_PUBLIC_KEY || "";
 
-  if (!secret.startsWith("sk_test_")) {
-    return { ok: false, error: "PAYSTACK_SECRET_KEY must start with sk_test_ for test mode" };
+  if (!secret.startsWith("sk_test_") && !secret.startsWith("sk_live_")) {
+    return { ok: false, error: "PAYSTACK_SECRET_KEY must start with sk_test_ or sk_live_" };
   }
 
-  if (!publicKey.startsWith("pk_test_")) {
-    return { ok: false, error: "PAYSTACK_PUBLIC_KEY must start with pk_test_ for test mode" };
+  if (!publicKey.startsWith("pk_test_") && !publicKey.startsWith("pk_live_")) {
+    return { ok: false, error: "PAYSTACK_PUBLIC_KEY must start with pk_test_ or pk_live_" };
   }
 
   return { ok: true };

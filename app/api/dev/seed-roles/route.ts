@@ -44,6 +44,10 @@ const ROLE_CONFIG = [
  */
 export async function POST(req: Request) {
   try {
+    if (process.env.NODE_ENV === "production") {
+      return NextResponse.json({ error: "Dev endpoints are disabled in production" }, { status: 403 });
+    }
+
     if (process.env.DEV_SEED_ROLES !== "true") {
       return NextResponse.json({ error: "DEV_SEED_ROLES is not enabled" }, { status: 403 });
     }

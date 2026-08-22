@@ -23,7 +23,6 @@ type ClerkUserEvent = {
     phone_numbers: Array<{ phone_number: string }>;
     image_url: string | null;
     public_metadata: { role?: string };
-    unsafe_metadata: { role?: string };
   };
 };
 
@@ -70,25 +69,13 @@ export async function POST(req: Request) {
 
   const { data } = event;
   const roleFromPublic = data.public_metadata?.role;
-  const roleFromUnsafe = data.unsafe_metadata?.role;
-  const role = isUserRole(roleFromPublic)
-    ? roleFromPublic
-    : isUserRole(roleFromUnsafe)
-      ? roleFromUnsafe
-      : null;
+  const role = isUserRole(roleFromPublic) ? roleFromPublic : null;
 
   if (!role) {
     return NextResponse.json(
-      { error: "User role missing from metadata" },
+      { error: "User role missing from public metadata" },
       { status: 400 }
     );
-  }
-
-  if (!isUserRole(roleFromPublic)) {
-    const client = await clerkClient();
-    await client.users.updateUserMetadata(data.id, {
-      publicMetadata: { role },
-    });
   }
 
   await connectDB();

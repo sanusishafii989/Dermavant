@@ -23,7 +23,7 @@ const ROLE_LABELS: Record<UserRole, string> = {
 
 function SignUpContent() {
   const searchParams = useSearchParams();
-  const initialRole = searchParams.get("role");
+  const initialRole = searchParams?.get("role");
   const router = useRouter();
 
   useEffect(() => {

@@ -1,10 +1,30 @@
+import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
-import { Medicine, Partner } from "@/models";
+import { Medicine, Partner, User } from "@/models";
+
+async function checkDevAdmin() {
+  if (process.env.NODE_ENV === "production") {
+    return { error: NextResponse.json({ ok: false, error: "Dev endpoints are disabled in production" }, { status: 403 }) };
+  }
+  const { userId } = await auth();
+  if (!userId) {
+    return { error: NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 }) };
+  }
+  await connectDB();
+  const adminDoc = await User.findOne({ clerkId: userId }).lean();
+  if (!adminDoc || adminDoc.role !== "admin") {
+    return { error: NextResponse.json({ ok: false, error: "Admin access required" }, { status: 403 }) };
+  }
+  return { adminDoc };
+}
 
 // Reassign all medicines from one partner to another
 export async function POST(req: Request) {
   try {
+    const guard = await checkDevAdmin();
+    if ("error" in guard) return guard.error;
+
     const body = await req.json();
     const { fromPartnerEmail, toPartnerEmail } = body;
 
@@ -50,6 +70,9 @@ export async function POST(req: Request) {
 // List all partners with their medicine counts
 export async function GET() {
   try {
+    const guard = await checkDevAdmin();
+    if ("error" in guard) return guard.error;
+
     await connectDB();
     const partners = await Partner.find({}).lean();
     const result = [];

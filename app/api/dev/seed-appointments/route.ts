@@ -1,9 +1,26 @@
+import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
 import { Appointment, Doctor, Patient, User } from "@/models";
 
 export async function POST(req: Request) {
   try {
+    if (process.env.NODE_ENV === "production") {
+      return NextResponse.json({ ok: false, error: "Dev endpoints are disabled in production" }, { status: 403 });
+    }
+
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
+    }
+
+    await connectDB();
+
+    const adminDoc = await User.findOne({ clerkId: userId }).lean();
+    if (!adminDoc || adminDoc.role !== "admin") {
+      return NextResponse.json({ ok: false, error: "Admin access required" }, { status: 403 });
+    }
+
     const body = await req.json();
     const clerkId = body.clerkId;
 
