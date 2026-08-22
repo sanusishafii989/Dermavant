@@ -184,6 +184,15 @@ export async function POST(req: Request) {
       );
     }
 
+    // Validate date is in the future
+    const appointmentDate = new Date(date);
+    if (isNaN(appointmentDate.getTime())) {
+      return NextResponse.json({ ok: false, error: "Invalid date format" }, { status: 400 });
+    }
+    if (appointmentDate <= new Date()) {
+      return NextResponse.json({ ok: false, error: "Appointment date must be in the future" }, { status: 400 });
+    }
+
     await connectDB();
 
     const clerkUser = await currentUser();
@@ -206,10 +215,25 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: false, error: "Doctor not found" }, { status: 404 });
     }
 
+    // Prevent double-booking: check if doctor already has a non-cancelled appointment at this slot
+    const existingAppointment = await Appointment.findOne({
+      doctor_id: doctorDoc._id,
+      date: appointmentDate,
+      time,
+      consultation_status: { $ne: "cancelled" },
+    } as any).lean();
+
+    if (existingAppointment) {
+      return NextResponse.json(
+        { ok: false, error: "This time slot is already booked. Please choose another time." },
+        { status: 409 }
+      );
+    }
+
     const appointment = await Appointment.create({
       patient_id: patientDoc._id,
       doctor_id: doctorDoc._id,
-      date: new Date(date),
+      date: appointmentDate,
       time,
       type,
       payment_status: "pending",

@@ -2,7 +2,8 @@ import { currentUser } from "@clerk/nextjs/server";
 import { PortalDashboardShell } from "@/components/layout/PortalDashboardShell";
 import { doctorNavLinks } from "@/lib/portal-nav";
 import { connectDB } from "@/lib/db";
-import { Appointment, Doctor, Payment, Wallet, User } from "@/models";
+import { COMMISSION } from "@/lib/commission";
+import { Doctor, User, Wallet, WalletTransaction } from "@/models";
 import { DoctorWalletClient } from "@/components/doctor/DoctorWalletClient";
 
 export const dynamic = "force-dynamic";
@@ -23,44 +24,33 @@ export default async function DoctorWalletPage() {
 
   let walletBalance = 0;
   let totalEarnings = 0;
-  let pendingEarnings = 0;
   let completedPaidCount = 0;
   let transactions: any[] = [];
 
-  if (doctor) {
-    const wallet = await Wallet.findOne({ ownerId: userDoc!._id as any }).lean();
+  if (doctor && userDoc) {
+    const wallet = await Wallet.findOne({ ownerId: userDoc._id as any }).lean();
     if (wallet) {
       walletBalance = wallet.balance ?? 0;
     }
 
-    const allApts = await Appointment.find({ doctor_id: doctor._id as any } as any).lean();
-    const aptIds = allApts.map((apt) => apt._id);
+    // Use WalletTransaction for accurate earnings (credits - debits)
+    const allTransactions = await WalletTransaction.find({
+      wallet_id: wallet?._id as any,
+    } as any).sort({ created_at: -1 }).lean();
 
-    const allPayments = await Payment.find({
-      appointment_id: { $in: aptIds },
-    } as any)
-      .sort({ paid_at: -1 })
-      .lean();
+    const credits = allTransactions.filter((t) => t.direction === "credit" && t.status === "completed");
+    totalEarnings = credits.reduce((sum, t) => sum + (t.amount || 0), 0);
+    completedPaidCount = credits.length;
 
-    const successfulPayments = allPayments.filter((p) => p.status === "success");
-    const pendingPayments = allPayments.filter((p) => p.status === "pending");
-
-    totalEarnings = successfulPayments.reduce((sum, p) => sum + (p.amount || 0), 0);
-    pendingEarnings = pendingPayments.reduce((sum, p) => sum + (p.amount || 0), 0);
-    completedPaidCount = successfulPayments.length;
-
-    transactions = successfulPayments.slice(0, 10).map((payment) => {
-      const apt = allApts.find((a) => a._id.toString() === payment.appointment_id?.toString());
-      return {
-        _id: payment._id.toString(),
-        amount: payment.amount,
-        reference: payment.reference,
-        channel: payment.channel || "paystack",
-        status: payment.status,
-        paid_at: payment.paid_at,
-        appointment_date: apt?.date,
-      };
-    });
+    transactions = credits.slice(0, 10).map((tx) => ({
+      _id: tx._id.toString(),
+      amount: tx.amount,
+      reference: tx.reference,
+      channel: (tx.metadata as any)?.payment_method || "wallet",
+      status: tx.status,
+      paid_at: tx.created_at,
+      appointment_date: (tx.metadata as any)?.appointment_id,
+    }));
   }
 
   return (
@@ -68,9 +58,10 @@ export default async function DoctorWalletPage() {
       <DoctorWalletClient
         initialBalance={walletBalance}
         initialEarnings={totalEarnings}
-        initialPending={pendingEarnings}
+        initialPending={0}
         initialPaidCount={completedPaidCount}
         initialTransactions={transactions}
+        commissionRate={COMMISSION.DOCTOR_RATE}
       />
     </PortalDashboardShell>
   );

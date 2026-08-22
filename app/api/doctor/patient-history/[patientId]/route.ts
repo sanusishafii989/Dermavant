@@ -1,7 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
-import { AIReport, Appointment, MedicalRecord, Patient, User } from "@/models";
+import { AIReport, Appointment, Doctor, MedicalRecord, Patient, User } from "@/models";
 import type { MedicalHistoryItem, PatientVitalsSummary } from "@/types/history";
 
 export async function GET(
@@ -29,6 +29,26 @@ export async function GET(
     const patientDoc: any = await Patient.findById(patientId).lean();
     if (!patientDoc) {
       return NextResponse.json({ ok: false, error: "Patient record not found" }, { status: 404 });
+    }
+
+    // For doctors: verify they have (or had) an appointment with this patient
+    if (userDoc.role === "doctor") {
+      const doctorDoc = await Doctor.findOne({ user_id: userDoc._id as any }).lean();
+      if (!doctorDoc) {
+        return NextResponse.json({ ok: false, error: "Doctor profile not found" }, { status: 404 });
+      }
+
+      const hasAppointment = await Appointment.findOne({
+        doctor_id: doctorDoc._id,
+        patient_id: patientDoc._id,
+      } as any).lean();
+
+      if (!hasAppointment) {
+        return NextResponse.json(
+          { ok: false, error: "You can only view history for patients you have appointments with" },
+          { status: 403 }
+        );
+      }
     }
 
     const [aiReports, appointments, medicalRecords] = await Promise.all([

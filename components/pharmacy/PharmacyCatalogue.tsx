@@ -99,6 +99,17 @@ export function PharmacyCatalogue() {
       return;
     }
 
+    const priceNum = Number(form.price);
+    const quantityNum = Number(form.quantity);
+    if (isNaN(priceNum) || priceNum < 0) {
+      setError("Price must be a valid non-negative number.");
+      return;
+    }
+    if (isNaN(quantityNum) || quantityNum < 0) {
+      setError("Quantity must be a valid non-negative number.");
+      return;
+    }
+
     setSaving(true);
     setError(null);
 

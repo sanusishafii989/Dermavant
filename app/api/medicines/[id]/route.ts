@@ -17,6 +17,13 @@ export async function PUT(req: Request, context: { params: Promise<{ id: string 
     const body = await req.json();
     const { name, brand, category, price, quantity, expiry_date, description, image } = body;
 
+    if (typeof price === "number" && price < 0) {
+      return NextResponse.json({ ok: false, error: "Price must not be negative" }, { status: 400 });
+    }
+    if (typeof quantity === "number" && quantity < 0) {
+      return NextResponse.json({ ok: false, error: "Quantity must not be negative" }, { status: 400 });
+    }
+
     await connectDB();
 
     const userDoc = await User.findOne({ clerkId: userId }).lean();

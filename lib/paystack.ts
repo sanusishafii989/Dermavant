@@ -1,5 +1,6 @@
 import crypto from "crypto";
 import { connectDB } from "@/lib/db";
+import { COMMISSION } from "@/lib/commission";
 import { Appointment, Payment, PharmacyOrder, Wallet, WalletTransaction, Patient, User, Medicine } from "@/models";
 
 export function getPaystackSecret(): string {
@@ -162,17 +163,19 @@ export async function markPharmacyOrderPaid(params: {
     }
   );
 
-  // Reduce medicine quantities in stock
+  // Reduce medicine quantities in stock atomically with sufficiency check
   for (const item of order.items) {
-    await Medicine.updateOne(
-      { _id: item.medicine_id } as any,
+    const stockResult = await Medicine.updateOne(
+      { _id: item.medicine_id, quantity: { $gte: item.qty } } as any,
       { $inc: { quantity: -item.qty } }
-    ).catch(() => {});
+    );
+    if (stockResult.matchedCount === 0) {
+      console.warn(`[PAYSTACK] Insufficient stock for medicine ${item.medicine_id} (qty: ${item.qty})`);
+    }
   }
 
-  // Credit partner wallet with 95% (5% platform commission)
-  const PHARMACY_COMMISSION_RATE = 5;
-  const partnerEarnings = Math.round(order.total * (100 - PHARMACY_COMMISSION_RATE) / 100);
+  // Credit partner wallet atomically
+  const partnerEarnings = Math.round(order.total * (100 - COMMISSION.PHARMACY_RATE) / 100);
 
   let partnerWallet = await Wallet.findOne({ ownerId: order.partner_id as any });
   if (!partnerWallet) {
@@ -183,8 +186,10 @@ export async function markPharmacyOrderPaid(params: {
       currency: "NGN",
     } as any);
   }
-  partnerWallet.balance += partnerEarnings;
-  await partnerWallet.save();
+  await Wallet.updateOne(
+    { _id: partnerWallet._id as any },
+    { $inc: { balance: partnerEarnings } }
+  );
 
   // Record the transaction
   await WalletTransaction.create({
@@ -200,19 +205,18 @@ export async function markPharmacyOrderPaid(params: {
     metadata: {
       order_id: order.order_id,
       gross_amount: order.total,
-      commission_rate: PHARMACY_COMMISSION_RATE,
+      commission_rate: COMMISSION.PHARMACY_RATE,
       commission_amount: order.total - partnerEarnings,
     },
   } as any).catch(() => {});
 
-  // Credit 5% commission to company/admin wallet
+  // Credit commission to company/admin wallet atomically
   const commissionAmount = order.total - partnerEarnings;
   if (commissionAmount > 0) {
-    // Find or create the company admin wallet
     let adminWallet = await Wallet.findOne({ ownerRole: "admin" as any }).lean();
     if (!adminWallet) {
       const created = await Wallet.create({
-        ownerId: order.partner_id, // temporary owner, will be updated when admin claims
+        ownerId: order.partner_id,
         ownerRole: "admin",
         balance: 0,
         currency: "NGN",
@@ -234,11 +238,11 @@ export async function markPharmacyOrderPaid(params: {
       currency: "NGN",
       status: "completed",
       reference: `COMM-PHARM-${order.order_id}-${Date.now()}`,
-      description: `5% platform commission from pharmacy order ${order.order_id}`,
+      description: `${COMMISSION.PHARMACY_RATE}% platform commission from pharmacy order ${order.order_id}`,
       metadata: {
         order_id: order.order_id,
         gross_amount: order.total,
-        commission_rate: PHARMACY_COMMISSION_RATE,
+        commission_rate: COMMISSION.PHARMACY_RATE,
         source: "pharmacy_commission",
       },
     } as any).catch(() => {});
@@ -298,8 +302,11 @@ export async function markWalletTopUpPaid(params: {
     } as any);
   }
 
-  wallet.balance += amountInNaira;
-  await wallet.save();
+  // Atomic credit — prevents double-credit on concurrent webhook retries
+  await Wallet.updateOne(
+    { _id: wallet._id as any },
+    { $inc: { balance: amountInNaira } }
+  );
 
   const transaction = await WalletTransaction.create({
     wallet_id: wallet._id,

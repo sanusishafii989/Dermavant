@@ -1,6 +1,7 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
+import { COMMISSION } from "@/lib/commission";
 import { Appointment, Doctor, Patient, PharmacyOrder, Medicine, User, Wallet, WalletTransaction, Payment } from "@/models";
 
 export async function POST(req: Request) {
@@ -50,16 +51,19 @@ export async function POST(req: Request) {
       const doctor = await Doctor.findById(appointment.doctor_id as any).lean();
       const amount = doctor?.consultation_fee ?? 5000;
 
-      if (wallet.balance < amount) {
+      // Atomic debit: only succeeds if balance >= amount
+      const updatedWallet = await Wallet.findOneAndUpdate(
+        { _id: wallet._id as any, balance: { $gte: amount } } as any,
+        { $inc: { balance: -amount } },
+        { new: true }
+      );
+
+      if (!updatedWallet) {
         return NextResponse.json({
           ok: false,
           error: `Insufficient balance. You need ₦${amount.toLocaleString()} but have ₦${wallet.balance.toLocaleString()}`,
         }, { status: 400 });
       }
-
-      // Debit patient wallet
-      wallet.balance -= amount;
-      await wallet.save();
 
       // Mark appointment as paid
       await Appointment.updateOne({ _id: appointment._id as any }, { $set: { payment_status: "paid" } });
@@ -92,9 +96,8 @@ export async function POST(req: Request) {
         metadata: { appointment_id: appointment._id.toString(), payment_method: "wallet" },
       } as any);
 
-      // Credit doctor wallet (90% after 10% commission)
-      const DOCTOR_COMMISSION = 10;
-      const doctorEarnings = Math.round(amount * (100 - DOCTOR_COMMISSION) / 100);
+      // Credit doctor wallet atomically
+      const doctorEarnings = Math.round(amount * (100 - COMMISSION.DOCTOR_RATE) / 100);
       let doctorWallet = await Wallet.findOne({ ownerId: doctor?.user_id as any });
       if (!doctorWallet) {
         doctorWallet = await Wallet.create({
@@ -104,8 +107,10 @@ export async function POST(req: Request) {
           currency: "NGN",
         } as any);
       }
-      doctorWallet.balance += doctorEarnings;
-      await doctorWallet.save();
+      await Wallet.updateOne(
+        { _id: doctorWallet._id as any },
+        { $inc: { balance: doctorEarnings } }
+      );
 
       await WalletTransaction.create({
         wallet_id: doctorWallet._id,
@@ -120,7 +125,7 @@ export async function POST(req: Request) {
         metadata: {
           appointment_id: appointment._id.toString(),
           gross_amount: amount,
-          commission_rate: DOCTOR_COMMISSION,
+          commission_rate: COMMISSION.DOCTOR_RATE,
           commission_amount: amount - doctorEarnings,
         },
       } as any).catch(() => {});
@@ -128,7 +133,7 @@ export async function POST(req: Request) {
       return NextResponse.json({
         ok: true,
         message: "Payment successful from wallet",
-        newBalance: wallet.balance,
+        newBalance: updatedWallet.balance,
         redirectUrl: `/patient/dashboard/payment/success?reference=${reference}&status=success`,
       });
     }
@@ -150,38 +155,43 @@ export async function POST(req: Request) {
 
       const amount = order.total;
 
-      if (wallet.balance < amount) {
+      // Atomic debit: only succeeds if balance >= amount
+      const updatedWallet = await Wallet.findOneAndUpdate(
+        { _id: wallet._id as any, balance: { $gte: amount } } as any,
+        { $inc: { balance: -amount } },
+        { new: true }
+      );
+
+      if (!updatedWallet) {
         return NextResponse.json({
           ok: false,
           error: `Insufficient balance. You need ₦${amount.toLocaleString()} but have ₦${wallet.balance.toLocaleString()}`,
         }, { status: 400 });
       }
 
-      // Debit patient wallet
-      wallet.balance -= amount;
-      await wallet.save();
-
       // Mark order as paid
+      const paymentRef = `WLT-${order.order_id}-${Date.now()}`;
       await PharmacyOrder.updateOne(
         { _id: order._id as any },
-        { $set: { payment_status: "paid", payment_reference: `WLT-${order.order_id}-${Date.now()}` } }
+        { $set: { payment_status: "paid", payment_reference: paymentRef } }
       );
 
-      // Reduce medicine quantities
+      // Reduce medicine quantities atomically with stock sufficiency check
       for (const item of order.items) {
-        await Medicine.updateOne(
-          { _id: item.medicine_id } as any,
+        const stockResult = await Medicine.updateOne(
+          { _id: item.medicine_id, quantity: { $gte: item.qty } } as any,
           { $inc: { quantity: -item.qty } }
-        ).catch(() => {});
+        );
+        if (stockResult.matchedCount === 0) {
+          console.warn(`[WALLET PAYMENT] Insufficient stock for medicine ${item.medicine_id} (qty: ${item.qty})`);
+        }
       }
 
-      // Credit partner wallet (95% after 5% commission)
-      const PHARMACY_COMMISSION = 5;
-      const partnerEarnings = Math.round(amount * (100 - PHARMACY_COMMISSION) / 100);
+      // Credit partner wallet atomically
+      const partnerEarnings = Math.round(amount * (100 - COMMISSION.PHARMACY_RATE) / 100);
 
       let partnerWallet = await Wallet.findOne({ ownerId: order.partner_id as any });
       if (!partnerWallet) {
-        // Find the partner's user_id from Partner model
         const { Partner } = await import("@/models");
         const partner = await Partner.findById(order.partner_id).lean();
         const partnerUserId = partner?.user_id || order.partner_id;
@@ -193,8 +203,10 @@ export async function POST(req: Request) {
           currency: "NGN",
         } as any);
       }
-      partnerWallet.balance += partnerEarnings;
-      await partnerWallet.save();
+      await Wallet.updateOne(
+        { _id: partnerWallet._id as any },
+        { $inc: { balance: partnerEarnings } }
+      );
 
       await WalletTransaction.create({
         wallet_id: partnerWallet._id,
@@ -209,7 +221,7 @@ export async function POST(req: Request) {
         metadata: {
           order_id: order.order_id,
           gross_amount: amount,
-          commission_rate: PHARMACY_COMMISSION,
+          commission_rate: COMMISSION.PHARMACY_RATE,
           commission_amount: amount - partnerEarnings,
         },
       } as any).catch(() => {});
@@ -231,8 +243,8 @@ export async function POST(req: Request) {
       return NextResponse.json({
         ok: true,
         message: "Payment successful from wallet",
-        newBalance: wallet.balance,
-        redirectUrl: `/patient/dashboard/payment/success?reference=WLT-${order.order_id}-${Date.now()}&status=success`,
+        newBalance: updatedWallet.balance,
+        redirectUrl: `/patient/dashboard/payment/success?reference=${paymentRef}&status=success`,
       });
     }
 

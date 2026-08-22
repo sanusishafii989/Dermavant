@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
-import { auth, clerkClient } from "@clerk/nextjs/server";
+import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import Groq from "groq-sdk";
 import { connectDB } from "@/lib/db";
@@ -101,32 +101,9 @@ export async function POST(req: Request) {
 
     await connectDB();
 
-    let userDoc = await User.findOne({ clerkId: userId }).lean();
+    const userDoc = await User.findOne({ clerkId: userId }).lean();
     if (!userDoc) {
-      try {
-        const client = await clerkClient();
-        const clerkUser = await client.users.getUser(userId);
-        const fullName =
-          [clerkUser.firstName, clerkUser.lastName].filter(Boolean).join(" ") || "Aetheris Patient";
-        const email = clerkUser.emailAddresses[0]?.emailAddress || `${userId}@example.com`;
-        const phone = clerkUser.phoneNumbers[0]?.phoneNumber || "";
-
-        const createdUser = await User.create({
-          clerkId: userId,
-          fullName,
-          email,
-          phone,
-          role: "patient",
-          status: "pending_verification",
-        } as any);
-        userDoc = createdUser.toObject();
-      } catch (autoProvisionErr) {
-        console.error("[AI CHAT] Failed to auto-provision user document:", autoProvisionErr);
-      }
-    }
-
-    if (!userDoc) {
-      return NextResponse.json({ ok: false, error: "Patient account not found in database" }, { status: 404 });
+      return NextResponse.json({ ok: false, error: "Account not found. Please complete registration first." }, { status: 404 });
     }
 
     if (userDoc.role !== "patient") {
@@ -134,17 +111,6 @@ export async function POST(req: Request) {
     }
 
     let patientDoc = await Patient.findOne({ user_id: userDoc._id as any }).lean();
-    if (!patientDoc) {
-      try {
-        const createdPatient = await Patient.create({
-          user_id: userDoc._id,
-        } as any);
-        patientDoc = createdPatient.toObject();
-      } catch (autoProvisionErr) {
-        console.error("[AI CHAT] Failed to auto-provision patient document:", autoProvisionErr);
-      }
-    }
-
     if (!patientDoc) {
       return NextResponse.json({ ok: false, error: "Patient profile not found" }, { status: 404 });
     }

@@ -24,6 +24,7 @@ interface DoctorWalletClientProps {
   initialPending: number;
   initialPaidCount: number;
   initialTransactions: any[];
+  commissionRate: number;
 }
 
 const STATUS_CONFIG: Record<string, { variant: "default" | "cyan" | "gold" | "success" | "warning" | "danger"; label: string }> = {
@@ -38,6 +39,7 @@ export function DoctorWalletClient({
   initialPending,
   initialPaidCount,
   initialTransactions,
+  commissionRate,
 }: DoctorWalletClientProps) {
   const [balance, setBalance] = useState(initialBalance);
   const [withdrawals, setWithdrawals] = useState<WithdrawalItem[]>([]);
@@ -154,10 +156,10 @@ export function DoctorWalletClient({
           <div>
             <p className="text-xs uppercase tracking-[0.2em] text-[var(--accent-cyan)]">Platform commission</p>
             <p className="text-sm text-[var(--text-primary)]">
-              Aetheris Health charges <span className="font-semibold text-[var(--text-primary)]">10%</span> commission on each consultation.
+              Aetheris Health charges <span className="font-semibold text-[var(--text-primary)]">{commissionRate}%</span> commission on each consultation.
               Gross earnings: <span className="font-semibold text-[var(--text-primary)]">₦{initialEarnings.toLocaleString()}</span> ·
-              Platform fee: <span className="font-semibold text-[var(--accent-gold)]">₦{Math.round(initialEarnings * 0.1).toLocaleString()}</span> ·
-              Net earnings: <span className="font-semibold text-emerald-400">₦{Math.round(initialEarnings * 0.9).toLocaleString()}</span>
+              Platform fee: <span className="font-semibold text-[var(--accent-gold)]">₦{Math.round(initialEarnings * commissionRate / 100).toLocaleString()}</span> ·
+              Net earnings: <span className="font-semibold text-emerald-400">₦{Math.round(initialEarnings * (100 - commissionRate) / 100).toLocaleString()}</span>
             </p>
           </div>
         </div>
@@ -260,7 +262,7 @@ export function DoctorWalletClient({
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="text-sm text-[var(--text-muted)]">{tx.reference?.slice(0, 16)}…</span>
+                  <span className="text-sm text-[var(--text-muted)]">{tx.reference?.slice(0, 16) ?? "—"}{tx.reference && tx.reference.length > 16 ? "…" : ""}</span>
                   <Badge variant="success">{tx.channel}</Badge>
                 </div>
               </div>

@@ -2,12 +2,11 @@ import { currentUser } from "@clerk/nextjs/server";
 import { PortalDashboardShell } from "@/components/layout/PortalDashboardShell";
 import { pharmacyNavLinks } from "@/lib/portal-nav";
 import { connectDB } from "@/lib/db";
+import { COMMISSION } from "@/lib/commission";
 import { Medicine, Partner, Patient, PharmacyOrder, User, Wallet } from "@/models";
 import { PharmacyWalletClient } from "@/components/pharmacy/PharmacyWalletClient";
 
 export const dynamic = "force-dynamic";
-
-const PHARMACY_COMMISSION_RATE = 5;
 
 export default async function PharmacyWalletPage() {
   const user = await currentUser();
@@ -77,7 +76,7 @@ export default async function PharmacyWalletPage() {
         initialPaidCount={paidOrdersCount}
         initialMedicines={totalMedicines}
         initialTransactions={transactions}
-        commissionRate={PHARMACY_COMMISSION_RATE}
+        commissionRate={COMMISSION.PHARMACY_RATE}
       />
     </PortalDashboardShell>
   );

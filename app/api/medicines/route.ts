@@ -62,6 +62,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: false, error: "name, price, quantity, and expiry_date are required" }, { status: 400 });
     }
 
+    if (price < 0 || quantity < 0) {
+      return NextResponse.json({ ok: false, error: "Price and quantity must not be negative" }, { status: 400 });
+    }
+
     await connectDB();
 
     const userDoc = await User.findOne({ clerkId: userId }).lean();
