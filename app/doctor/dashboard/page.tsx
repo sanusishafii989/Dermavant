@@ -50,93 +50,99 @@ function formatDate(dateStr: string) {
 }
 
 export default async function DoctorDashboardPage() {
-  const user = await currentUser();
+  let debugError: string | null = null;
 
-  // Enforce role — redirect if not a doctor
-  const userRole = (user as any)?.publicMetadata?.role;
-  if (userRole && userRole !== "doctor") {
-    redirect(ROLE_DASHBOARD[userRole as keyof typeof ROLE_DASHBOARD] || "/");
-  }
+  try {
+    const user = await currentUser();
 
-  const fullName =
-    user?.fullName ||
-    [user?.firstName, user?.lastName].filter(Boolean).join(" ") ||
-    "Doctor";
+    // Enforce role — redirect if not a doctor
+    const userRole = (user as any)?.publicMetadata?.role;
+    if (userRole && userRole !== "doctor") {
+      redirect(ROLE_DASHBOARD[userRole as keyof typeof ROLE_DASHBOARD] || "/");
+    }
 
-  await connectDB();
+    if (!user) {
+      redirect("/sign-in");
+    }
 
-  const userDoc = await User.findOne({ clerkId: user?.id }).lean();
-  const doctor = userDoc
-    ? await Doctor.findOne({ user_id: userDoc._id as any }).lean()
-    : null;
+    const fullName =
+      user.fullName ||
+      [user.firstName, user.lastName].filter(Boolean).join(" ") ||
+      "Doctor";
 
-  let upcomingAppointments: any[] = [];
-  let completedCount = 0;
-  let scheduledCount = 0;
-  let totalEarnings = 0;
-  let recentPayments: any[] = [];
+    await connectDB();
 
-  if (doctor) {
-    const now = new Date();
+    const userDoc = await User.findOne({ clerkId: user.id }).lean();
+    const doctor = userDoc
+      ? await Doctor.findOne({ user_id: userDoc._id as any }).lean()
+      : null;
 
-    upcomingAppointments = await Appointment.find({
-      doctor_id: doctor._id as any,
-      consultation_status: "scheduled",
-      date: { $gte: now },
-    } as any)
-      .sort({ date: 1 })
-      .limit(5)
-      .lean();
+    let upcomingAppointments: any[] = [];
+    let completedCount = 0;
+    let scheduledCount = 0;
+    let totalEarnings = 0;
+    let recentPayments: any[] = [];
 
-    const patientIds = [...new Set(upcomingAppointments.map((apt) => apt.patient_id?.toString()))];
-    const patients = await Promise.all(
-      patientIds.map((id) =>
-        id ? Patient.findById(id).lean() : null
-      )
-    );
-    const patientUserIds = [...new Set(patients.filter(Boolean).map((p: any) => p.user_id?.toString()))];
-    const patientUsers = await User.find({ _id: { $in: patientUserIds } }).lean();
-    const userMap = new Map(patientUsers.map((u) => [u._id.toString(), u]));
-    const patientMap = new Map(patients.filter(Boolean).map((p: any) => [p._id.toString(), p]));
+    if (doctor) {
+      const now = new Date();
 
-    upcomingAppointments = upcomingAppointments.map((apt) => {
-      const patient = patientMap.get(apt.patient_id?.toString());
-      const patientUser = patient ? userMap.get(patient.user_id?.toString()) : null;
-      return {
-        ...apt,
-        _id: apt._id.toString(),
-        patient_name: patientUser?.fullName || "Unknown patient",
-      };
-    });
+      upcomingAppointments = await Appointment.find({
+        doctor_id: doctor._id as any,
+        consultation_status: "scheduled",
+        date: { $gte: now },
+      } as any)
+        .sort({ date: 1 })
+        .limit(5)
+        .lean();
 
-    completedCount = await Appointment.countDocuments({
-      doctor_id: doctor._id as any,
-      consultation_status: "completed",
-    } as any);
+      const patientIds = [...new Set(upcomingAppointments.map((apt) => apt.patient_id?.toString()))];
+      const patients = await Promise.all(
+        patientIds.map((id) =>
+          id ? Patient.findById(id).lean() : null
+        )
+      );
+      const patientUserIds = [...new Set(patients.filter(Boolean).map((p: any) => p.user_id?.toString()))];
+      const patientUsers = await User.find({ _id: { $in: patientUserIds } }).lean();
+      const userMap = new Map(patientUsers.map((u) => [u._id.toString(), u]));
+      const patientMap = new Map(patients.filter(Boolean).map((p: any) => [p._id.toString(), p]));
 
-    scheduledCount = await Appointment.countDocuments({
-      doctor_id: doctor._id as any,
-      consultation_status: "scheduled",
-    } as any);
+      upcomingAppointments = upcomingAppointments.map((apt) => {
+        const patient = patientMap.get(apt.patient_id?.toString());
+        const patientUser = patient ? userMap.get(patient.user_id?.toString()) : null;
+        return {
+          ...apt,
+          _id: apt._id.toString(),
+          patient_name: patientUser?.fullName || "Unknown patient",
+        };
+      });
 
-    // Get all appointment IDs for this doctor to calculate earnings
-    const allAptIds = (await Appointment.find({ doctor_id: doctor._id as any } as any)
-      .select("_id")
-      .lean()).map((apt) => apt._id);
+      completedCount = await Appointment.countDocuments({
+        doctor_id: doctor._id as any,
+        consultation_status: "completed",
+      } as any);
 
-    const payments = await Payment.find({
-      appointment_id: { $in: allAptIds },
-      status: "success",
-    } as any)
-      .sort({ paid_at: -1 })
-      .lean();
+      scheduledCount = await Appointment.countDocuments({
+        doctor_id: doctor._id as any,
+        consultation_status: "scheduled",
+      } as any);
 
-    totalEarnings = payments.reduce((sum, p) => sum + (p.amount || 0), 0);
-    recentPayments = payments.slice(0, 5);
-  }
+      const allAptIds = (await Appointment.find({ doctor_id: doctor._id as any } as any)
+        .select("_id")
+        .lean()).map((apt) => apt._id);
 
-  return (
-    <PortalDashboardShell title="Doctor Portal" links={doctorNavLinks}>
+      const payments = await Payment.find({
+        appointment_id: { $in: allAptIds },
+        status: "success",
+      } as any)
+        .sort({ paid_at: -1 })
+        .lean();
+
+      totalEarnings = payments.reduce((sum, p) => sum + (p.amount || 0), 0);
+      recentPayments = payments.slice(0, 5);
+    }
+
+    return (
+      <PortalDashboardShell title="Doctor Portal" links={doctorNavLinks}>
       <div className="space-y-6">
         {/* Welcome */}
         <Card className="max-w-3xl">
@@ -259,5 +265,19 @@ export default async function DoctorDashboardPage() {
         </Card>
       </div>
     </PortalDashboardShell>
-  );
+    );
+  } catch (err) {
+    const error = err as Error;
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[var(--bg-primary)] px-4">
+        <div className="max-w-lg rounded-2xl border border-red-500/30 bg-red-500/5 p-6">
+          <h1 className="text-xl font-bold text-red-400">Dashboard Error (debug)</h1>
+          <pre className="mt-4 overflow-auto text-sm text-red-300">
+            {error.message}
+            {error.stack}
+          </pre>
+        </div>
+      </div>
+    );
+  }
 }
