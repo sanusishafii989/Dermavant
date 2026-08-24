@@ -59,7 +59,7 @@ export function Sidebar({ links, title = "Aetheris Health", footer, className }:
   const sidebarWidth = collapsed ? "w-16" : "w-64";
 
   const navLinks = links.map((link) => {
-    const isActive = pathname === link.href || pathname.startsWith(`${link.href}/`);
+    const isActive = pathname === link.href || !!pathname?.startsWith(`${link.href}/`);
     return (
       <Link
         key={link.href}

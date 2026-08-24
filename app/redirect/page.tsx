@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { ROLE_DASHBOARD } from "@/lib/roles";
 
+export const dynamic = "force-dynamic";
+
 export default function PostLoginRedirect() {
   const { user, isLoaded } = useUser();
   const router = useRouter();
