@@ -1,9 +1,9 @@
 import { Webhook } from "svix";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
-import { clerkClient } from "@clerk/nextjs/server";
+import mongoose from "mongoose";
 import { connectDB } from "@/lib/db";
-import { isUserRole } from "@/lib/roles";
+import { isUserRole, type UserRole } from "@/lib/roles";
 import {
   Admin,
   Doctor,
@@ -23,8 +23,68 @@ type ClerkUserEvent = {
     phone_numbers: Array<{ phone_number: string }>;
     image_url: string | null;
     public_metadata: { role?: string };
+    deleted?: boolean;
   };
 };
+
+async function ensureRoleProfile(
+  role: UserRole,
+  userId: mongoose.Types.ObjectId,
+  fullName: string,
+  email: string,
+  phone: string
+) {
+  switch (role) {
+    case "patient": {
+      const existing = await Patient.findOne({ user_id: userId } as any).lean();
+      if (!existing) await Patient.create({ user_id: userId } as any);
+      break;
+    }
+    case "doctor": {
+      const existing = await Doctor.findOne({ user_id: userId } as any).lean();
+      if (!existing) await Doctor.create({ user_id: userId } as any);
+      break;
+    }
+    case "partner": {
+      const existing = await Partner.findOne({ email: email.toLowerCase() }).lean();
+      if (!existing) {
+        await Partner.create({
+          business_name: `${fullName}'s Pharmacy`,
+          license: "PENDING",
+          owner_name: fullName,
+          email,
+          phone,
+          address: "",
+          rating: 0,
+          status: "pending",
+        } as any);
+      }
+      break;
+    }
+    case "admin": {
+      const existing = await Admin.findOne({ userId } as any).lean();
+      if (!existing) {
+        await Admin.create({
+          userId,
+          adminLevel: "standard",
+          permissions: [],
+        } as any);
+      }
+      break;
+    }
+  }
+
+  // Ensure wallet exists
+  const walletExists = await Wallet.findOne({ ownerId: userId } as any).lean();
+  if (!walletExists) {
+    await Wallet.create({
+      ownerId: userId,
+      ownerRole: role,
+      balance: 0,
+      currency: "NGN",
+    } as any);
+  }
+}
 
 export async function POST(req: Request) {
   const webhookSecret = process.env.CLERK_WEBHOOK_SECRET;
@@ -63,81 +123,69 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid webhook signature" }, { status: 400 });
   }
 
-  if (event.type !== "user.created") {
+  const { data, type } = event;
+
+  // Handle user deletion — mark as suspended in DB
+  if (type === "user.deleted" || data.deleted) {
+    await connectDB();
+    await User.updateOne(
+      { clerkId: data.id },
+      { $set: { status: "suspended" } }
+    ).exec();
     return NextResponse.json({ received: true });
   }
 
-  const { data } = event;
-  const roleFromPublic = data.public_metadata?.role;
-  const role = isUserRole(roleFromPublic) ? roleFromPublic : null;
-
-  if (!role) {
-    return NextResponse.json(
-      { error: "User role missing from public metadata" },
-      { status: 400 }
-    );
+  // For both user.created and user.updated, sync the user
+  if (type !== "user.created" && type !== "user.updated") {
+    return NextResponse.json({ received: true });
   }
+
+  const roleFromPublic = data.public_metadata?.role;
+  const role: UserRole = isUserRole(roleFromPublic) ? roleFromPublic : "patient";
 
   await connectDB();
-
-  const existingUser = await User.findOne({ clerkId: data.id });
-  if (existingUser) {
-    return NextResponse.json({ received: true, duplicate: true });
-  }
 
   const fullName =
     [data.first_name, data.last_name].filter(Boolean).join(" ") || "Aetheris User";
   const email = data.email_addresses[0]?.email_address ?? "";
   const phone = data.phone_numbers[0]?.phone_number ?? "";
+  const profilePhoto = data.image_url ?? undefined;
 
+  const existingUser = await User.findOne({ clerkId: data.id });
+
+  if (existingUser) {
+    // Update existing user with latest Clerk data
+    const oldRole = existingUser.role;
+    existingUser.fullName = fullName;
+    existingUser.email = email;
+    existingUser.phone = phone;
+    existingUser.role = role;
+    if (profilePhoto) existingUser.profilePhoto = profilePhoto;
+    if (role === "admin" && existingUser.status !== "active") {
+      existingUser.status = "active";
+    }
+    await existingUser.save();
+
+    // If role changed, ensure role-specific profile exists
+    if (oldRole !== role) {
+      await ensureRoleProfile(role, existingUser._id, fullName, email, phone);
+    }
+
+    return NextResponse.json({ received: true, updated: true });
+  }
+
+  // Create new user
   const user = await User.create({
     clerkId: data.id,
     fullName,
     email,
     phone,
     role,
-    profilePhoto: data.image_url ?? undefined,
+    profilePhoto,
     status: role === "admin" ? "active" : "pending_verification",
   });
 
-  const wallet = await Wallet.create({
-    ownerId: user._id,
-    ownerRole: role,
-    balance: 0,
-    currency: "NGN",
-  });
+  await ensureRoleProfile(role, user._id, fullName, email, phone);
 
-  switch (role) {
-    case "patient": {
-      const patient = new Patient({ user_id: user._id });
-      await patient.save();
-      break;
-    }
-    case "doctor": {
-      const doctor = new Doctor({ user_id: user._id });
-      await doctor.save();
-      break;
-    }
-    case "partner":
-      await Partner.create({
-        business_name: `${fullName}'s Pharmacy`,
-        license: "PENDING",
-        owner_name: fullName,
-        email,
-        phone,
-        address: "",
-        rating: 0,
-        status: "pending",
-      });
-      break;
-    case "admin":
-      await Admin.create({
-        userId: user._id,
-        adminLevel: "standard",
-        permissions: [],
-      });
-      break;
-  }
-
-  return NextResponse.json({ received: true });
+  return NextResponse.json({ received: true, created: true });
 }

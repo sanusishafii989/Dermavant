@@ -9,11 +9,13 @@ import { Input } from "@/components/ui/Input";
 import { Avatar } from "@/components/ui/Avatar";
 import { UserDetailModal, type UserDetail } from "@/components/admin/UserDetailModal";
 import { adminNavLinks } from "@/lib/portal-nav";
-import { Search, ShieldAlert, UserCheck, RefreshCw, Eye, CheckCircle, XCircle } from "lucide-react";
+import { Search, ShieldAlert, UserCheck, RefreshCw, Eye, CheckCircle, XCircle, CloudDownload } from "lucide-react";
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<UserDetail[]>([]);
   const [loading, setLoading] = useState(true);
+  const [syncing, setSyncing] = useState(false);
+  const [syncMessage, setSyncMessage] = useState<string>("");
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -42,6 +44,26 @@ export default function AdminUsersPage() {
   useEffect(() => {
     fetchUsers();
   }, [fetchUsers]);
+
+  const handleSyncFromClerk = async () => {
+    setSyncing(true);
+    setSyncMessage("");
+    try {
+      const res = await fetch("/api/admin/users/sync", { method: "POST" });
+      const data = await res.json();
+      if (data.ok) {
+        setSyncMessage(`Synced ${data.total} users — ${data.created} created, ${data.updated} updated`);
+        await fetchUsers();
+      } else {
+        setSyncMessage(data.error || "Sync failed");
+      }
+    } catch (err) {
+      setSyncMessage("Failed to sync with Clerk");
+    } finally {
+      setSyncing(false);
+      setTimeout(() => setSyncMessage(""), 5000);
+    }
+  };
 
   const handleStatusChange = async (userId: string, newStatus: string) => {
     try {
@@ -86,15 +108,30 @@ export default function AdminUsersPage() {
               Manage accounts, verify credentials, and govern system access
             </p>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={fetchUsers}
-            disabled={loading}
-            className="text-cyan hover:bg-cyan/10 self-start sm:self-auto"
-          >
-            <RefreshCw className={`mr-1.5 h-4 w-4 ${loading ? "animate-spin" : ""}`} /> Refresh List
-          </Button>
+          <div className="flex items-center gap-2">
+            {syncMessage && (
+              <span className="text-xs text-cyan">{syncMessage}</span>
+            )}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleSyncFromClerk}
+              disabled={syncing}
+              className="text-cyan hover:bg-cyan/10"
+            >
+              <CloudDownload className={`mr-1.5 h-4 w-4 ${syncing ? "animate-pulse" : ""}`} />
+              {syncing ? "Syncing..." : "Sync from Clerk"}
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={fetchUsers}
+              disabled={loading}
+              className="text-cyan hover:bg-cyan/10"
+            >
+              <RefreshCw className={`mr-1.5 h-4 w-4 ${loading ? "animate-spin" : ""}`} /> Refresh List
+            </Button>
+          </div>
         </div>
 
         {/* Filter Controls Bar */}
