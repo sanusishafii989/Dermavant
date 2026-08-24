@@ -23,7 +23,7 @@ export async function POST(req: Request) {
     }
 
     // Get patient's wallet
-    let wallet = await Wallet.findOne({ ownerId: userDoc._id as any });
+    const wallet = await Wallet.findOne({ ownerId: userDoc._id as any });
     if (!wallet) {
       return NextResponse.json({ ok: false, error: "Wallet not found. Please top up first." }, { status: 400 });
     }

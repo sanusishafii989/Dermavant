@@ -110,7 +110,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: false, error: "Only patients may use dermatology AI consultation" }, { status: 403 });
     }
 
-    let patientDoc = await Patient.findOne({ user_id: userDoc._id as any }).lean();
+    const patientDoc = await Patient.findOne({ user_id: userDoc._id as any }).lean();
     if (!patientDoc) {
       return NextResponse.json({ ok: false, error: "Patient profile not found" }, { status: 404 });
     }

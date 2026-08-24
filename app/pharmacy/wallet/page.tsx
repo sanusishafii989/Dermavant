@@ -1,4 +1,5 @@
 import { currentUser } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 import { PortalDashboardShell } from "@/components/layout/PortalDashboardShell";
 import { pharmacyNavLinks } from "@/lib/portal-nav";
 import { connectDB } from "@/lib/db";
@@ -10,14 +11,19 @@ export const dynamic = "force-dynamic";
 
 export default async function PharmacyWalletPage() {
   const user = await currentUser();
+
+  if (!user) {
+    redirect("/sign-in");
+  }
+
   const fullName =
-    user?.fullName ||
-    [user?.firstName, user?.lastName].filter(Boolean).join(" ") ||
+    user.fullName ||
+    [user.firstName, user.lastName].filter(Boolean).join(" ") ||
     "Partner";
 
   await connectDB();
 
-  const userDoc = await User.findOne({ clerkId: user?.id }).lean();
+  const userDoc = await User.findOne({ clerkId: user.id }).lean();
   const partner = userDoc
     ? await Partner.findOne({ email: userDoc.email }).lean()
     : null;

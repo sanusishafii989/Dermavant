@@ -129,7 +129,7 @@ export async function PUT(req: Request) {
       return NextResponse.json({ ok: false, error: "Only doctors or patients can update appointments" }, { status: 403 });
     }
 
-    let query: any = { $or: [{ _id: appointmentId }, { appointment_id: appointmentId }] };
+    const query: any = { $or: [{ _id: appointmentId }, { appointment_id: appointmentId }] };
 
     if (userDoc.role === "doctor") {
       const doctor = await Doctor.findOne({ user_id: userDoc._id as any }).lean();

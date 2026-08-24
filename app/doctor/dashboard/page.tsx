@@ -50,7 +50,7 @@ function formatDate(dateStr: string) {
 }
 
 export default async function DoctorDashboardPage() {
-  let debugError: string | null = null;
+  const debugError: string | null = null;
 
   try {
     const user = await currentUser();

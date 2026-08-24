@@ -26,12 +26,22 @@ self.addEventListener("fetch", (event) => {
   // Skip non-GET requests
   if (request.method !== "GET") return;
 
-  // Skip API calls (except dev/seed)
+  // Skip API calls entirely — never cache API responses
   const url = new URL(request.url);
-  if (url.pathname.startsWith("/api/") && !url.pathname.startsWith("/api/dev")) return;
+  if (url.pathname.startsWith("/api/")) return;
 
   // Skip Clerk auth requests
   if (url.hostname.includes("clerk")) return;
+
+  // Skip authenticated dashboard pages — caching them causes stale user data
+  if (
+    url.pathname.startsWith("/patient/") ||
+    url.pathname.startsWith("/doctor/") ||
+    url.pathname.startsWith("/pharmacy/") ||
+    url.pathname.startsWith("/admin/")
+  ) {
+    return;
+  }
 
   // Cache-first for static assets (images, fonts, css, js)
   if (
@@ -45,8 +55,11 @@ self.addEventListener("fetch", (event) => {
         (cached) =>
           cached ||
           fetch(request).then((response) => {
-            const clone = response.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+            // Only cache successful responses
+            if (response.ok) {
+              const clone = response.clone();
+              caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+            }
             return response;
           })
       )
@@ -54,12 +67,15 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Network-first for pages (fall back to cache when offline)
+  // Network-first for public pages (fall back to cache when offline)
   event.respondWith(
     fetch(request)
       .then((response) => {
-        const clone = response.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+        // Only cache successful responses — don't cache 404/500 pages
+        if (response.ok) {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+        }
         return response;
       })
       .catch(() => caches.match(request).then((cached) => cached || caches.match("/")))

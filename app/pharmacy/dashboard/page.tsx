@@ -21,14 +21,18 @@ export default async function PharmacyDashboardPage() {
     redirect(ROLE_DASHBOARD[userRole as keyof typeof ROLE_DASHBOARD] || "/");
   }
 
+  if (!user) {
+    redirect("/sign-in");
+  }
+
   const fullName =
-    user?.fullName ||
-    [user?.firstName, user?.lastName].filter(Boolean).join(" ") ||
+    user.fullName ||
+    [user.firstName, user.lastName].filter(Boolean).join(" ") ||
     "Partner";
 
   await connectDB();
 
-  const userDoc = await User.findOne({ clerkId: user?.id }).lean();
+  const userDoc = await User.findOne({ clerkId: user.id }).lean();
   const partner = userDoc
     ? await Partner.findOne({ email: userDoc.email }).lean()
     : null;

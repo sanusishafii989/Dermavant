@@ -98,7 +98,7 @@ export async function POST(req: Request) {
     const clerkUser = await currentUser();
     const email = body.email || clerkUser?.emailAddresses?.[0]?.emailAddress || `${userId}@example.com`;
 
-    let userDoc: any = await User.findOne({ clerkId: userId }).lean();
+    const userDoc: any = await User.findOne({ clerkId: userId }).lean();
     if (!userDoc) {
       return NextResponse.json({ ok: false, error: "User account not found" }, { status: 404 });
     }

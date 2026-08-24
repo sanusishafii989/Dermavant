@@ -37,6 +37,7 @@ yarn-error.log*
 tmp-*
 *.localmp*
 .env.localmp*
+build-output.txt
 
 # vercel
 .vercel

@@ -83,7 +83,7 @@ export async function POST() {
 
     let created = 0;
     let updated = 0;
-    let skipped = 0;
+    const skipped = 0;
 
     for (const clerkUser of clerkUsers.data) {
       const clerkId = clerkUser.id;

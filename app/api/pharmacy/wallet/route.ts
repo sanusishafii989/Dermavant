@@ -1,6 +1,7 @@
+import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
-import { Partner, User, Wallet, WalletTransaction } from "@/models";
+import { User, Wallet, WalletTransaction } from "@/models";
 
 export async function POST(req: Request) {
   try {
@@ -18,12 +19,12 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: false, error: "Bank name, account number, and account name are required" }, { status: 400 });
     }
 
-    await connectDB();
-
-    const { userId } = await (await import("@clerk/nextjs/server")).auth();
+    const { userId } = await auth();
     if (!userId) {
       return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
     }
+
+    await connectDB();
 
     const userDoc = await User.findOne({ clerkId: userId }).lean();
     if (!userDoc || userDoc.role !== "partner") {
@@ -44,12 +45,18 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: false, error: "Insufficient balance for this withdrawal" }, { status: 400 });
     }
 
+    // Debit wallet immediately — funds are locked pending admin approval
+    await Wallet.updateOne(
+      { _id: wallet._id as any },
+      { $inc: { balance: -amount } }
+    );
+
     const reference = `PWDR-${Date.now()}`;
 
     const transaction = await WalletTransaction.create({
       wallet_id: wallet._id,
       patient_id: userDoc._id,
-      type: "refund",
+      type: "pharmacy_purchase",
       amount,
       direction: "debit",
       currency: "NGN",
@@ -85,7 +92,7 @@ export async function POST(req: Request) {
 
 export async function GET() {
   try {
-    const { userId } = await (await import("@clerk/nextjs/server")).auth();
+    const { userId } = await auth();
     if (!userId) {
       return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
     }
@@ -104,8 +111,8 @@ export async function GET() {
 
     const withdrawals = await WalletTransaction.find({
       wallet_id: wallet._id,
-      type: "refund",
       direction: "debit",
+      "metadata.request_type": "partner_withdrawal",
     } as any)
       .sort({ created_at: -1 })
       .lean();

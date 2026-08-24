@@ -84,6 +84,7 @@ export function PharmacyWalletClient({
         setSuccess("Withdrawal request submitted! It will be processed by admin.");
         setShowWithdrawModal(false);
         setForm({ amount: "", bankName: "", accountNumber: "", accountName: "" });
+        setBalance((prev) => Math.max(0, prev - amount));
         void loadWithdrawals();
       } else {
         setError(data.error || "Failed to request withdrawal");
