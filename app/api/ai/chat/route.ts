@@ -29,7 +29,7 @@ function getEnvValue(name: string): string | undefined {
 }
 
 const GROQ_API_KEY = getEnvValue("GROQ_API_KEY");
-const GROQ_MODEL = getEnvValue("GROQ_MODEL") || "llama-3.3-70b-versatile";
+const GROQ_MODEL = getEnvValue("GROQ_MODEL") || "openai/gpt-oss-120b";
 
 function buildDermatologyPrompt(symptoms: string, clinicalContext: string) {
   return `You are a dermatological symptom triage assistant for a patient-facing health app, focused specifically on skin, hair, and nail conditions.

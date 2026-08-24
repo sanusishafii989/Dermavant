@@ -20,7 +20,7 @@ Always include a brief disclaimer that the information is AI-generated and shoul
 export async function POST(req: Request) {
   try {
     const GROQ_API_KEY = process.env.GROQ_API_KEY?.trim();
-    const GROQ_MODEL = process.env.GROQ_MODEL?.trim() || "llama-3.3-70b-versatile";
+    const GROQ_MODEL = process.env.GROQ_MODEL?.trim() || "openai/gpt-oss-120b";
 
     if (!GROQ_API_KEY) {
       return NextResponse.json(
