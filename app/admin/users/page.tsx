@@ -291,7 +291,7 @@ export default function AdminUsersPage() {
                             <Eye className="mr-1 h-3.5 w-3.5" /> Details
                           </Button>
 
-                          {u.status === "pending_verification" && (
+                          {(u.status === "pending_verification" || u.roleDetails?.verificationStatus === "pending") && (
                             <Button
                               variant="primary"
                               size="sm"

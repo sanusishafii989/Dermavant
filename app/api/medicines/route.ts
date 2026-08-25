@@ -73,7 +73,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: false, error: "Only partners can create medicines" }, { status: 403 });
     }
 
-    const partnerDoc = await Partner.findOne({ email: userDoc.email }).lean();
+    const partnerDoc = await Partner.findOne({ email: userDoc.email }).lean()
+      || await resolvePartnerForUser(
+        { email: userDoc.email, fullName: userDoc.fullName },
+        { findOne: (query: any) => Partner.findOne(query).lean() }
+      );
     if (!partnerDoc) {
       return NextResponse.json({ ok: false, error: "Partner profile not found" }, { status: 404 });
     }

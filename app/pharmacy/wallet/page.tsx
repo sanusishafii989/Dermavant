@@ -2,6 +2,7 @@ import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { PortalDashboardShell } from "@/components/layout/PortalDashboardShell";
 import { pharmacyNavLinks } from "@/lib/portal-nav";
+import { resolvePartnerForUser } from "@/lib/partner-resolution";
 import { connectDB } from "@/lib/db";
 import { COMMISSION } from "@/lib/commission";
 import { Medicine, Partner, Patient, PharmacyOrder, User, Wallet } from "@/models";
@@ -25,7 +26,11 @@ export default async function PharmacyWalletPage() {
 
   const userDoc = await User.findOne({ clerkId: user.id }).lean();
   const partner = userDoc
-    ? await Partner.findOne({ email: userDoc.email }).lean()
+    ? (await Partner.findOne({ email: userDoc.email }).lean()) ||
+      (await resolvePartnerForUser(
+        { email: userDoc.email, fullName: userDoc.fullName },
+        { findOne: (query: any) => Partner.findOne(query).lean() }
+      ))
     : null;
 
   let walletBalance = 0;

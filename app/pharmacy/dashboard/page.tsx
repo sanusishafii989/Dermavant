@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { pharmacyNavLinks } from "@/lib/portal-nav";
 import { ROLE_DASHBOARD } from "@/lib/roles";
+import { resolvePartnerForUser } from "@/lib/partner-resolution";
 import { connectDB } from "@/lib/db";
 import { Medicine, Partner, Patient, PharmacyOrder, User } from "@/models";
 import { Package, ClipboardList, TrendingUp, Clock } from "lucide-react";
@@ -34,7 +35,11 @@ export default async function PharmacyDashboardPage() {
 
   const userDoc = await User.findOne({ clerkId: user.id }).lean();
   const partner = userDoc
-    ? await Partner.findOne({ email: userDoc.email }).lean()
+    ? (await Partner.findOne({ email: userDoc.email }).lean()) ||
+      (await resolvePartnerForUser(
+        { email: userDoc.email, fullName: userDoc.fullName },
+        { findOne: (query: any) => Partner.findOne(query).lean() }
+      ))
     : null;
 
   let totalMedicines = 0;
