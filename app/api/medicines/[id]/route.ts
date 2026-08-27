@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
-import { resolvePartnerForUser } from "@/lib/partner-resolution";
+import { ensurePartnerProfile } from "@/lib/ensure-partner";
 import { Medicine, Partner, User } from "@/models";
 
 export async function PUT(req: Request, context: { params: Promise<{ id: string }> }) {
@@ -32,14 +32,7 @@ export async function PUT(req: Request, context: { params: Promise<{ id: string 
       return NextResponse.json({ ok: false, error: "Only partners can edit medicines" }, { status: 403 });
     }
 
-    const partnerDoc = await Partner.findOne({ email: userDoc.email }).lean()
-      || await resolvePartnerForUser(
-        { email: userDoc.email, fullName: userDoc.fullName },
-        { findOne: (query: any) => Partner.findOne(query).lean() }
-      );
-    if (!partnerDoc) {
-      return NextResponse.json({ ok: false, error: "Partner profile not found" }, { status: 404 });
-    }
+    const partnerDoc = await ensurePartnerProfile(userDoc as any);
 
     const medicine = await Medicine.findOne({ _id: objectId } as any).lean();
     if (!medicine || medicine.partner_id?.toString() !== partnerDoc._id.toString()) {
@@ -87,14 +80,7 @@ export async function DELETE(req: Request, context: { params: Promise<{ id: stri
       return NextResponse.json({ ok: false, error: "Only partners can remove medicines" }, { status: 403 });
     }
 
-    const partnerDoc = await Partner.findOne({ email: userDoc.email }).lean()
-      || await resolvePartnerForUser(
-        { email: userDoc.email, fullName: userDoc.fullName },
-        { findOne: (query: any) => Partner.findOne(query).lean() }
-      );
-    if (!partnerDoc) {
-      return NextResponse.json({ ok: false, error: "Partner profile not found" }, { status: 404 });
-    }
+    const partnerDoc = await ensurePartnerProfile(userDoc as any);
 
     const medicine = await Medicine.findOne({ _id: objectId } as any).lean();
     if (!medicine || medicine.partner_id?.toString() !== partnerDoc._id.toString()) {

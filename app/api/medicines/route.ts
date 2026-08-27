@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
-import { resolvePartnerForUser } from "@/lib/partner-resolution";
+import { ensurePartnerProfile } from "@/lib/ensure-partner";
 import { Medicine, Partner, User } from "@/models";
 
 export async function GET(req: Request) {
@@ -22,16 +22,7 @@ export async function GET(req: Request) {
       return NextResponse.json({ ok: false, error: "Only partners can view this catalogue" }, { status: 403 });
     }
 
-    const partnerDoc = await resolvePartnerForUser(
-      {
-        email: userDoc.email,
-        fullName: userDoc.fullName,
-      },
-      {
-        findOne: (query: any) => Partner.findOne(query).lean(),
-      },
-      partnerId
-    );
+    const partnerDoc = await ensurePartnerProfile(userDoc as any);
 
     if (!partnerDoc) {
       return NextResponse.json({ ok: false, error: "Partner profile not found" }, { status: 404 });
@@ -73,14 +64,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: false, error: "Only partners can create medicines" }, { status: 403 });
     }
 
-    const partnerDoc = await Partner.findOne({ email: userDoc.email }).lean()
-      || await resolvePartnerForUser(
-        { email: userDoc.email, fullName: userDoc.fullName },
-        { findOne: (query: any) => Partner.findOne(query).lean() }
-      );
-    if (!partnerDoc) {
-      return NextResponse.json({ ok: false, error: "Partner profile not found" }, { status: 404 });
-    }
+    const partnerDoc = await ensurePartnerProfile(userDoc as any);
 
     const medicine = await Medicine.create({
       partner_id: partnerDoc._id,
