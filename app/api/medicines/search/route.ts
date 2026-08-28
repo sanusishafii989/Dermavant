@@ -9,7 +9,11 @@ export async function GET(req: Request) {
     const url = new URL(req.url);
     const query = url.searchParams.get("q") || "";
 
-    const filter: any = { status: "active" };
+    // Only show medicines from verified partners
+    const verifiedPartnerIds = (await Partner.find({ status: "verified" }).select("_id").lean())
+      .map((p) => p._id);
+
+    const filter: any = { status: "active", partner_id: { $in: verifiedPartnerIds } };
     if (query) {
       filter.$text = { $search: query };
     }

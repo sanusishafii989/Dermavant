@@ -38,6 +38,8 @@ tmp-*
 *.localmp*
 .env.localmp*
 build-output.txt
+*.bak
+dev-output.txt
 
 # vercel
 .vercel

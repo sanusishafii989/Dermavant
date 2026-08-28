@@ -51,6 +51,8 @@ export function PharmacyOrders() {
   const [filter, setFilter] = useState("all");
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [statusModal, setStatusModal] = useState<{ order: PharmacyOrderItem; status: string } | null>(null);
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 10;
 
   const loadOrders = useCallback(async () => {
     setLoading(true);
@@ -102,6 +104,14 @@ export function PharmacyOrders() {
     ? orders
     : orders.filter((o) => o.delivery_status === filter);
 
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+  const paginatedOrders = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+  const handleFilterChange = (status: string) => {
+    setFilter(status);
+    setPage(1);
+  };
+
   const counts = {
     all: orders.length,
     pending: orders.filter((o) => o.delivery_status === "pending").length,
@@ -127,7 +137,7 @@ export function PharmacyOrders() {
         {["all", "pending", "processing", "shipped", "delivered", "cancelled"].map((status) => (
           <button
             key={status}
-            onClick={() => setFilter(status)}
+            onClick={() => handleFilterChange(status)}
             className={`rounded-xl px-4 py-2 text-sm font-medium transition-colors capitalize ${
               filter === status
                 ? "bg-[var(--accent-cyan)] text-white"
@@ -145,11 +155,11 @@ export function PharmacyOrders() {
 
       {loading ? (
         <Card className="p-6 text-[var(--text-secondary)]">Loading orders…</Card>
-      ) : filtered.length === 0 ? (
+      ) : paginatedOrders.length === 0 ? (
         <Card className="p-6 text-[var(--text-secondary)]">No orders found.</Card>
       ) : (
         <div className="space-y-4">
-          {filtered.map((order) => {
+          {paginatedOrders.map((order) => {
             const delCfg = DELIVERY_CONFIG[order.delivery_status] || DELIVERY_CONFIG.pending;
             const payCfg = PAYMENT_CONFIG[order.payment_status] || PAYMENT_CONFIG.pending;
             const currentStep = STATUS_FLOW.indexOf(order.delivery_status);
@@ -173,7 +183,7 @@ export function PharmacyOrders() {
                         {new Date(order.created_at).toLocaleDateString("en-NG", { weekday: "short", month: "short", day: "numeric" })}
                       </span>
                       <span className="rounded-full border border-[var(--border)] bg-[var(--bg-input)] px-2.5 py-1">
-                        {order.items.length} item{order.items.length !== 1 ? "s" : ""}
+                        {(order.items || []).length} item{(order.items || []).length !== 1 ? "s" : ""}
                       </span>
                       <span className="rounded-full border border-[var(--border)] bg-[var(--bg-input)] px-2.5 py-1">
                         ₦{order.total.toLocaleString()}
@@ -183,7 +193,7 @@ export function PharmacyOrders() {
                     <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-3">
                       <p className="mb-2 text-xs uppercase tracking-[0.2em] text-[var(--text-muted)]">Items</p>
                       <div className="space-y-1">
-                        {order.items.map((item, i) => (
+                        {(order.items || []).map((item, i) => (
                           <div key={i} className="flex justify-between text-sm">
                             <span className="text-[var(--text-primary)]">{item.name} × {item.qty}</span>
                             <span className="text-[var(--text-secondary)]">₦{(item.unit_price * item.qty).toLocaleString()}</span>
@@ -234,6 +244,14 @@ export function PharmacyOrders() {
           })}
         </div>
       )}
+
+      {totalPages > 1 ? (
+        <div className="flex items-center justify-center gap-3">
+          <Button size="sm" variant="ghost" disabled={page === 1} onClick={() => setPage((p) => Math.max(1, p - 1))}>Previous</Button>
+          <span className="text-sm text-[var(--text-secondary)]">Page {page} of {totalPages}</span>
+          <Button size="sm" variant="ghost" disabled={page === totalPages} onClick={() => setPage((p) => Math.min(totalPages, p + 1))}>Next</Button>
+        </div>
+      ) : null}
 
       <Modal open={!!statusModal} onClose={() => setStatusModal(null)} title="Confirm status update">
         {statusModal ? (

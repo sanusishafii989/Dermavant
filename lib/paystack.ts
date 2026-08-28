@@ -124,6 +124,8 @@ export async function markAppointmentPaid(params: {
   return paymentDoc;
 }
 
+const COMPANY_WALLET_OWNER_ID = "000000000000000000000000";
+
 export async function markPharmacyOrderPaid(params: {
   orderIdentifier?: string | null;
   reference: string;
@@ -148,39 +150,56 @@ export async function markPharmacyOrderPaid(params: {
     return null;
   }
 
-  if (order.payment_status === "paid") {
-    return order;
-  }
-
-  // Mark order as paid
-  await PharmacyOrder.updateOne(
-    { _id: order._id as any },
+  // Atomic idempotency guard: only one request can transition payment_status from "pending" → "paid"
+  const updated = await PharmacyOrder.findOneAndUpdate(
+    { _id: order._id as any, payment_status: "pending" } as any,
     {
       $set: {
         payment_status: "paid",
         payment_reference: params.reference,
       },
-    }
-  );
+    },
+    { new: true }
+  ).lean();
+
+  if (!updated) {
+    // A concurrent request already marked this order as paid
+    return PharmacyOrder.findOne({ _id: order._id } as any).lean();
+  }
 
   // Reduce medicine quantities in stock atomically with sufficiency check
-  for (const item of order.items) {
+  const stockFailures: { medicine_id: any; name: string; qty: number }[] = [];
+  for (const item of updated.items) {
     const stockResult = await Medicine.updateOne(
       { _id: item.medicine_id, quantity: { $gte: item.qty } } as any,
       { $inc: { quantity: -item.qty } }
     );
     if (stockResult.matchedCount === 0) {
-      console.warn(`[PAYSTACK] Insufficient stock for medicine ${item.medicine_id} (qty: ${item.qty})`);
+      stockFailures.push({ medicine_id: item.medicine_id, name: item.name, qty: item.qty });
     }
   }
 
-  // Credit partner wallet atomically
-  const partnerEarnings = Math.round(order.total * (100 - COMMISSION.PHARMACY_RATE) / 100);
+  if (stockFailures.length > 0) {
+    console.error(
+      `[PAYSTACK] Insufficient stock for order ${updated.order_id}:`,
+      stockFailures.map((f) => `${f.name} (needed: ${f.qty})`).join(", ")
+    );
+    // Reverse the payment status — the order cannot be fulfilled with insufficient stock
+    await PharmacyOrder.updateOne(
+      { _id: updated._id as any },
+      { $set: { payment_status: "failed" } }
+    );
+    // TODO: Trigger refund flow via Paystack refund API
+    return PharmacyOrder.findOne({ _id: updated._id } as any).lean();
+  }
 
-  let partnerWallet = await Wallet.findOne({ ownerId: order.partner_id as any });
+  // Credit partner wallet atomically (ownerId = Partner._id)
+  const partnerEarnings = Math.round(updated.total * (100 - COMMISSION.PHARMACY_RATE) / 100);
+
+  let partnerWallet = await Wallet.findOne({ ownerId: updated.partner_id as any });
   if (!partnerWallet) {
     partnerWallet = await Wallet.create({
-      ownerId: order.partner_id,
+      ownerId: updated.partner_id,
       ownerRole: "partner",
       balance: 0,
       currency: "NGN",
@@ -191,32 +210,39 @@ export async function markPharmacyOrderPaid(params: {
     { $inc: { balance: partnerEarnings } }
   );
 
-  // Record the transaction
-  await WalletTransaction.create({
-    wallet_id: partnerWallet._id,
-    patient_id: order.patient_id,
-    type: "pharmacy_purchase",
-    amount: partnerEarnings,
-    direction: "credit",
-    currency: "NGN",
-    status: "completed",
-    reference: `PHARM-SALE-${order.order_id}-${Date.now()}`,
-    description: `Pharmacy order ${order.order_id} — ${order.items.length} items`,
-    metadata: {
-      order_id: order.order_id,
-      gross_amount: order.total,
-      commission_rate: COMMISSION.PHARMACY_RATE,
-      commission_amount: order.total - partnerEarnings,
-    },
-  } as any).catch(() => {});
+  // Record the partner credit transaction
+  try {
+    await WalletTransaction.create({
+      wallet_id: partnerWallet._id,
+      patient_id: updated.patient_id,
+      type: "pharmacy_purchase",
+      amount: partnerEarnings,
+      direction: "credit",
+      currency: "NGN",
+      status: "completed",
+      reference: `PHARM-SALE-${updated.order_id}-${Date.now()}`,
+      description: `Pharmacy order ${updated.order_id} — ${updated.items.length} items`,
+      metadata: {
+        order_id: updated.order_id,
+        gross_amount: updated.total,
+        commission_rate: COMMISSION.PHARMACY_RATE,
+        commission_amount: updated.total - partnerEarnings,
+      },
+    } as any);
+  } catch (err) {
+    console.error(
+      `[PAYSTACK] CRITICAL: Partner wallet credited ₦${partnerEarnings} but ledger creation FAILED for order ${updated.order_id}:`,
+      err
+    );
+  }
 
-  // Credit commission to company/admin wallet atomically
-  const commissionAmount = order.total - partnerEarnings;
+  // Credit commission to company/admin wallet (fixed ownerId for deterministic lookup)
+  const commissionAmount = updated.total - partnerEarnings;
   if (commissionAmount > 0) {
-    let adminWallet = await Wallet.findOne({ ownerRole: "admin" as any }).lean();
+    let adminWallet = await Wallet.findOne({ ownerId: COMPANY_WALLET_OWNER_ID as any, ownerRole: "admin" as any }).lean();
     if (!adminWallet) {
       const created = await Wallet.create({
-        ownerId: order.partner_id,
+        ownerId: COMPANY_WALLET_OWNER_ID,
         ownerRole: "admin",
         balance: 0,
         currency: "NGN",
@@ -229,26 +255,33 @@ export async function markPharmacyOrderPaid(params: {
       { $inc: { balance: commissionAmount } }
     );
 
-    await WalletTransaction.create({
-      wallet_id: adminWallet._id,
-      patient_id: order.patient_id,
-      type: "bonus",
-      amount: commissionAmount,
-      direction: "credit",
-      currency: "NGN",
-      status: "completed",
-      reference: `COMM-PHARM-${order.order_id}-${Date.now()}`,
-      description: `${COMMISSION.PHARMACY_RATE}% platform commission from pharmacy order ${order.order_id}`,
-      metadata: {
-        order_id: order.order_id,
-        gross_amount: order.total,
-        commission_rate: COMMISSION.PHARMACY_RATE,
-        source: "pharmacy_commission",
-      },
-    } as any).catch(() => {});
+    try {
+      await WalletTransaction.create({
+        wallet_id: adminWallet._id,
+        patient_id: updated.patient_id,
+        type: "bonus",
+        amount: commissionAmount,
+        direction: "credit",
+        currency: "NGN",
+        status: "completed",
+        reference: `COMM-PHARM-${updated.order_id}-${Date.now()}`,
+        description: `${COMMISSION.PHARMACY_RATE}% platform commission from pharmacy order ${updated.order_id}`,
+        metadata: {
+          order_id: updated.order_id,
+          gross_amount: updated.total,
+          commission_rate: COMMISSION.PHARMACY_RATE,
+          source: "pharmacy_commission",
+        },
+      } as any);
+    } catch (err) {
+      console.error(
+        `[PAYSTACK] CRITICAL: Admin wallet credited ₦${commissionAmount} but ledger creation FAILED for order ${updated.order_id}:`,
+        err
+      );
+    }
   }
 
-  return PharmacyOrder.findOne({ _id: order._id } as any).lean();
+  return PharmacyOrder.findOne({ _id: updated._id } as any).lean();
 }
 
 export async function markWalletTopUpPaid(params: {

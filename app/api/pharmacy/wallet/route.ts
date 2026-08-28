@@ -1,6 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
+import { ensurePartnerProfile } from "@/lib/ensure-partner";
 import { User, Wallet, WalletTransaction } from "@/models";
 
 export async function POST(req: Request) {
@@ -31,32 +32,28 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: false, error: "Only partners can request withdrawals" }, { status: 403 });
     }
 
-    let wallet = await Wallet.findOne({ ownerId: userDoc._id as any }).lean();
+    const partner = await ensurePartnerProfile(userDoc as any);
+    if (!partner) {
+      return NextResponse.json({ ok: false, error: "Partner profile not found" }, { status: 404 });
+    }
+
+    // Look up wallet by Partner._id (consistent with lib/paystack.ts)
+    let wallet = await Wallet.findOne({ ownerId: partner._id as any }).lean();
     if (!wallet) {
       wallet = await Wallet.create({
-        ownerId: userDoc._id,
+        ownerId: partner._id,
         ownerRole: "partner",
         balance: 0,
         currency: "NGN",
       } as any);
     }
 
-    if (wallet.balance < amount) {
-      return NextResponse.json({ ok: false, error: "Insufficient balance for this withdrawal" }, { status: 400 });
-    }
-
-    // Debit wallet immediately — funds are locked pending admin approval
-    await Wallet.updateOne(
-      { _id: wallet._id as any },
-      { $inc: { balance: -amount } }
-    );
-
-    const reference = `PWDR-${Date.now()}`;
+    // Create the withdrawal transaction record FIRST (pending), then attempt atomic debit
+    const reference = `PWDR-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
     const transaction = await WalletTransaction.create({
       wallet_id: wallet._id,
-      patient_id: userDoc._id,
-      type: "pharmacy_purchase",
+      type: "withdrawal",
       amount,
       direction: "debit",
       currency: "NGN",
@@ -70,6 +67,22 @@ export async function POST(req: Request) {
         request_type: "partner_withdrawal",
       },
     } as any);
+
+    // Atomic debit: only succeeds if balance >= amount (prevents overdrawing on concurrent requests)
+    const updatedWallet = await Wallet.findOneAndUpdate(
+      { _id: wallet._id as any, balance: { $gte: amount } } as any,
+      { $inc: { balance: -amount } },
+      { new: true }
+    ).lean();
+
+    if (!updatedWallet) {
+      // Insufficient balance — mark transaction as failed
+      await WalletTransaction.updateOne(
+        { _id: transaction._id as any },
+        { $set: { status: "failed" } }
+      );
+      return NextResponse.json({ ok: false, error: "Insufficient balance for this withdrawal" }, { status: 400 });
+    }
 
     return NextResponse.json({
       ok: true,
@@ -104,7 +117,13 @@ export async function GET() {
       return NextResponse.json({ ok: false, error: "Only partners can view withdrawals" }, { status: 403 });
     }
 
-    const wallet = await Wallet.findOne({ ownerId: userDoc._id as any }).lean();
+    const partner = await ensurePartnerProfile(userDoc as any);
+    if (!partner) {
+      return NextResponse.json({ ok: false, error: "Partner profile not found" }, { status: 404 });
+    }
+
+    // Look up wallet by Partner._id (consistent with lib/paystack.ts)
+    const wallet = await Wallet.findOne({ ownerId: partner._id as any }).lean();
     if (!wallet) {
       return NextResponse.json({ ok: true, withdrawals: [] });
     }

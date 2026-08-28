@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -50,17 +50,17 @@ export function PharmacyWalletClient({
   const [success, setSuccess] = useState("");
   const [form, setForm] = useState({ amount: "", bankName: "", accountNumber: "", accountName: "" });
 
-  useEffect(() => {
-    void loadWithdrawals();
-  }, []);
-
-  const loadWithdrawals = async () => {
+  const loadWithdrawals = useCallback(async () => {
     try {
       const res = await fetch("/api/pharmacy/wallet");
       const data = await res.json();
       if (data.ok) setWithdrawals(data.withdrawals || []);
     } catch {}
-  };
+  }, []);
+
+  useEffect(() => {
+    void loadWithdrawals();
+  }, [loadWithdrawals]);
 
   const handleWithdraw = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -84,6 +84,7 @@ export function PharmacyWalletClient({
         setSuccess("Withdrawal request submitted! It will be processed by admin.");
         setShowWithdrawModal(false);
         setForm({ amount: "", bankName: "", accountNumber: "", accountName: "" });
+        // Debit is atomic on server — reflect immediately
         setBalance((prev) => Math.max(0, prev - amount));
         void loadWithdrawals();
       } else {

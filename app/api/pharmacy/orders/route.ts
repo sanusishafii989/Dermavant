@@ -7,6 +7,14 @@ import { PharmacyOrder, Partner, Patient, User } from "@/models";
 const VALID_DELIVERY_STATUSES = ["pending", "processing", "shipped", "delivered", "cancelled"] as const;
 type DeliveryStatus = (typeof VALID_DELIVERY_STATUSES)[number];
 
+const VALID_TRANSITIONS: Record<string, DeliveryStatus[]> = {
+  pending: ["processing", "cancelled"],
+  processing: ["shipped", "cancelled"],
+  shipped: ["delivered"],
+  delivered: [],
+  cancelled: [],
+};
+
 function isDeliveryStatus(value: string): value is DeliveryStatus {
   return (VALID_DELIVERY_STATUSES as readonly string[]).includes(value);
 }
@@ -25,7 +33,8 @@ export async function GET() {
       return NextResponse.json({ ok: false, error: "Only partners can view pharmacy orders" }, { status: 403 });
     }
 
-    const partner = await ensurePartnerProfile(userDoc as any);
+    // Look up Partner by email (no auto-create on read)
+    const partner = await Partner.findOne({ email: userDoc.email }).lean();
     if (!partner) {
       return NextResponse.json({ ok: false, error: "Partner profile not found" }, { status: 404 });
     }
@@ -50,8 +59,8 @@ export async function GET() {
         _id: order._id.toString(),
         patient_name: patientUser?.fullName || "Unknown patient",
         patient_email: patientUser?.email || "",
-        fulfillment_type: (order as any).fulfillment_type || "delivery",
-        patient_confirmed: (order as any).patient_confirmed || false,
+        fulfillment_type: order.fulfillment_type || "delivery",
+        patient_confirmed: order.patient_confirmed || false,
       };
     });
 
@@ -93,6 +102,25 @@ export async function PUT(req: Request) {
     }
 
     const partner = await ensurePartnerProfile(userDoc as any);
+
+    // Fetch current order to validate status transition
+    const currentOrder = await PharmacyOrder.findOne({
+      $or: [{ _id: orderId }, { order_id: orderId }],
+      partner_id: partner._id,
+    } as any).lean();
+
+    if (!currentOrder) {
+      return NextResponse.json({ ok: false, error: "Order not found" }, { status: 404 });
+    }
+
+    // Validate legal status transition
+    const allowed = VALID_TRANSITIONS[currentOrder.delivery_status] || [];
+    if (!allowed.includes(delivery_status as DeliveryStatus)) {
+      return NextResponse.json(
+        { ok: false, error: `Cannot transition from "${currentOrder.delivery_status}" to "${delivery_status}"` },
+        { status: 400 }
+      );
+    }
 
     const order = await PharmacyOrder.findOneAndUpdate(
       { $or: [{ _id: orderId }, { order_id: orderId }], partner_id: partner._id } as any,

@@ -35,7 +35,8 @@ export default async function PharmacyWalletPage() {
   let transactions: any[] = [];
 
   if (partner) {
-    const wallet = await Wallet.findOne({ ownerId: userDoc!._id as any }).lean();
+    // Wallet ownerId is the Partner doc _id (consistent with lib/paystack.ts)
+    const wallet = await Wallet.findOne({ ownerId: partner._id as any }).lean();
     if (wallet) walletBalance = wallet.balance ?? 0;
 
     const orders = await PharmacyOrder.find({ partner_id: partner._id } as any)

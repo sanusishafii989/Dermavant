@@ -18,12 +18,11 @@ const WalletTransactionSchema = new Schema(
     patient_id: {
       type: Schema.Types.ObjectId,
       ref: "Patient",
-      required: true,
       index: true,
     },
     type: {
       type: String,
-      enum: ["top_up", "consultation_fee", "pharmacy_purchase", "refund", "bonus"],
+      enum: ["top_up", "consultation_fee", "pharmacy_purchase", "refund", "bonus", "withdrawal"],
       required: true,
     },
     amount: { type: Number, required: true },

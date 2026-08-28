@@ -16,14 +16,14 @@ export const dynamic = "force-dynamic";
 export default async function PharmacyDashboardPage() {
   const user = await currentUser();
 
+  if (!user) {
+    redirect("/sign-in");
+  }
+
   // Enforce role — redirect if not a partner
   const userRole = (user as any)?.publicMetadata?.role;
   if (userRole && userRole !== "partner") {
     redirect(ROLE_DASHBOARD[userRole as keyof typeof ROLE_DASHBOARD] || "/");
-  }
-
-  if (!user) {
-    redirect("/sign-in");
   }
 
   const fullName =

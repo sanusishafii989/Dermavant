@@ -1,10 +1,5 @@
 "use client";
 
-// Workaround for Next.js 15.5.x prerendering bug:
-// "Html should not be imported outside of pages/_document" on /_error: /404
-// See: https://github.com/vercel/next.js/issues/82366
-export const dynamic = "force-dynamic";
-
 export default function GlobalError({
   reset,
 }: {
