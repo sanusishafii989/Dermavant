@@ -28,13 +28,15 @@ export async function POST(req: Request) {
 
     const data = await response.json();
     if (!response.ok || !data.status) {
+      // Paystack returns 404 when the reference doesn't exist on their system
+      const isNotFound = response.status === 404 || data.message?.includes("not found") || data.message?.includes("doesn't exist");
       return NextResponse.json(
         {
           ok: false,
           error: data.message || "Unable to verify payment",
           details: data,
         },
-        { status: 502 }
+        { status: isNotFound ? 404 : 502 }
       );
     }
 

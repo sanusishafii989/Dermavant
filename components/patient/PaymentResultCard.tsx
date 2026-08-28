@@ -35,6 +35,13 @@ export function PaymentResultCard({ mode }: Props) {
       return;
     }
 
+    // Wallet payments (WLT- prefix) are confirmed server-side — skip Paystack verification
+    if (paystackStatus === "success" && reference.startsWith("WLT-")) {
+      setStatus("success");
+      setMessage("Payment successful from your wallet balance.");
+      return;
+    }
+
     const verifyPayment = async () => {
       try {
         const response = await fetch("/api/payment/paystack/verify", {
