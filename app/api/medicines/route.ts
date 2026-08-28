@@ -68,7 +68,9 @@ export async function POST(req: Request) {
     if (isNaN(parsedExpiry.getTime())) {
       return NextResponse.json({ ok: false, error: "Invalid expiry date" }, { status: 400 });
     }
-    if (parsedExpiry < new Date()) {
+    const todayStart = new Date();
+    todayStart.setUTCHours(0, 0, 0, 0);
+    if (parsedExpiry < todayStart) {
       return NextResponse.json({ ok: false, error: "Expiry date cannot be in the past" }, { status: 400 });
     }
 

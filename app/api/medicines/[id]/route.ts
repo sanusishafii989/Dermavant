@@ -37,7 +37,9 @@ export async function PUT(req: Request, context: { params: Promise<{ id: string 
       if (isNaN(parsed.getTime())) {
         return NextResponse.json({ ok: false, error: "Invalid expiry date" }, { status: 400 });
       }
-      if (parsed < new Date()) {
+      const todayStart = new Date();
+      todayStart.setUTCHours(0, 0, 0, 0);
+      if (parsed < todayStart) {
         return NextResponse.json({ ok: false, error: "Expiry date cannot be in the past" }, { status: 400 });
       }
     }

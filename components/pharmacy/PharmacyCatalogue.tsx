@@ -283,7 +283,7 @@ export function PharmacyCatalogue() {
             <Input label="Price (₦)" type="number" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} placeholder="e.g. 500" required />
             <Input label="Quantity" type="number" value={form.quantity} onChange={(e) => setForm({ ...form, quantity: e.target.value })} placeholder="e.g. 100" required />
           </div>
-          <Input label="Expiry date" type="date" value={form.expiry_date} onChange={(e) => setForm({ ...form, expiry_date: e.target.value })} required />
+          <Input label="Expiry date" type="date" min={new Date().toISOString().split("T")[0]} value={form.expiry_date} onChange={(e) => setForm({ ...form, expiry_date: e.target.value })} required />
           <div>
             <label className="mb-2 block text-sm font-medium text-[var(--text-primary)]">Product image (required)</label>
             <input
