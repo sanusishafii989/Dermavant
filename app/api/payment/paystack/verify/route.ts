@@ -28,12 +28,17 @@ export async function POST(req: Request) {
 
     const data = await response.json();
     if (!response.ok || !data.status) {
-      // Paystack returns 404 when the reference doesn't exist on their system
-      const isNotFound = response.status === 404 || data.message?.includes("not found") || data.message?.includes("doesn't exist");
+      // Paystack returns 404 or a message like "Transaction not found" / "transaction_not_found"
+      const msg = (data.message || "").toLowerCase();
+      const isNotFound =
+        response.status === 404 ||
+        msg.includes("not found") ||
+        msg.includes("not_found") ||
+        msg.includes("doesn't exist");
       return NextResponse.json(
         {
           ok: false,
-          error: data.message || "Unable to verify payment",
+          error: isNotFound ? "Transaction not found on Paystack. If you completed payment, your wallet will be credited shortly." : (data.message || "Unable to verify payment"),
           details: data,
         },
         { status: isNotFound ? 404 : 502 }

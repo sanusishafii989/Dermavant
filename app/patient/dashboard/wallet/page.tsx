@@ -54,8 +54,11 @@ function WalletContent() {
           const data = await res.json();
           if (res.ok && data.ok) {
             setSuccessMsg("Payment verified! Your e-wallet balance has been updated successfully.");
+          } else if (res.status === 404) {
+            // Transaction not found on Paystack — webhook may still credit the wallet
+            setSuccessMsg("Payment is being processed. If you completed payment, your wallet will be credited shortly.");
           } else {
-            setError(data.error || "Unable to verify payment reference.");
+            setError(data.error || "Unable to verify payment reference. If you completed payment, your wallet will be credited shortly.");
           }
         } catch (err: any) {
           setError(err.message || "Failed to verify top-up payment.");
