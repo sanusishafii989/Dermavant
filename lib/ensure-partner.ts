@@ -30,7 +30,7 @@ export async function ensurePartnerProfile(userDoc: {
       license: "PENDING",
       owner_name: userDoc.fullName,
       email: userDoc.email,
-      phone: userDoc.phone || "",
+      phone: userDoc.phone || "N/A",
       address: "",
       rating: 0,
       status: "pending",
