@@ -18,7 +18,7 @@ export function LandingNav() {
 
   return (
     <nav className="sticky top-0 z-50 border-b border-[var(--border)] bg-[var(--bg-primary)]/80 backdrop-blur-md">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 sm:py-4">
+      <div className="mx-auto flex min-h-[4.5rem] max-w-7xl items-center justify-between px-4 pb-3 pt-[calc(0.75rem+env(safe-area-inset-top))] sm:px-6 md:py-4">
         <Link href="/" className="flex items-center gap-2">
           <Image
             src="/logo.svg"
