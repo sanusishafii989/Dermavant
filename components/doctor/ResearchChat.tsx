@@ -19,6 +19,29 @@ const SUGGESTED_PROMPTS = [
   "Evidence-based treatments for melasma in darker skin types",
 ];
 
+const RESEARCH_RETRY_DELAYS = [500, 1000];
+
+async function postResearchMessage(payload: object) {
+  for (let attempt = 0; attempt <= RESEARCH_RETRY_DELAYS.length; attempt += 1) {
+    const response = await fetch("/api/doctor/research", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    const data = await response.json();
+    const shouldRetry =
+      (response.status === 502 || response.status === 503) &&
+      data.retryable !== false &&
+      attempt < RESEARCH_RETRY_DELAYS.length;
+
+    if (!shouldRetry) return { response, data };
+
+    await new Promise((resolve) => setTimeout(resolve, RESEARCH_RETRY_DELAYS[attempt]));
+  }
+
+  throw new Error("Research service did not respond");
+}
+
 export function ResearchChat() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
@@ -70,17 +93,12 @@ export function ResearchChat() {
     setError("");
 
     try {
-      const res = await fetch("/api/doctor/research", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+      const { data } = await postResearchMessage({
           messages: newMessages.map((msg) => ({ role: msg.role, content: msg.content })),
           image: image || undefined,
           conversationId: conversationId || undefined,
-        }),
       });
 
-      const data = await res.json();
       if (data.ok) {
         const responseText = data.response;
         if (data.conversationId) setConversationId(data.conversationId);

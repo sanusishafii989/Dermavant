@@ -100,6 +100,7 @@ export async function POST(req: Request) {
           error: isCredentialError
             ? "The research service is temporarily unavailable. Please contact support."
             : "The research service could not process your request.",
+          retryable: !isCredentialError,
         },
         { status: 502 }
       );
