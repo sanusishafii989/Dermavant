@@ -70,8 +70,8 @@ export function Sidebar({ links, title = "Aetheris Health", footer, mobileHeader
           "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
           collapsed && "justify-center px-0",
           isActive
-            ? "bg-[var(--accent-cyan)]/15 text-[var(--accent-cyan)]"
-            : "text-[var(--text-secondary)] hover:bg-[var(--bg-input)] hover:text-[var(--text-primary)]"
+            ? "bg-accent-cyan/15 text-accent-cyan"
+            : "text-secondary hover:bg-surface-elevated hover:text-primary"
         )}
       >
         {link.icon ? (
@@ -104,11 +104,11 @@ export function Sidebar({ links, title = "Aetheris Health", footer, mobileHeader
           />
         </>
       ) : (
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--accent-cyan)]/15">
+        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent-cyan/15 text-accent-cyan">
           <svg viewBox="0 0 48 48" className="h-6 w-6">
-            <polygon points="24,4 42,14 42,34 24,44 6,34 6,14" fill="none" stroke="var(--accent-cyan)" strokeWidth="2" strokeLinejoin="round" />
-            <rect x="17" y="14" width="14" height="20" rx="2" fill="var(--accent-cyan)" />
-            <rect x="10" y="21" width="28" height="6" rx="2" fill="var(--accent-cyan)" />
+            <polygon points="24,4 42,14 42,34 24,44 6,34 6,14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+            <rect x="17" y="14" width="14" height="20" rx="2" fill="currentColor" />
+            <rect x="10" y="21" width="28" height="6" rx="2" fill="currentColor" />
           </svg>
         </div>
       )}
@@ -116,14 +116,14 @@ export function Sidebar({ links, title = "Aetheris Health", footer, mobileHeader
   );
 
   const footerSection = footer ? (
-    <div className="mt-auto space-y-3 border-t border-[var(--border)] pt-4">
+    <div className="mt-auto space-y-3 border-t border-border pt-4">
       <div className={cn("flex items-center gap-2", collapsed && "flex-col")}>{footer}</div>
       <div className={cn("flex items-center gap-2", collapsed ? "flex-col" : "justify-end")}>
         <ThemeToggle />
       </div>
     </div>
   ) : (
-    <div className="mt-auto border-t border-[var(--border)] pt-4">
+    <div className="mt-auto border-t border-border pt-4">
       <ThemeToggle />
     </div>
   );
@@ -138,17 +138,17 @@ export function Sidebar({ links, title = "Aetheris Health", footer, mobileHeader
     return (
       <>
         {/* Mobile app bar */}
-        <header className="fixed left-0 right-0 top-0 z-40 flex min-h-[4.5rem] items-center justify-between border-b border-[var(--border)] bg-[var(--bg-primary)]/90 px-4 pb-3 pt-[calc(0.75rem+env(safe-area-inset-top))] backdrop-blur-xl md:hidden">
+        <header className="fixed left-0 right-0 top-0 z-40 flex min-h-[4.5rem] items-center justify-between border-b border-border bg-background/90 px-4 pb-3 pt-[calc(0.75rem+env(safe-area-inset-top))] backdrop-blur-xl md:hidden">
           <button
             onClick={() => setMobileOpen(true)}
-            className="flex h-10 w-10 items-center justify-center rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-secondary)] active:scale-95"
+            className="flex h-10 w-10 items-center justify-center rounded-2xl border border-border bg-surface text-secondary active:scale-95"
             aria-label="Open menu"
           >
             <Menu className="h-5 w-5" />
           </button>
           <div className="min-w-0 flex-1 px-3">
-            <p className="truncate text-sm font-semibold text-[var(--text-primary)]">{title}</p>
-            <p className="text-[11px] font-medium text-[var(--accent-cyan)]">Aetheris Health</p>
+            <p className="truncate text-sm font-semibold text-primary">{title}</p>
+            <p className="text-[11px] font-medium text-accent-cyan">Aetheris Health</p>
           </div>
           <div className="flex shrink-0 items-center gap-2">
             {mobileHeaderActions}
@@ -162,7 +162,7 @@ export function Sidebar({ links, title = "Aetheris Health", footer, mobileHeader
               className="absolute inset-0 bg-black/50 backdrop-blur-sm"
               onClick={() => setMobileOpen(false)}
             />
-            <aside className="absolute left-0 top-0 flex h-full w-[min(19rem,86vw)] flex-col border-r border-[var(--border)] bg-[var(--bg-primary)] p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] shadow-2xl animate-in slide-in-from-left">
+            <aside className="absolute left-0 top-0 flex h-full w-[min(19rem,86vw)] flex-col border-r border-border bg-background p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] shadow-2xl animate-in slide-in-from-left">
               <div className="mb-6 flex items-center justify-between">
                 <Image
                   src="/logo.svg"
@@ -182,7 +182,7 @@ export function Sidebar({ links, title = "Aetheris Health", footer, mobileHeader
                 />
                 <button
                   onClick={() => setMobileOpen(false)}
-                  className="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--text-secondary)] hover:bg-[var(--bg-input)]"
+                  className="flex h-8 w-8 items-center justify-center rounded-lg text-secondary hover:bg-surface-elevated"
                   aria-label="Close menu"
                 >
                   <X className="h-5 w-5" />
@@ -196,8 +196,7 @@ export function Sidebar({ links, title = "Aetheris Health", footer, mobileHeader
           </div>
         ) : null}
 
-        {/* Persistent bottom navigation gives mobile users an app-native way to move around. */}
-        <nav aria-label="Primary navigation" className="fixed bottom-0 left-0 right-0 z-40 grid grid-cols-5 border-t border-[var(--border)] bg-[var(--bg-primary)]/95 px-1 pb-[max(0.35rem,env(safe-area-inset-bottom))] pt-1.5 backdrop-blur-xl md:hidden">
+        <nav aria-label="Primary navigation" className="fixed bottom-0 left-0 right-0 z-40 grid grid-cols-5 border-t border-border bg-surface/95 px-1 pb-[max(0.35rem,env(safe-area-inset-bottom))] pt-1.5 backdrop-blur-xl md:hidden">
           {primaryMobileLinks.map((link) => (
             <Link
               key={link.href}
@@ -205,8 +204,8 @@ export function Sidebar({ links, title = "Aetheris Health", footer, mobileHeader
               className={cn(
                 "flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl text-[10px] font-medium transition-colors",
                 isActive(link.href)
-                  ? "bg-[var(--accent-cyan)]/12 text-[var(--accent-cyan)]"
-                  : "text-[var(--text-muted)] active:bg-[var(--bg-input)]"
+                  ? "bg-accent-cyan/12 text-accent-cyan"
+                  : "text-muted active:bg-surface-elevated"
               )}
             >
               <span className="flex h-5 w-5 items-center justify-center">{link.icon}</span>
@@ -216,7 +215,7 @@ export function Sidebar({ links, title = "Aetheris Health", footer, mobileHeader
           <button
             type="button"
             onClick={() => setMobileOpen(true)}
-            className="flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl text-[10px] font-medium text-[var(--text-muted)] active:bg-[var(--bg-input)]"
+            className="flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl text-[10px] font-medium text-muted active:bg-surface-elevated"
             aria-label="Open more navigation options"
           >
             <Menu className="h-5 w-5" />
@@ -246,7 +245,7 @@ export function Sidebar({ links, title = "Aetheris Health", footer, mobileHeader
       <button
         onClick={() => setCollapsed(!collapsed)}
         className={cn(
-          "mb-2 flex items-center justify-center rounded-lg border border-[var(--border)] py-2 text-[var(--text-secondary)] transition-colors hover:bg-[var(--bg-input)] hover:text-[var(--accent-cyan)]",
+          "mb-2 flex items-center justify-center rounded-lg border border-border py-2 text-secondary transition-colors hover:bg-surface-elevated hover:text-accent-cyan",
         )}
         aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
       >

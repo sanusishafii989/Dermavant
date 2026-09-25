@@ -5,6 +5,7 @@ import { PortalDashboardShell } from "@/components/layout/PortalDashboardShell";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { PageHeader } from "@/components/ui/PageHeader";
 import { SupportResponseModal, type SupportTicketDetail } from "@/components/admin/SupportResponseModal";
 import { adminNavLinks } from "@/lib/portal-nav";
 import { Headphones, RefreshCw, MessageSquare, CheckCircle, Clock, Filter, Mail } from "lucide-react";
@@ -58,26 +59,21 @@ export default function AdminSupportPage() {
   return (
     <PortalDashboardShell title="Admin Portal" links={adminNavLinks}>
       <div className="space-y-6">
-        {/* Page Title & Refresh */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-              <Headphones className="h-6 w-6 text-cyan" /> User Support Queue
-            </h1>
-            <p className="text-sm text-white/60">
-              Manage inbound support requests, technical issues, and user resolution
-            </p>
-          </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={fetchTickets}
-            disabled={loading}
-            className="text-cyan hover:bg-cyan/10 self-start sm:self-auto"
-          >
-            <RefreshCw className={`mr-1.5 h-4 w-4 ${loading ? "animate-spin" : ""}`} /> Refresh Inbox
-          </Button>
-        </div>
+        <PageHeader 
+          title="User Support Queue"
+          description="Manage inbound support requests, technical issues, and user resolution"
+          actions={
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={fetchTickets}
+              disabled={loading}
+              className="text-accent-cyan hover:bg-accent-cyan/10"
+            >
+              <RefreshCw className={`mr-1.5 h-4 w-4 ${loading ? "animate-spin" : ""}`} /> Refresh Inbox
+            </Button>
+          }
+        />
 
         {/* Filter Controls Bar */}
         <Card className="p-4">
@@ -96,8 +92,8 @@ export default function AdminSupportPage() {
                   onClick={() => setStatusFilter(tab.value)}
                   className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
                     statusFilter === tab.value
-                      ? "bg-cyan text-dark font-bold"
-                      : "bg-white/5 text-white/70 hover:bg-white/10"
+                      ? "bg-accent-cyan text-dark font-bold"
+                      : "bg-surface-elevated text-secondary hover:bg-surface-elevated"
                   }`}
                 >
                   {tab.label}
@@ -107,11 +103,11 @@ export default function AdminSupportPage() {
 
             {/* Category Dropdown */}
             <div className="flex items-center gap-2">
-              <Filter className="h-4 w-4 text-white/40" />
+              <Filter className="h-4 w-4 text-muted" />
               <select
                 value={categoryFilter}
                 onChange={(e) => setCategoryFilter(e.target.value)}
-                className="rounded-lg bg-dark/80 px-3 py-1.5 text-xs text-white border border-white/20 focus:border-cyan focus:outline-none"
+                className="rounded-lg bg-surface px-3 py-1.5 text-xs text-primary border border-border focus:border-cyan focus:outline-none"
               >
                 <option value="all">All Categories</option>
                 <option value="general">General</option>
@@ -126,13 +122,13 @@ export default function AdminSupportPage() {
         {/* Support Tickets Queue List */}
         <div className="space-y-3">
           {loading ? (
-            <Card className="py-12 text-center text-white/50">
-              <RefreshCw className="mx-auto h-6 w-6 animate-spin text-cyan mb-2" />
+            <Card className="py-12 text-center text-muted">
+              <RefreshCw className="mx-auto h-6 w-6 animate-spin text-accent-cyan mb-2" />
               Loading support tickets...
             </Card>
           ) : tickets.length === 0 ? (
-            <Card className="py-12 text-center text-white/40">
-              <MessageSquare className="mx-auto h-8 w-8 text-cyan/40 mb-2" />
+            <Card className="py-12 text-center text-muted">
+              <MessageSquare className="mx-auto h-8 w-8 text-accent-cyan/40 mb-2" />
               No support tickets found matching the selected filters.
             </Card>
           ) : (
@@ -141,12 +137,12 @@ export default function AdminSupportPage() {
                 key={t._id}
                 hover
                 onClick={() => setSelectedTicket(t)}
-                className="cursor-pointer transition-all hover:border-cyan/40 p-5 space-y-3"
+                className="cursor-pointer transition-all hover:border-accent-cyan/40 p-5 space-y-3"
               >
                 <div className="flex items-start justify-between gap-4 flex-wrap">
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <h3 className="text-base font-bold text-white hover:text-cyan transition-colors">
+                      <h3 className="text-base font-bold text-primary hover:text-accent-cyan transition-colors">
                         {t.subject}
                       </h3>
                       <Badge variant="cyan">{t.category}</Badge>
@@ -161,9 +157,9 @@ export default function AdminSupportPage() {
                       </Badge>
                     </div>
                     {t.user && (
-                      <p className="text-xs text-white/60 flex items-center gap-1.5">
-                        <Mail className="h-3.5 w-3.5 text-cyan" /> {t.user.fullName} ({t.user.role}) —{" "}
-                        <span className="text-white/40">{t.user.email}</span>
+                      <p className="text-xs text-muted flex items-center gap-1.5">
+                        <Mail className="h-3.5 w-3.5 text-accent-cyan" /> {t.user.fullName} ({t.user.role}) —{" "}
+                        <span className="text-muted">{t.user.email}</span>
                       </p>
                     )}
                   </div>
@@ -182,7 +178,7 @@ export default function AdminSupportPage() {
                     >
                       {t.status}
                     </Badge>
-                    <span className="text-xs text-white/40 flex items-center gap-1">
+                    <span className="text-xs text-muted flex items-center gap-1">
                       <Clock className="h-3.5 w-3.5" />
                       {new Date(t.createdAt).toLocaleDateString("en-US", {
                         dateStyle: "short",
@@ -191,7 +187,7 @@ export default function AdminSupportPage() {
                   </div>
                 </div>
 
-                <p className="text-xs text-white/80 line-clamp-2 bg-white/5 p-3 rounded-lg border border-white/5">
+                <p className="text-xs text-secondary line-clamp-2 bg-surface-elevated p-3 rounded-lg border border-border">
                   {t.message}
                 </p>
 

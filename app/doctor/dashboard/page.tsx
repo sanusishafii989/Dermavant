@@ -1,9 +1,12 @@
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { PortalDashboardShell } from "@/components/layout/PortalDashboardShell";
-import { Avatar } from "@/components/ui/Avatar";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { SectionHeader } from "@/components/ui/SectionHeader";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { MobileList, MobileListItem } from "@/components/ui/MobileList";
 import { doctorNavLinks } from "@/lib/portal-nav";
 import { ROLE_DASHBOARD } from "@/lib/roles";
 import { connectDB } from "@/lib/db";
@@ -25,19 +28,19 @@ function StatCard({
   variant?: "cyan" | "gold" | "success";
 }) {
   const colorMap = {
-    cyan: "text-[var(--accent-cyan)]",
-    gold: "text-[var(--accent-gold)]",
-    success: "text-emerald-400",
+    cyan: "text-accent-cyan",
+    gold: "text-accent-gold",
+    success: "text-success",
   };
   return (
     <Card className="space-y-2">
       <div className="flex items-center gap-3">
-        <div className={`flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--bg-card)] ${colorMap[variant]}`}>
+        <div className={`flex h-10 w-10 items-center justify-center rounded-xl bg-surface-elevated ${colorMap[variant]}`}>
           {icon}
         </div>
         <div>
-          <p className="text-xs uppercase tracking-[0.2em] text-[var(--text-muted)]">{label}</p>
-          <p className="text-2xl font-bold text-[var(--text-primary)]">{value}</p>
+          <p className="text-xs uppercase tracking-[0.2em] text-muted">{label}</p>
+          <p className="text-2xl font-bold text-primary">{value}</p>
         </div>
       </div>
     </Card>
@@ -143,28 +146,25 @@ export default async function DoctorDashboardPage() {
 
     return (
       <PortalDashboardShell title="Doctor Portal" links={doctorNavLinks}>
-      <div className="space-y-6">
-        {/* Welcome */}
-        <Card className="max-w-3xl">
-          <div className="flex items-center gap-4">
-            <Avatar src={user?.imageUrl} name={fullName} size="lg" />
-            <div>
-              <p className="text-sm uppercase tracking-[0.2em] text-[var(--accent-cyan)]">Welcome back</p>
-              <h1 className="mt-1 text-3xl font-bold text-[var(--text-primary)]">{fullName}</h1>
-              <div className="mt-2 flex items-center gap-2">
-                <Badge variant="gold">doctor</Badge>
+        <div className="space-y-6 max-w-5xl mx-auto">
+          {/* Welcome */}
+          <PageHeader 
+            title={`Welcome back, ${fullName}`}
+            description="Manage your schedule, appointments, and earnings from your command center."
+            actions={
+              <div className="flex items-center gap-2">
+                <Badge variant="gold">Doctor</Badge>
                 {doctor?.status === "verified" ? (
                   <Badge variant="success">Verified</Badge>
                 ) : (
                   <Badge variant="warning">Pending verification</Badge>
                 )}
-                {doctor?.available_today ? (
+                {doctor?.available_today && (
                   <Badge variant="cyan">Available today</Badge>
-                ) : null}
+                )}
               </div>
-            </div>
-          </div>
-        </Card>
+            }
+          />
 
         {/* Stats grid */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -193,76 +193,68 @@ export default async function DoctorDashboardPage() {
           />
         </div>
 
-        {/* Upcoming appointments preview */}
-        <Card>
-          <div className="mb-4 flex items-center justify-between">
-            <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-[var(--accent-cyan)]">Upcoming appointments</p>
-              <h2 className="mt-1 text-xl font-semibold text-[var(--text-primary)]">Next consultations</h2>
-            </div>
-            <Link href="/doctor/appointments" className="text-sm text-[var(--accent-cyan)] hover:underline">
-              View all
-            </Link>
+        <div className="grid gap-6 md:grid-cols-2">
+          {/* Upcoming appointments preview */}
+          <div className="space-y-4">
+            <SectionHeader 
+              title="Upcoming appointments"
+              description="Next consultations"
+              actions={
+                <Link href="/doctor/appointments" className="text-sm font-medium text-accent-cyan hover:underline">
+                  View all
+                </Link>
+              }
+            />
+
+            {upcomingAppointments.length === 0 ? (
+              <EmptyState 
+                title="No upcoming appointments"
+                description="Your schedule is clear."
+                className="py-12"
+              />
+            ) : (
+              <MobileList>
+                {upcomingAppointments.map((apt) => (
+                  <MobileListItem
+                    key={apt._id}
+                    icon={<Calendar className="h-5 w-5" />}
+                    title={apt.patient_name}
+                    subtitle={`${formatDate(apt.date)} at ${apt.time}`}
+                    status={<Badge variant="cyan" className="capitalize">{apt.type}</Badge>}
+                  />
+                ))}
+              </MobileList>
+            )}
           </div>
 
-          {upcomingAppointments.length === 0 ? (
-            <p className="py-6 text-center text-[var(--text-secondary)]">No upcoming appointments scheduled.</p>
-          ) : (
-            <div className="space-y-3">
-              {upcomingAppointments.map((apt) => (
-                <div
-                  key={apt._id}
-                  className="flex items-center justify-between rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--accent-cyan)]/15 text-[var(--accent-cyan)]">
-                      <Calendar className="h-4 w-4" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-[var(--text-primary)]">{apt.patient_name}</p>
-                      <p className="text-sm text-[var(--text-secondary)]">{formatDate(apt.date)} at {apt.time}</p>
-                    </div>
-                  </div>
-                  <Badge variant="cyan" className="capitalize">{apt.type}</Badge>
-                </div>
-              ))}
-            </div>
-          )}
-        </Card>
+          {/* Recent earnings */}
+          <div className="space-y-4">
+            <SectionHeader 
+              title="Recent earnings"
+              description="Latest payments"
+            />
 
-        {/* Recent earnings */}
-        <Card>
-          <div className="mb-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-[var(--accent-cyan)]">Recent earnings</p>
-            <h2 className="mt-1 text-xl font-semibold text-[var(--text-primary)]">Latest payments</h2>
+            {recentPayments.length === 0 ? (
+              <EmptyState 
+                title="No payments received"
+                description="Your recent payments will appear here."
+                className="py-12"
+              />
+            ) : (
+              <MobileList>
+                {recentPayments.map((payment) => (
+                  <MobileListItem
+                    key={payment._id.toString()}
+                    icon={<Wallet className="h-5 w-5 text-accent-gold" />}
+                    title={`₦${payment.amount.toLocaleString()}`}
+                    subtitle={payment.paid_at ? new Date(payment.paid_at).toLocaleDateString("en-NG", { month: "short", day: "numeric", year: "numeric" }) : "—"}
+                    status={<Badge variant="success">{payment.channel || "paystack"}</Badge>}
+                  />
+                ))}
+              </MobileList>
+            )}
           </div>
-
-          {recentPayments.length === 0 ? (
-            <p className="py-6 text-center text-[var(--text-secondary)]">No payments received yet.</p>
-          ) : (
-            <div className="space-y-3">
-              {recentPayments.map((payment) => (
-                <div
-                  key={payment._id.toString()}
-                  className="flex items-center justify-between rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--accent-gold)]/15 text-[var(--accent-gold)]">
-                      <Wallet className="h-4 w-4" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-[var(--text-primary)]">₦{payment.amount.toLocaleString()}</p>
-                      <p className="text-sm text-[var(--text-secondary)]">
-                        {payment.paid_at ? new Date(payment.paid_at).toLocaleDateString("en-NG", { month: "short", day: "numeric", year: "numeric" }) : "—"}
-                      </p>
-                    </div>
-                  </div>
-                  <Badge variant="success">{payment.channel || "paystack"}</Badge>
-                </div>
-              ))}
-            </div>
-          )}
-        </Card>
+        </div>
       </div>
     </PortalDashboardShell>
     );

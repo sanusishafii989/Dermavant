@@ -66,7 +66,7 @@ export default function RootLayout({
             }}
           />
         </head>
-        <body className="min-h-full flex flex-col bg-[var(--bg-primary)] text-[var(--text-primary)]">
+        <body className="min-h-full flex flex-col bg-background text-primary">
           <ThemeProvider>
             {children}
             <RegisterSW />

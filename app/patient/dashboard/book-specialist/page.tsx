@@ -1,5 +1,6 @@
 import { currentUser } from "@clerk/nextjs/server";
 import { PortalDashboardShell } from "@/components/layout/PortalDashboardShell";
+import { PageHeader } from "@/components/ui/PageHeader";
 import { BookingWizard } from "@/components/patient/BookingWizard";
 import { patientNavLinks } from "@/lib/portal-nav";
 
@@ -14,14 +15,11 @@ export default async function BookSpecialistPage() {
 
   return (
     <PortalDashboardShell title="Patient Portal" links={patientNavLinks}>
-      <div className="space-y-6">
-        <div className="rounded-3xl border border-[var(--border)] bg-[var(--bg-card)] p-6 shadow-[0_20px_64px_rgba(0,0,0,0.35)] backdrop-blur-sm">
-          <p className="text-xs uppercase tracking-[0.3em] text-[var(--accent-cyan)]">Book Specialist</p>
-          <h1 className="mt-2 text-3xl font-semibold text-[var(--text-primary)]">Care booking for {fullName}</h1>
-          <p className="mt-3 max-w-3xl text-[var(--text-secondary)]">
-            Choose the specialist you need, pick a date and time, and confirm your appointment.
-          </p>
-        </div>
+      <div className="space-y-6 max-w-4xl mx-auto">
+        <PageHeader 
+          title="Book a Specialist"
+          description="Choose the specialist you need, pick a date and time, and confirm your appointment in a single flow."
+        />
 
         <BookingWizard patientName={fullName} />
       </div>

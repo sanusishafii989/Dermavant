@@ -5,6 +5,8 @@ import { PortalDashboardShell } from "@/components/layout/PortalDashboardShell";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { MobileList, MobileListItem } from "@/components/ui/MobileList";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/Table";
 import { adminNavLinks } from "@/lib/portal-nav";
 import { Shield, RefreshCw, ChevronDown, ChevronRight, User, Terminal, Calendar } from "lucide-react";
 
@@ -105,65 +107,125 @@ export default function AdminAuditLogsPage() {
           </div>
         </Card>
 
-        {/* Audit Log Table */}
-        <Card className="p-0 overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-white/80">
-              <thead className="border-b border-white/10 bg-white/5 text-xs text-white/60 uppercase tracking-wider">
-                <tr>
-                  <th className="w-8 px-4 py-3.5"></th>
-                  <th className="px-4 py-3.5">Timestamp</th>
-                  <th className="px-4 py-3.5">Actor</th>
-                  <th className="px-4 py-3.5">Action Executed</th>
-                  <th className="px-4 py-3.5">Target Entity</th>
-                  <th className="px-4 py-3.5 text-right">Details</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-white/5 text-xs">
+        {/* Responsive Lists & Tables */}
+        <div className="w-full">
+          {/* Mobile View */}
+          <div className="block md:hidden">
+            {loading ? (
+              <div className="py-12 text-center text-white/50">
+                <RefreshCw className="mx-auto h-6 w-6 animate-spin text-cyan mb-2" />
+                Loading system audit trail...
+              </div>
+            ) : logs.length === 0 ? (
+              <div className="py-12 text-center text-white/40">
+                No audit log entries found for selected filter.
+              </div>
+            ) : (
+              <MobileList>
+                {logs.map((log) => (
+                  <MobileListItem
+                    key={log._id}
+                    icon={<Calendar className="h-5 w-5" />}
+                    title={log.actor?.fullName || "System"}
+                    subtitle={new Date(log.createdAt).toLocaleString("en-US", { dateStyle: "short", timeStyle: "short" })}
+                    status={
+                      <Badge
+                        variant={
+                          log.action.includes("suspended") || log.action.includes("rejected")
+                            ? "danger"
+                            : log.action.includes("verified") || log.action.includes("resolved")
+                            ? "success"
+                            : "cyan"
+                        }
+                      >
+                        {log.action}
+                      </Badge>
+                    }
+                    actions={
+                      <div className="flex w-full justify-end gap-2">
+                        <Button variant="ghost" size="sm" onClick={() => toggleExpand(log._id)}>
+                          <Terminal className="mr-1 h-3.5 w-3.5" /> {expandedId === log._id ? "Hide Details" : "Details"}
+                        </Button>
+                      </div>
+                    }
+                  />
+                ))}
+              </MobileList>
+            )}
+
+            {/* Mobile Expanded JSON Inspector */}
+            {expandedId && (
+              <div className="mt-4 rounded-xl bg-dark/95 p-4 border border-white/10 space-y-2">
+                <div className="flex items-center justify-between text-xs text-cyan font-mono">
+                  <span className="flex items-center gap-1.5">
+                    <Terminal className="h-3.5 w-3.5" /> Payload Metadata
+                  </span>
+                </div>
+                <pre className="overflow-x-auto text-[11px] font-mono text-emerald-300 leading-relaxed bg-black/60 p-3 rounded-lg border border-white/5">
+                  {JSON.stringify(logs.find(l => l._id === expandedId)?.metadata || {}, null, 2)}
+                </pre>
+              </div>
+            )}
+          </div>
+
+          {/* Desktop View */}
+          <Card className="hidden md:block p-0 overflow-hidden border-border bg-surface">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-8"></TableHead>
+                  <TableHead>Timestamp</TableHead>
+                  <TableHead>Actor</TableHead>
+                  <TableHead>Action Executed</TableHead>
+                  <TableHead>Target Entity</TableHead>
+                  <TableHead className="text-right">Details</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
                 {loading ? (
-                  <tr>
-                    <td colSpan={6} className="py-12 text-center text-white/50">
-                      <RefreshCw className="mx-auto h-6 w-6 animate-spin text-cyan mb-2" />
+                  <TableRow>
+                    <TableCell colSpan={6} className="py-12 text-center text-secondary">
+                      <RefreshCw className="mx-auto h-6 w-6 animate-spin text-accent-cyan mb-2" />
                       Loading system audit trail...
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 ) : logs.length === 0 ? (
-                  <tr>
-                    <td colSpan={6} className="py-12 text-center text-white/40">
+                  <TableRow>
+                    <TableCell colSpan={6} className="py-12 text-center text-secondary">
                       No audit log entries found for selected filter.
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 ) : (
                   logs.map((log) => (
                     <Fragment key={log._id}>
-                      <tr
+                      <TableRow
                         onClick={() => toggleExpand(log._id)}
-                        className="cursor-pointer hover:bg-white/5 transition-colors"
+                        className="cursor-pointer"
                       >
-                        <td className="px-4 py-3.5 text-white/40">
+                        <TableCell className="text-muted">
                           {expandedId === log._id ? (
-                            <ChevronDown className="h-4 w-4 text-cyan" />
+                            <ChevronDown className="h-4 w-4 text-accent-cyan" />
                           ) : (
                             <ChevronRight className="h-4 w-4" />
                           )}
-                        </td>
-                        <td className="px-4 py-3.5 text-white/60 whitespace-nowrap font-mono">
+                        </TableCell>
+                        <TableCell className="text-secondary whitespace-nowrap font-mono text-sm">
                           {new Date(log.createdAt).toLocaleString("en-US", {
                             dateStyle: "short",
                             timeStyle: "medium",
                           })}
-                        </td>
-                        <td className="px-4 py-3.5">
+                        </TableCell>
+                        <TableCell>
                           {log.actor ? (
                             <div>
-                              <span className="font-semibold text-white block">{log.actor.fullName}</span>
-                              <span className="text-[11px] text-white/50">{log.actor.email}</span>
+                              <span className="font-semibold text-primary block">{log.actor.fullName}</span>
+                              <span className="text-[11px] text-secondary">{log.actor.email}</span>
                             </div>
                           ) : (
-                            <span className="text-white/40 font-mono">System</span>
+                            <span className="text-muted font-mono">System</span>
                           )}
-                        </td>
-                        <td className="px-4 py-3.5">
+                        </TableCell>
+                        <TableCell>
                           <Badge
                             variant={
                               log.action.includes("suspended") || log.action.includes("rejected")
@@ -175,30 +237,30 @@ export default function AdminAuditLogsPage() {
                           >
                             {log.action}
                           </Badge>
-                        </td>
-                        <td className="px-4 py-3.5 text-white/70">
+                        </TableCell>
+                        <TableCell className="text-secondary">
                           {log.targetType ? (
                             <span>
                               {log.targetType}{" "}
                               {log.targetId && (
-                                <span className="font-mono text-[11px] text-white/40">({log.targetId.slice(-6)})</span>
+                                <span className="font-mono text-[11px] text-muted">({log.targetId.slice(-6)})</span>
                               )}
                             </span>
                           ) : (
-                            <span className="text-white/40">—</span>
+                            <span className="text-muted">—</span>
                           )}
-                        </td>
-                        <td className="px-4 py-3.5 text-right text-cyan font-medium">
+                        </TableCell>
+                        <TableCell className="text-right text-accent-cyan font-medium">
                           {expandedId === log._id ? "Collapse" : "Inspect Payload"}
-                        </td>
-                      </tr>
+                        </TableCell>
+                      </TableRow>
 
                       {/* Expandable JSON Metadata Inspector */}
                       {expandedId === log._id && (
-                        <tr className="bg-dark/80">
-                          <td colSpan={6} className="p-4 border-t border-b border-cyan/20">
-                            <div className="rounded-xl bg-dark/95 p-4 border border-white/10 space-y-2">
-                              <div className="flex items-center justify-between text-xs text-cyan font-mono">
+                        <TableRow className="bg-surface-elevated/50 hover:bg-surface-elevated/50">
+                          <TableCell colSpan={6} className="p-4 border-t border-b border-accent-cyan/20">
+                            <div className="rounded-xl bg-surface p-4 border border-border space-y-2">
+                              <div className="flex items-center justify-between text-xs text-accent-cyan font-mono">
                                 <span className="flex items-center gap-1.5">
                                   <Terminal className="h-3.5 w-3.5" /> Payload Metadata Inspection
                                 </span>
@@ -208,16 +270,16 @@ export default function AdminAuditLogsPage() {
                                 {JSON.stringify(log.metadata || {}, null, 2)}
                               </pre>
                             </div>
-                          </td>
-                        </tr>
+                          </TableCell>
+                        </TableRow>
                       )}
                     </Fragment>
                   ))
                 )}
-              </tbody>
-            </table>
-          </div>
-        </Card>
+              </TableBody>
+            </Table>
+          </Card>
+        </div>
       </div>
     </PortalDashboardShell>
   );

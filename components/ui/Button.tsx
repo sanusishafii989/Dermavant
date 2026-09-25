@@ -1,4 +1,4 @@
-import type { ButtonHTMLAttributes } from "react";
+import { cloneElement, isValidElement, type ButtonHTMLAttributes, type ReactElement } from "react";
 import { cn } from "@/lib/utils";
 
 type ButtonVariant = "primary" | "secondary" | "ghost" | "gold";
@@ -7,13 +7,14 @@ type ButtonSize = "sm" | "md" | "lg";
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
   size?: ButtonSize;
+  asChild?: boolean;
 }
 
 const variantStyles: Record<ButtonVariant, string> = {
-  primary: "bg-[var(--accent-cyan)] text-white hover:opacity-90",
-  secondary: "bg-transparent text-[var(--text-primary)] border border-[var(--border)] hover:border-[var(--accent-cyan)]",
-  ghost: "bg-transparent text-[var(--text-secondary)] hover:bg-[var(--bg-input)]",
-  gold: "bg-[var(--accent-gold)] text-white hover:opacity-90",
+  primary: "bg-accent-cyan text-white hover:opacity-90",
+  secondary: "bg-transparent text-primary border border-border hover:border-accent-cyan",
+  ghost: "bg-transparent text-secondary hover:bg-surface-elevated",
+  gold: "bg-accent-gold text-white hover:opacity-90",
 };
 
 const sizeStyles: Record<ButtonSize, string> = {
@@ -27,18 +28,24 @@ export function Button({
   variant = "primary",
   size = "md",
   type = "button",
+  asChild = false,
+  children,
   ...props
 }: ButtonProps) {
-  return (
-    <button
-      type={type}
-      className={cn(
-        "inline-flex items-center justify-center rounded-xl font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-cyan)] disabled:pointer-events-none disabled:opacity-50",
-        variantStyles[variant],
-        sizeStyles[size],
-        className
-      )}
-      {...props}
-    />
+  const buttonClassName = cn(
+    "inline-flex items-center justify-center rounded-xl font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-cyan)] disabled:pointer-events-none disabled:opacity-50",
+    variantStyles[variant],
+    sizeStyles[size],
+    className
   );
+
+  if (asChild && isValidElement(children)) {
+    const child = children as ReactElement<{ className?: string }>;
+    return cloneElement(child, {
+      ...props,
+      className: cn(buttonClassName, child.props.className),
+    });
+  }
+
+  return <button type={type} className={buttonClassName} {...props}>{children}</button>;
 }

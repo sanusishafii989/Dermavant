@@ -7,6 +7,9 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Avatar } from "@/components/ui/Avatar";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { MobileList, MobileListItem } from "@/components/ui/MobileList";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/Table";
 import { UserDetailModal, type UserDetail } from "@/components/admin/UserDetailModal";
 import { adminNavLinks } from "@/lib/portal-nav";
 import { Search, ShieldAlert, UserCheck, RefreshCw, Eye, CheckCircle, XCircle, CloudDownload } from "lucide-react";
@@ -185,50 +188,105 @@ export default function AdminUsersPage() {
           </div>
         </Card>
 
-        {/* User Accounts Table */}
-        <Card className="p-0 overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-white/80">
-              <thead className="border-b border-white/10 bg-white/5 text-xs text-white/60 uppercase tracking-wider">
-                <tr>
-                  <th className="px-5 py-3.5">User</th>
-                  <th className="px-5 py-3.5">Role</th>
-                  <th className="px-5 py-3.5">Status</th>
-                  <th className="px-5 py-3.5">Credentials / Info</th>
-                  <th className="px-5 py-3.5">Joined Date</th>
-                  <th className="px-5 py-3.5 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-white/5 text-xs">
+        {/* Responsive Lists & Tables */}
+        <div className="w-full">
+          {/* Mobile View */}
+          <div className="block md:hidden">
+            {loading ? (
+              <div className="py-12 text-center text-white/50">
+                <RefreshCw className="mx-auto h-6 w-6 animate-spin text-cyan mb-2" />
+                Loading user accounts...
+              </div>
+            ) : users.length === 0 ? (
+              <div className="py-12 text-center text-white/40">
+                No user accounts found matching selected criteria.
+              </div>
+            ) : (
+              <MobileList>
+                {users.map((u) => (
+                  <MobileListItem
+                    key={u._id}
+                    icon={<Avatar src={u.profilePhoto} name={u.fullName} size="sm" />}
+                    title={u.fullName}
+                    subtitle={u.email}
+                    status={
+                      <div className="flex flex-col items-end gap-1">
+                        <Badge
+                          variant={
+                            u.role === "admin" ? "gold" : u.role === "doctor" ? "cyan" : u.role === "partner" ? "warning" : "default"
+                          }
+                        >
+                          {u.role === "partner" ? "Pharmacist" : u.role}
+                        </Badge>
+                        <Badge
+                          variant={u.status === "active" ? "success" : u.status === "suspended" ? "danger" : "warning"}
+                        >
+                          {u.status}
+                        </Badge>
+                      </div>
+                    }
+                    actions={
+                      <div className="flex w-full justify-end gap-2">
+                        <Button variant="ghost" size="sm" onClick={() => setSelectedUser(u)}>
+                          <Eye className="mr-1 h-3.5 w-3.5" /> Details
+                        </Button>
+                        {(u.status === "pending_verification" || u.roleDetails?.verificationStatus === "pending") && (
+                          <Button
+                            variant="primary"
+                            size="sm"
+                            onClick={() => handleVerifyChange(u._id, "verified")}
+                          >
+                            <CheckCircle className="mr-1 h-3.5 w-3.5" /> Verify
+                          </Button>
+                        )}
+                      </div>
+                    }
+                  />
+                ))}
+              </MobileList>
+            )}
+          </div>
+
+          {/* Desktop View */}
+          <Card className="hidden md:block p-0 overflow-hidden border-border bg-surface">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>User</TableHead>
+                  <TableHead>Role</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Credentials / Info</TableHead>
+                  <TableHead>Joined Date</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
                 {loading ? (
-                  <tr>
-                    <td colSpan={6} className="py-12 text-center text-white/50">
-                      <RefreshCw className="mx-auto h-6 w-6 animate-spin text-cyan mb-2" />
+                  <TableRow>
+                    <TableCell colSpan={6} className="py-12 text-center text-secondary">
+                      <RefreshCw className="mx-auto h-6 w-6 animate-spin text-accent-cyan mb-2" />
                       Loading user accounts...
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 ) : users.length === 0 ? (
-                  <tr>
-                    <td colSpan={6} className="py-12 text-center text-white/40">
+                  <TableRow>
+                    <TableCell colSpan={6} className="py-12 text-center text-secondary">
                       No user accounts found matching selected criteria.
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 ) : (
                   users.map((u) => (
-                    <tr key={u._id} className="hover:bg-white/5 transition-colors">
-                      {/* User Avatar + Name */}
-                      <td className="px-5 py-3.5">
+                    <TableRow key={u._id}>
+                      <TableCell>
                         <div className="flex items-center gap-3">
                           <Avatar src={u.profilePhoto} name={u.fullName} size="sm" />
                           <div>
-                            <span className="font-semibold text-white block">{u.fullName}</span>
-                            <span className="text-white/50 text-[11px]">{u.email}</span>
+                            <span className="font-semibold text-primary block">{u.fullName}</span>
+                            <span className="text-secondary text-xs">{u.email}</span>
                           </div>
                         </div>
-                      </td>
-
-                      {/* Role Badge */}
-                      <td className="px-5 py-3.5 capitalize">
+                      </TableCell>
+                      <TableCell className="capitalize">
                         <Badge
                           variant={
                             u.role === "admin"
@@ -242,10 +300,8 @@ export default function AdminUsersPage() {
                         >
                           {u.role === "partner" ? "Pharmacist" : u.role}
                         </Badge>
-                      </td>
-
-                      {/* Status Badge */}
-                      <td className="px-5 py-3.5">
+                      </TableCell>
+                      <TableCell>
                         <Badge
                           variant={
                             u.status === "active"
@@ -257,10 +313,8 @@ export default function AdminUsersPage() {
                         >
                           {u.status}
                         </Badge>
-                      </td>
-
-                      {/* Credentials Summary */}
-                      <td className="px-5 py-3.5 text-white/70">
+                      </TableCell>
+                      <TableCell className="text-secondary text-sm">
                         {u.roleDetails ? (
                           u.role === "doctor" ? (
                             <span>Lic: {u.roleDetails.license_number} ({u.roleDetails.specialization})</span>
@@ -270,46 +324,41 @@ export default function AdminUsersPage() {
                             <span>Registered Patient</span>
                           )
                         ) : (
-                          <span className="text-white/40">Standard Profile</span>
+                          <span className="text-muted">Standard Profile</span>
                         )}
-                      </td>
-
-                      {/* Joined Date */}
-                      <td className="px-5 py-3.5 text-white/50">
+                      </TableCell>
+                      <TableCell className="text-secondary text-sm">
                         {new Date(u.createdAt).toLocaleDateString("en-US", { dateStyle: "short" })}
-                      </td>
-
-                      {/* Action Controls */}
-                      <td className="px-5 py-3.5 text-right">
+                      </TableCell>
+                      <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-2">
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => setSelectedUser(u)}
-                            className="text-cyan hover:bg-cyan/10 px-2.5 py-1 text-xs"
+                            className="text-accent-cyan hover:bg-accent-cyan/10 px-2.5 py-1 text-xs"
                           >
                             <Eye className="mr-1 h-3.5 w-3.5" /> Details
                           </Button>
-
                           {(u.status === "pending_verification" || u.roleDetails?.verificationStatus === "pending") && (
                             <Button
                               variant="primary"
                               size="sm"
                               onClick={() => handleVerifyChange(u._id, "verified")}
-                              className="bg-emerald-600 hover:bg-emerald-500 text-white px-2 py-1 text-xs"
+                              className="px-2 py-1 text-xs"
                             >
                               <CheckCircle className="mr-1 h-3.5 w-3.5" /> Verify
                             </Button>
                           )}
                         </div>
-                      </td>
-                    </tr>
+                      </TableCell>
+                    </TableRow>
                   ))
                 )}
-              </tbody>
-            </table>
-          </div>
-        </Card>
+              </TableBody>
+            </Table>
+          </Card>
+        </div>
 
         {/* Interactive User Detail Modal */}
         <UserDetailModal

@@ -16,48 +16,17 @@ import {
   Mail,
   Phone,
   MapPin as LocationIcon,
+  MessageSquare,
   Menu,
   X,
   Send,
 } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
+import { Badge } from "@/components/ui/Badge";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { LandingNav } from "@/components/landing/LandingNav";
 import { LandingContactForm } from "@/components/landing/LandingContactForm";
-
-const SERVICES = [
-  {
-    icon: <Brain className="h-6 w-6" />,
-    title: "AI Dermatology Triage",
-    description: "Instant AI-powered assessment of skin conditions with evidence-based recommendations and confidence scoring.",
-  },
-  {
-    icon: <Video className="h-6 w-6" />,
-    title: "Specialist Consultations",
-    description: "Book video, voice, or chat consultations with licensed doctors across multiple specializations.",
-  },
-  {
-    icon: <Pill className="h-6 w-6" />,
-    title: "E-Pharmacy Marketplace",
-    description: "Browse and order verified medicines from licensed pharmacy partners with home delivery.",
-  },
-  {
-    icon: <QrCode className="h-6 w-6" />,
-    title: "QR-Verified Medicines",
-    description: "Every medicine listing includes a unique QR code for authenticity verification and patient safety.",
-  },
-  {
-    icon: <MapPin className="h-6 w-6" />,
-    title: "GPS Doctor Discovery",
-    description: "Find nearby doctors and pharmacies using location-based search with interactive maps.",
-  },
-  {
-    icon: <CreditCard className="h-6 w-6" />,
-    title: "Integrated Payments",
-    description: "Secure Paystack integration for consultations, pharmacy orders, and wallet top-ups.",
-  },
-];
 
 const STEPS = [
   {
@@ -82,37 +51,6 @@ const STEPS = [
   },
 ];
 
-const PORTALS = [
-  {
-    role: "patient",
-    label: "Patient Portal",
-    description: "Book consultations, use AI triage, manage your health wallet, and order medicines.",
-    icon: <HeartPulse className="h-6 w-6" />,
-    accent: "var(--accent-cyan)",
-  },
-  {
-    role: "doctor",
-    label: "Doctor Portal",
-    description: "Manage appointments, conduct virtual consultations, track earnings, and access research tools.",
-    icon: <Stethoscope className="h-6 w-6" />,
-    accent: "var(--accent-gold)",
-  },
-  {
-    role: "partner",
-    label: "Pharmacy Portal",
-    description: "Manage your medicine catalogue, fulfil orders, track commissions, and process withdrawals.",
-    icon: <Store className="h-6 w-6" />,
-    accent: "var(--accent-cyan)",
-  },
-  {
-    role: "admin",
-    label: "Admin Portal",
-    description: "Oversee all users, monitor platform health, manage support tickets, and review audit logs.",
-    icon: <Shield className="h-6 w-6" />,
-    accent: "var(--accent-gold)",
-  },
-];
-
 export default function HomePage() {
   const companyName = process.env.NEXT_PUBLIC_COMPANY_NAME || "Aetheris Health";
   const companyTagline = process.env.NEXT_PUBLIC_COMPANY_TAGLINE || "Digital Healthcare Ecosystem";
@@ -127,24 +65,24 @@ export default function HomePage() {
   const socialInstagram = process.env.NEXT_PUBLIC_SOCIAL_INSTAGRAM;
 
   return (
-    <div className="min-h-screen bg-[var(--bg-primary)]">
+    <div className="min-h-screen bg-background">
       {/* Navbar */}
       <LandingNav />
 
       {/* Hero */}
       <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-[var(--accent-cyan)]/5 via-transparent to-[var(--accent-gold)]/5" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[accent-cyan]/5 via-transparent to-[accent-gold]/5" />
         <div className="relative mx-auto max-w-7xl px-6 py-20 md:py-28">
           <div className="mx-auto max-w-3xl text-center">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--bg-card)] px-4 py-1.5 text-sm text-[var(--text-secondary)]">
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-surface px-4 py-1.5 text-sm text-secondary">
               <span className="flex h-2 w-2 rounded-full bg-emerald-500" />
               NextGen Innovation Challenge 2026 — National Showcase
             </div>
-            <h1 className="text-4xl font-bold leading-tight text-[var(--text-primary)] md:text-6xl">
+            <h1 className="text-4xl font-bold leading-tight text-primary md:text-6xl">
               AI-Powered Healthcare
-              <span className="block text-[var(--accent-cyan)]">for Everyone, Everywhere</span>
+              <span className="block text-accent-cyan">for Everyone, Everywhere</span>
             </h1>
-            <p className="mt-6 text-lg text-[var(--text-secondary)] md:text-xl">
+            <p className="mt-6 text-lg text-secondary md:text-xl">
               {companyName} connects patients to instant dermatological triage, licensed doctors, and verified medicine — all in one platform.
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
@@ -162,14 +100,14 @@ export default function HomePage() {
             {/* Stats */}
             <div className="mt-16 grid grid-cols-2 gap-6 md:grid-cols-4">
               {[
-                { label: "AI Triage Accuracy", value: "85%+" },
-                { label: "Portal Access", value: "24/7" },
-                { label: "User Roles", value: "4" },
-                { label: "Payment Ready", value: "Paystack" },
+                { label: "AI-Assisted Triage", value: "Smart" },
+                { label: "Secure Portals", value: "Role-Based" },
+                { label: "Verified Pharmacies", value: "Authentic" },
+                { label: "Integrated Payments", value: "Paystack" },
               ].map((stat) => (
                 <div key={stat.label} className="text-center">
-                  <p className="text-2xl font-bold text-[var(--accent-cyan)] md:text-3xl">{stat.value}</p>
-                  <p className="mt-1 text-xs text-[var(--text-muted)] md:text-sm">{stat.label}</p>
+                  <p className="text-2xl font-bold text-accent-cyan md:text-3xl">{stat.value}</p>
+                  <p className="mt-1 text-xs text-muted md:text-sm">{stat.label}</p>
                 </div>
               ))}
             </div>
@@ -177,89 +115,164 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Portals */}
-      <section className="border-t border-[var(--border)] py-20">
+      {/* Patient Journey & Trust Signals */}
+      <section className="border-t border-border py-20">
         <div className="mx-auto max-w-7xl px-6">
-          <div className="mb-12 text-center">
-            <p className="text-xs uppercase tracking-[0.2em] text-[var(--accent-cyan)]">Portals</p>
-            <h2 className="mt-2 text-3xl font-bold text-[var(--text-primary)] md:text-4xl">One Platform. Four Secure Portals.</h2>
-            <p className="mt-4 text-[var(--text-secondary)]">Role-based access ensures every user sees exactly what they need.</p>
+          <div className="mb-16 text-center">
+            <p className="text-xs uppercase tracking-[0.2em] text-accent-cyan">Your Health Journey</p>
+            <h2 className="mt-2 text-3xl font-bold text-primary md:text-4xl">From Symptom to Recovery</h2>
+            <p className="mt-4 text-secondary max-w-2xl mx-auto">We&apos;ve streamlined the healthcare experience so you can get the care you need without the friction.</p>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-            {PORTALS.map((portal) => (
-              <Card key={portal.role} hover className="space-y-4">
-                <div
-                  className="flex h-12 w-12 items-center justify-center rounded-xl"
-                  style={{ backgroundColor: `${portal.accent === "var(--accent-cyan)" ? "rgba(13,148,136,0.12)" : "rgba(217,119,6,0.12)"}`, color: portal.accent }}
-                >
-                  {portal.icon}
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-[var(--text-primary)]">{portal.label}</h3>
-                  <p className="mt-2 text-sm text-[var(--text-secondary)]">{portal.description}</p>
-                </div>
-                <div className="flex gap-2">
-                  <Link href={`/sign-in?portal=${portal.role}`}>
-                    <Button variant="ghost" size="sm">Sign In</Button>
-                  </Link>
-                  {portal.role !== "admin" ? (
-                    <Link href={`/sign-up?role=${portal.role}`}>
-                      <Button variant="secondary" size="sm">Sign Up</Button>
-                    </Link>
-                  ) : null}
-                </div>
-              </Card>
-            ))}
+          <div className="grid gap-12 lg:grid-cols-3">
+            <div className="relative flex flex-col gap-4 text-center">
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-accent-cyan/10 text-accent-cyan ring-1 ring-accent-cyan/20">
+                <Brain className="h-8 w-8" />
+              </div>
+              <h3 className="text-xl font-bold text-primary">1. Initial Triage</h3>
+              <p className="text-secondary text-sm">
+                Describe your symptoms to our clinical AI. It securely analyzes your input to recommend the right type of specialist or care urgency.
+              </p>
+            </div>
+            <div className="relative flex flex-col gap-4 text-center">
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-accent-gold/10 text-accent-gold ring-1 ring-accent-gold/20">
+                <Video className="h-8 w-8" />
+              </div>
+              <h3 className="text-xl font-bold text-primary">2. Specialist Consult</h3>
+              <p className="text-secondary text-sm">
+                Connect with verified, licensed doctors via secure video or chat. Get a professional diagnosis and prescription from the comfort of home.
+              </p>
+            </div>
+            <div className="relative flex flex-col gap-4 text-center">
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-500 ring-1 ring-emerald-500/20">
+                <Pill className="h-8 w-8" />
+              </div>
+              <h3 className="text-xl font-bold text-primary">3. Verified Pharmacy</h3>
+              <p className="text-secondary text-sm">
+                Order prescribed medications from our network of audited pharmacies. Every medicine features QR verification for authenticity and safety.
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Services */}
-      <section id="services" className="border-t border-[var(--border)] bg-[var(--bg-secondary)] py-20">
+      {/* Features with UI Mocks */}
+      <section id="services" className="border-t border-border bg-surface-elevated py-24">
         <div className="mx-auto max-w-7xl px-6">
-          <div className="mb-12 text-center">
-            <p className="text-xs uppercase tracking-[0.2em] text-[var(--accent-cyan)]">Services</p>
-            <h2 className="mt-2 text-3xl font-bold text-[var(--text-primary)] md:text-4xl">Comprehensive Healthcare Services</h2>
-            <p className="mt-4 text-[var(--text-secondary)]">Everything you need for a complete digital healthcare experience.</p>
+          <div className="mb-20 text-center">
+            <p className="text-xs uppercase tracking-[0.2em] text-accent-cyan">Capabilities</p>
+            <h2 className="mt-2 text-3xl font-bold text-primary md:text-4xl">Platform Features</h2>
+            <p className="mt-4 text-secondary max-w-2xl mx-auto">Purpose-built tools for patients, doctors, and pharmacies.</p>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {SERVICES.map((service) => (
-              <Card key={service.title} hover className="space-y-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--accent-cyan)]/10 text-[var(--accent-cyan)]">
-                  {service.icon}
+          <div className="space-y-32">
+            {/* Feature 1 */}
+            <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
+              <div>
+                <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-accent-cyan/10 text-accent-cyan">
+                  <Brain className="h-6 w-6" />
                 </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-[var(--text-primary)]">{service.title}</h3>
-                  <p className="mt-2 text-sm text-[var(--text-secondary)]">{service.description}</p>
+                <h3 className="text-2xl font-bold text-primary md:text-3xl">Clinical AI Triage</h3>
+                <p className="mt-4 text-lg text-secondary">
+                  Our advanced AI model analyzes patient symptoms, photos, and medical history to provide an immediate preliminary assessment. It helps route you to the correct specialist and severity level before you even book an appointment.
+                </p>
+                <ul className="mt-8 space-y-3">
+                  {["Secure symptom analysis", "Confidence-scored recommendations", "Automated specialist routing"].map((item) => (
+                    <li key={item} className="flex items-center gap-3 text-secondary">
+                      <CheckCircle2 className="h-5 w-5 text-accent-cyan" /> {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="relative rounded-2xl border border-border bg-surface p-6 shadow-xl lg:ml-auto w-full">
+                <div className="flex items-center gap-3 border-b border-border pb-4">
+                  <div className="h-3 w-3 rounded-full bg-rose-500" />
+                  <div className="h-3 w-3 rounded-full bg-amber-500" />
+                  <div className="h-3 w-3 rounded-full bg-emerald-500" />
+                  <span className="ml-2 text-xs font-mono text-muted">AI_Triage_Console</span>
                 </div>
-              </Card>
-            ))}
+                <div className="mt-6 space-y-4">
+                  <div className="flex gap-3">
+                    <div className="h-8 w-8 shrink-0 rounded-full bg-accent-cyan/20" />
+                    <div className="rounded-2xl rounded-tl-none bg-surface-elevated p-3 text-sm text-secondary">
+                      I&apos;ve noticed a persistent red rash on my arm for the last 3 days. It&apos;s slightly itchy.
+                    </div>
+                  </div>
+                  <div className="flex gap-3 flex-row-reverse">
+                    <div className="h-8 w-8 shrink-0 rounded-full bg-accent-gold/20" />
+                    <div className="rounded-2xl rounded-tr-none bg-accent-cyan/10 p-3 text-sm text-primary">
+                      <p className="font-medium text-accent-cyan mb-1">Preliminary Assessment</p>
+                      Based on the description, this could be contact dermatitis. I recommend booking a general dermatologist for a confirmed diagnosis.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Feature 2 */}
+            <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
+              <div className="order-2 lg:order-1 relative rounded-2xl border border-border bg-surface p-6 shadow-xl w-full">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="h-12 w-12 rounded-full bg-surface-elevated animate-pulse" />
+                  <div className="space-y-2 flex-1">
+                    <div className="h-4 w-1/3 rounded bg-surface-elevated" />
+                    <div className="h-3 w-1/4 rounded bg-surface-elevated/50" />
+                  </div>
+                  <Badge variant="success">Available Now</Badge>
+                </div>
+                <div className="grid grid-cols-2 gap-3 mb-6">
+                  <div className="rounded-xl border border-border p-3 text-center">
+                    <Video className="mx-auto h-5 w-5 text-accent-gold mb-1" />
+                    <span className="text-xs text-secondary">Video Call</span>
+                  </div>
+                  <div className="rounded-xl border border-border p-3 text-center">
+                    <MessageSquare className="mx-auto h-5 w-5 text-accent-cyan mb-1" />
+                    <span className="text-xs text-secondary">Secure Chat</span>
+                  </div>
+                </div>
+                <Button className="w-full" variant="primary">Book Consultation</Button>
+              </div>
+              <div className="order-1 lg:order-2">
+                <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-accent-gold/10 text-accent-gold">
+                  <Stethoscope className="h-6 w-6" />
+                </div>
+                <h3 className="text-2xl font-bold text-primary md:text-3xl">Telemedicine Suite</h3>
+                <p className="mt-4 text-lg text-secondary">
+                  Connect seamlessly with verified healthcare professionals. Our telemedicine suite supports high-quality video consultations, voice calls, and secure messaging with end-to-end encryption.
+                </p>
+                <ul className="mt-8 space-y-3">
+                  {["Verified medical practitioners", "Secure video & chat infrastructure", "Instant digital prescriptions"].map((item) => (
+                    <li key={item} className="flex items-center gap-3 text-secondary">
+                      <CheckCircle2 className="h-5 w-5 text-accent-gold" /> {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
       {/* How It Works */}
-      <section id="how-it-works" className="border-t border-[var(--border)] py-20">
+      <section id="how-it-works" className="border-t border-border py-20">
         <div className="mx-auto max-w-7xl px-6">
           <div className="mb-12 text-center">
-            <p className="text-xs uppercase tracking-[0.2em] text-[var(--accent-cyan)]">Process</p>
-            <h2 className="mt-2 text-3xl font-bold text-[var(--text-primary)] md:text-4xl">How It Works</h2>
-            <p className="mt-4 text-[var(--text-secondary)]">From sign-up to treatment in four simple steps.</p>
+            <p className="text-xs uppercase tracking-[0.2em] text-accent-cyan">Process</p>
+            <h2 className="mt-2 text-3xl font-bold text-primary md:text-4xl">How It Works</h2>
+            <p className="mt-4 text-secondary">From sign-up to treatment in four simple steps.</p>
           </div>
 
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
             {STEPS.map((step, index) => (
               <div key={step.number} className="relative">
                 {index < STEPS.length - 1 ? (
-                  <div className="absolute top-8 left-[60%] hidden h-[2px] w-full bg-gradient-to-r from-[var(--accent-cyan)]/40 to-transparent lg:block" />
+                  <div className="absolute top-8 left-[60%] hidden h-[2px] w-full bg-gradient-to-r from-[accent-cyan]/40 to-transparent lg:block" />
                 ) : null}
-                <div className="relative z-10 flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--accent-cyan)]/10 text-2xl font-bold text-[var(--accent-cyan)]">
+                <div className="relative z-10 flex h-16 w-16 items-center justify-center rounded-2xl bg-[accent-cyan]/10 text-2xl font-bold text-accent-cyan">
                   {step.number}
                 </div>
-                <h3 className="mt-4 text-lg font-semibold text-[var(--text-primary)]">{step.title}</h3>
-                <p className="mt-2 text-sm text-[var(--text-secondary)]">{step.description}</p>
+                <h3 className="mt-4 text-lg font-semibold text-primary">{step.title}</h3>
+                <p className="mt-2 text-sm text-secondary">{step.description}</p>
               </div>
             ))}
           </div>
@@ -267,20 +280,20 @@ export default function HomePage() {
       </section>
 
       {/* About */}
-      <section id="about" className="border-t border-[var(--border)] bg-[var(--bg-secondary)] py-20">
+      <section id="about" className="border-t border-border bg-surface-elevated py-20">
         <div className="mx-auto max-w-7xl px-6">
           <div className="grid gap-12 md:grid-cols-2">
             <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-[var(--accent-cyan)]">About Us</p>
-              <h2 className="mt-2 text-3xl font-bold text-[var(--text-primary)] md:text-4xl">
+              <p className="text-xs uppercase tracking-[0.2em] text-accent-cyan">About Us</p>
+              <h2 className="mt-2 text-3xl font-bold text-primary md:text-4xl">
                 Built by Danhaire Medical Services
               </h2>
-              <p className="mt-6 text-[var(--text-secondary)]">
+              <p className="mt-6 text-secondary">
                 {companyName} is an AI-powered digital healthcare ecosystem that bridges the gap between patients and quality healthcare.
                 Founded by {founderName}, the platform addresses critical healthcare challenges in Nigeria and beyond — long travel distances,
                 limited specialist access, unsafe self-medication, and delayed triage.
               </p>
-              <p className="mt-4 text-[var(--text-secondary)]">
+              <p className="mt-4 text-secondary">
                 Our solution combines AI-assisted dermatology triage, specialist video/voice/chat booking, QR-verified e-pharmacy,
                 GPS-based provider discovery, and integrated payments — all in one continuous patient journey.
               </p>
@@ -294,8 +307,8 @@ export default function HomePage() {
                   "Terms & Privacy compliance",
                 ].map((feature) => (
                   <div key={feature} className="flex items-center gap-3">
-                    <CheckCircle2 className="h-5 w-5 shrink-0 text-[var(--accent-cyan)]" />
-                    <span className="text-sm text-[var(--text-secondary)]">{feature}</span>
+                    <CheckCircle2 className="h-5 w-5 shrink-0 text-accent-cyan" />
+                    <span className="text-sm text-secondary">{feature}</span>
                   </div>
                 ))}
               </div>
@@ -303,25 +316,25 @@ export default function HomePage() {
 
             <div className="flex flex-col gap-6">
               <Card className="space-y-4">
-                <p className="text-xs uppercase tracking-[0.2em] text-[var(--accent-cyan)]">Founder</p>
+                <p className="text-xs uppercase tracking-[0.2em] text-accent-cyan">Founder</p>
                 <div>
-                  <h3 className="text-xl font-semibold text-[var(--text-primary)]">{founderName}</h3>
-                  <p className="text-sm text-[var(--text-secondary)]">{founderTitle}</p>
+                  <h3 className="text-xl font-semibold text-primary">{founderName}</h3>
+                  <p className="text-sm text-secondary">{founderTitle}</p>
                 </div>
-                <p className="text-sm text-[var(--text-secondary)]">
+                <p className="text-sm text-secondary">
                   &ldquo;We built Aetheris Health to ensure every Nigerian — regardless of location — has access to quality healthcare through technology.&rdquo;
                 </p>
               </Card>
 
               <Card className="space-y-4">
-                <p className="text-xs uppercase tracking-[0.2em] text-[var(--accent-gold)]">Tech Stack</p>
+                <p className="text-xs uppercase tracking-[0.2em] text-accent-gold">Built for Trusted Care</p>
                 <div className="grid grid-cols-2 gap-3 text-sm">
-                  <div className="text-[var(--text-secondary)]">Frontend: Next.js 15</div>
-                  <div className="text-[var(--text-secondary)]">Database: MongoDB</div>
-                  <div className="text-[var(--text-secondary)]">Auth: Clerk</div>
-                  <div className="text-[var(--text-secondary)]">AI: Groq + RAG</div>
-                  <div className="text-[var(--text-secondary)]">Payments: Paystack</div>
-                  <div className="text-[var(--text-secondary)]">Maps: Leaflet</div>
+                  <div className="text-secondary">Private patient accounts</div>
+                  <div className="text-secondary">Clinically guided triage</div>
+                  <div className="text-secondary">Verified care providers</div>
+                  <div className="text-secondary">Secure consultations</div>
+                  <div className="text-secondary">Protected payments</div>
+                  <div className="text-secondary">Connected care history</div>
                 </div>
               </Card>
             </div>
@@ -330,12 +343,12 @@ export default function HomePage() {
       </section>
 
       {/* Contact */}
-      <section id="contact" className="border-t border-[var(--border)] py-20">
+      <section id="contact" className="border-t border-border py-20">
         <div className="mx-auto max-w-7xl px-6">
           <div className="mb-12 text-center">
-            <p className="text-xs uppercase tracking-[0.2em] text-[var(--accent-cyan)]">Contact</p>
-            <h2 className="mt-2 text-3xl font-bold text-[var(--text-primary)] md:text-4xl">Get In Touch</h2>
-            <p className="mt-4 text-[var(--text-secondary)]">Have questions? We&apos;re here to help.</p>
+            <p className="text-xs uppercase tracking-[0.2em] text-accent-cyan">Contact</p>
+            <h2 className="mt-2 text-3xl font-bold text-primary md:text-4xl">Get In Touch</h2>
+            <p className="mt-4 text-secondary">Have questions? We&apos;re here to help.</p>
           </div>
 
           <div className="grid gap-8 md:grid-cols-2">
@@ -343,36 +356,36 @@ export default function HomePage() {
             <div className="space-y-6">
               <Card className="space-y-4">
                 <div className="flex items-center gap-4">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--accent-cyan)]/10 text-[var(--accent-cyan)]">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[accent-cyan]/10 text-accent-cyan">
                     <Mail className="h-5 w-5" />
                   </div>
                   <div>
-                    <p className="text-xs uppercase tracking-[0.2em] text-[var(--text-muted)]">Email</p>
-                    <p className="text-[var(--text-primary)]">{contactEmail}</p>
+                    <p className="text-xs uppercase tracking-[0.2em] text-muted">Email</p>
+                    <p className="text-primary">{contactEmail}</p>
                   </div>
                 </div>
               </Card>
 
               <Card className="space-y-4">
                 <div className="flex items-center gap-4">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--accent-gold)]/10 text-[var(--accent-gold)]">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[accent-gold]/10 text-accent-gold">
                     <Phone className="h-5 w-5" />
                   </div>
                   <div>
-                    <p className="text-xs uppercase tracking-[0.2em] text-[var(--text-muted)]">Phone</p>
-                    <p className="text-[var(--text-primary)]">{contactPhone}</p>
+                    <p className="text-xs uppercase tracking-[0.2em] text-muted">Phone</p>
+                    <p className="text-primary">{contactPhone}</p>
                   </div>
                 </div>
               </Card>
 
               <Card className="space-y-4">
                 <div className="flex items-center gap-4">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--accent-cyan)]/10 text-[var(--accent-cyan)]">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[accent-cyan]/10 text-accent-cyan">
                     <LocationIcon className="h-5 w-5" />
                   </div>
                   <div>
-                    <p className="text-xs uppercase tracking-[0.2em] text-[var(--text-muted)]">Address</p>
-                    <p className="text-[var(--text-primary)]">{contactAddress}</p>
+                    <p className="text-xs uppercase tracking-[0.2em] text-muted">Address</p>
+                    <p className="text-primary">{contactAddress}</p>
                   </div>
                 </div>
               </Card>
@@ -380,22 +393,22 @@ export default function HomePage() {
               {/* Social links */}
               <div className="flex gap-3">
                 {socialGithub ? (
-                  <a href={socialGithub} target="_blank" rel="noopener noreferrer" className="flex h-11 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-4 text-sm font-medium text-[var(--text-secondary)] transition-colors hover:border-[var(--accent-cyan)] hover:text-[var(--accent-cyan)]">
+                  <a href={socialGithub} target="_blank" rel="noopener noreferrer" className="flex h-11 items-center justify-center rounded-xl border border-border bg-surface px-4 text-sm font-medium text-secondary transition-colors hover:border-[accent-cyan] hover:text-accent-cyan">
                     GitHub
                   </a>
                 ) : null}
                 {socialTwitter ? (
-                  <a href={socialTwitter} target="_blank" rel="noopener noreferrer" className="flex h-11 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-4 text-sm font-medium text-[var(--text-secondary)] transition-colors hover:border-[var(--accent-cyan)] hover:text-[var(--accent-cyan)]">
+                  <a href={socialTwitter} target="_blank" rel="noopener noreferrer" className="flex h-11 items-center justify-center rounded-xl border border-border bg-surface px-4 text-sm font-medium text-secondary transition-colors hover:border-[accent-cyan] hover:text-accent-cyan">
                     Twitter
                   </a>
                 ) : null}
                 {socialLinkedin ? (
-                  <a href={socialLinkedin} target="_blank" rel="noopener noreferrer" className="flex h-11 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-4 text-sm font-medium text-[var(--text-secondary)] transition-colors hover:border-[var(--accent-cyan)] hover:text-[var(--accent-cyan)]">
+                  <a href={socialLinkedin} target="_blank" rel="noopener noreferrer" className="flex h-11 items-center justify-center rounded-xl border border-border bg-surface px-4 text-sm font-medium text-secondary transition-colors hover:border-[accent-cyan] hover:text-accent-cyan">
                     LinkedIn
                   </a>
                 ) : null}
                 {socialInstagram ? (
-                  <a href={socialInstagram} target="_blank" rel="noopener noreferrer" className="flex h-11 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-4 text-sm font-medium text-[var(--text-secondary)] transition-colors hover:border-[var(--accent-cyan)] hover:text-[var(--accent-cyan)]">
+                  <a href={socialInstagram} target="_blank" rel="noopener noreferrer" className="flex h-11 items-center justify-center rounded-xl border border-border bg-surface px-4 text-sm font-medium text-secondary transition-colors hover:border-[accent-cyan] hover:text-accent-cyan">
                     Instagram
                   </a>
                 ) : null}
@@ -409,7 +422,7 @@ export default function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-[var(--border)] bg-[var(--bg-secondary)] py-12">
+      <footer className="border-t border-border bg-surface-elevated py-12">
         <div className="mx-auto max-w-7xl px-6">
           <div className="grid gap-8 md:grid-cols-4">
             <div className="space-y-4">
@@ -429,39 +442,39 @@ export default function HomePage() {
                 priority
                 className="dark:hidden block"
               />
-              <p className="text-sm text-[var(--text-secondary)]">{companyTagline}</p>
+              <p className="text-sm text-secondary">{companyTagline}</p>
             </div>
 
             <div>
-              <p className="mb-3 text-xs uppercase tracking-[0.2em] text-[var(--text-muted)]">Platform</p>
+              <p className="mb-3 text-xs uppercase tracking-[0.2em] text-muted">Platform</p>
               <div className="space-y-2">
-                <a href="#services" className="block text-sm text-[var(--text-secondary)] hover:text-[var(--accent-cyan)]">Services</a>
-                <a href="#how-it-works" className="block text-sm text-[var(--text-secondary)] hover:text-[var(--accent-cyan)]">How It Works</a>
-                <a href="#about" className="block text-sm text-[var(--text-secondary)] hover:text-[var(--accent-cyan)]">About Us</a>
-                <a href="#contact" className="block text-sm text-[var(--text-secondary)] hover:text-[var(--accent-cyan)]">Contact</a>
+                <a href="#services" className="block text-sm text-secondary hover:text-accent-cyan">Services</a>
+                <a href="#how-it-works" className="block text-sm text-secondary hover:text-accent-cyan">How It Works</a>
+                <a href="#about" className="block text-sm text-secondary hover:text-accent-cyan">About Us</a>
+                <a href="#contact" className="block text-sm text-secondary hover:text-accent-cyan">Contact</a>
               </div>
             </div>
 
             <div>
-              <p className="mb-3 text-xs uppercase tracking-[0.2em] text-[var(--text-muted)]">Legal</p>
+              <p className="mb-3 text-xs uppercase tracking-[0.2em] text-muted">Legal</p>
               <div className="space-y-2">
-                <Link href="/terms" className="block text-sm text-[var(--text-secondary)] hover:text-[var(--accent-cyan)]">Terms &amp; Conditions</Link>
-                <Link href="/privacy" className="block text-sm text-[var(--text-secondary)] hover:text-[var(--accent-cyan)]">Privacy Policy</Link>
+                <Link href="/terms" className="block text-sm text-secondary hover:text-accent-cyan">Terms &amp; Conditions</Link>
+                <Link href="/privacy" className="block text-sm text-secondary hover:text-accent-cyan">Privacy Policy</Link>
               </div>
             </div>
 
             <div>
-              <p className="mb-3 text-xs uppercase tracking-[0.2em] text-[var(--text-muted)]">Get Started</p>
+              <p className="mb-3 text-xs uppercase tracking-[0.2em] text-muted">Get Started</p>
               <div className="space-y-2">
-                <Link href="/sign-up?role=patient" className="block text-sm text-[var(--text-secondary)] hover:text-[var(--accent-cyan)]">Patient Sign Up</Link>
-                <Link href="/sign-up?role=doctor" className="block text-sm text-[var(--text-secondary)] hover:text-[var(--accent-cyan)]">Doctor Sign Up</Link>
-                <Link href="/sign-up?role=partner" className="block text-sm text-[var(--text-secondary)] hover:text-[var(--accent-cyan)]">Pharmacy Sign Up</Link>
+                <Link href="/sign-up?role=patient" className="block text-sm text-secondary hover:text-accent-cyan">Patient Sign Up</Link>
+                <Link href="/sign-up?role=doctor" className="block text-sm text-secondary hover:text-accent-cyan">Doctor Sign Up</Link>
+                <Link href="/sign-up?role=partner" className="block text-sm text-secondary hover:text-accent-cyan">Pharmacy Sign Up</Link>
               </div>
             </div>
           </div>
 
-          <div className="mt-8 border-t border-[var(--border)] pt-6 text-center">
-            <p className="text-sm text-[var(--text-muted)]">
+          <div className="mt-8 border-t border-border pt-6 text-center">
+            <p className="text-sm text-muted">
               © 2026 Danhaire Medical Services. All rights reserved. Built for the NextGen Innovation Challenge 2026.
             </p>
           </div>

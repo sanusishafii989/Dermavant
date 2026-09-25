@@ -4,57 +4,18 @@ import { PortalDashboardShell } from "@/components/layout/PortalDashboardShell";
 import { Avatar } from "@/components/ui/Avatar";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { SectionHeader } from "@/components/ui/SectionHeader";
+import { MobileList, MobileListItem } from "@/components/ui/MobileList";
+import { StatusAlert } from "@/components/ui/StatusAlert";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { patientNavLinks } from "@/lib/portal-nav";
 import { connectDB } from "@/lib/db";
 import { Appointment, Patient, PharmacyOrder, User, Wallet, AIReport } from "@/models";
-import { Calendar, Wallet as WalletIcon, Package, Brain } from "lucide-react";
+import { Calendar, Wallet as WalletIcon, Package, Brain, Plus, Activity, Clock, ChevronRight } from "lucide-react";
 
 export const dynamic = "force-dynamic";
-
-const serviceCards = [
-  {
-    title: "Start AI Consultation",
-    description: "Open your guided clinical assistant for symptom triage and next steps.",
-    href: "/patient/dashboard/start-ai-consultation",
-    accent: "border-[var(--accent-cyan)]/40 bg-[var(--accent-cyan)]/10",
-  },
-  {
-    title: "Book Specialist",
-    description: "Choose a specialist and reserve your visit in a single flow.",
-    href: "/patient/dashboard/book-specialist",
-    accent: "border-[var(--accent-gold)]/40 bg-[var(--accent-gold)]/10",
-  },
-  {
-    title: "Nearby Doctors",
-    description: "Find medical professionals close to your current location.",
-    href: "/patient/dashboard/nearby-doctors",
-    accent: "border-[var(--accent-cyan)]/40 bg-[var(--accent-cyan)]/10",
-  },
-  {
-    title: "Nearby Pharmacies",
-    description: "Locate nearby licensed partners and quick-access prescriptions.",
-    href: "/patient/dashboard/nearby-pharmacies",
-    accent: "border-[var(--accent-gold)]/40 bg-[var(--accent-gold)]/10",
-  },
-  {
-    title: "Medical History",
-    description: "Review care records, reports, and treatment milestones.",
-    href: "/patient/dashboard/medical-history",
-    accent: "border-[var(--accent-cyan)]/40 bg-[var(--accent-cyan)]/10",
-  },
-  {
-    title: "Global E-Pharmacy",
-    description: "Browse essential medicines and trusted partner fulfillment.",
-    href: "/patient/pharmacy",
-    accent: "border-[var(--accent-cyan)]/40 bg-[var(--accent-cyan)]/10",
-  },
-  {
-    title: "Emergency Services",
-    description: "Quick access to urgent response, emergency support, and escalation.",
-    href: "/patient/dashboard/emergency-services",
-    accent: "border-[var(--accent-gold)]/40 bg-[var(--accent-gold)]/10",
-  },
-];
 
 export default async function PatientDashboardPage() {
   const user = await currentUser();
@@ -73,12 +34,20 @@ export default async function PatientDashboardPage() {
   let walletBalance = 0;
   let activeOrders = 0;
   let aiReportsCount = 0;
+  let recentAppointments: any[] = [];
 
   if (patient) {
     upcomingCount = await Appointment.countDocuments({
       patient_id: patient._id as any,
       consultation_status: "scheduled",
     } as any);
+    
+    recentAppointments = await Appointment.find({
+      patient_id: patient._id as any,
+    })
+    .sort({ consultation_date: -1 })
+    .limit(3)
+    .lean();
 
     const wallet = await Wallet.findOne({ ownerId: userDoc!._id as any }).lean();
     if (wallet) walletBalance = wallet.balance ?? 0;
@@ -93,68 +62,130 @@ export default async function PatientDashboardPage() {
     } as any);
   }
 
-  const stats = [
-    { label: "Upcoming", value: upcomingCount, icon: <Calendar className="h-5 w-5" />, color: "text-[var(--accent-cyan)]" },
-    { label: "Wallet", value: `₦${walletBalance.toLocaleString()}`, icon: <WalletIcon className="h-5 w-5" />, color: "text-[var(--accent-gold)]" },
-    { label: "Active orders", value: activeOrders, icon: <Package className="h-5 w-5" />, color: "text-emerald-500" },
-    { label: "AI reports", value: aiReportsCount, icon: <Brain className="h-5 w-5" />, color: "text-[var(--accent-cyan)]" },
-  ];
+  const primaryAction = (
+    <Button variant="primary" size="lg" className="w-full md:w-auto" asChild>
+      <Link href="/patient/dashboard/start-ai-consultation">
+        <Brain className="mr-2 h-5 w-5" />
+        New AI Consultation
+      </Link>
+    </Button>
+  );
 
   return (
-    <PortalDashboardShell title="Patient Portal" links={patientNavLinks}>
-      <div className="space-y-6">
-        <Card className="max-w-5xl">
-          <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
-            <div className="flex items-center gap-4">
-              <Avatar src={user?.imageUrl} name={fullName} size="lg" />
-              <div>
-                <p className="text-xs uppercase tracking-[0.32em] text-[var(--accent-cyan)]">Welcome back</p>
-                <h1 className="mt-1 text-3xl font-bold text-[var(--text-primary)]">{fullName}</h1>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  <Badge variant="cyan">patient</Badge>
-                  <Badge variant="gold">AI care portal</Badge>
-                </div>
-              </div>
+    <PortalDashboardShell 
+      title="Patient Portal" 
+      links={patientNavLinks}
+      primaryAction={primaryAction}
+    >
+      <div className="space-y-8 max-w-5xl mx-auto">
+        <PageHeader 
+          title={`Welcome, ${fullName}`}
+          description="Manage your health, appointments, and prescriptions from one secure location."
+          actions={
+            <div className="hidden md:block">
+              {primaryAction}
             </div>
+          }
+        />
 
-            <div className="grid grid-cols-2 gap-3">
-              {stats.map((stat) => (
-                <div key={stat.label} className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] px-4 py-3">
-                  <div className="flex items-center gap-2">
-                    <span className={stat.color}>{stat.icon}</span>
-                    <p className="text-xs uppercase tracking-[0.15em] text-[var(--text-muted)]">{stat.label}</p>
+        {/* Highlighted Next Action Area */}
+        {upcomingCount === 0 && (
+          <StatusAlert 
+            variant="info" 
+            title="You're up to date"
+            description="You don't have any upcoming appointments. If you're feeling unwell, try our AI Consultation for instant triage."
+            className="mb-8"
+          />
+        )}
+
+        <div className="grid gap-6 md:grid-cols-4">
+          <Card className="col-span-1 md:col-span-3 bg-surface border-border flex flex-col justify-center items-start p-6 sm:p-8">
+            <Badge variant="cyan" className="mb-4">Guided Triage</Badge>
+            <h3 className="text-2xl font-semibold mb-2">Feeling Unwell?</h3>
+            <p className="text-secondary mb-6 max-w-lg">
+              Start an AI-guided consultation to assess your symptoms instantly. Our system will recommend the best next steps, whether it&apos;s resting at home or booking a specialist.
+            </p>
+            <Button variant="primary" asChild>
+              <Link href="/patient/dashboard/start-ai-consultation">
+                <Brain className="mr-2 h-4 w-4" />
+                Start Triage Now
+              </Link>
+            </Button>
+          </Card>
+
+          <Card className="col-span-1 flex flex-col justify-center bg-surface-elevated">
+            <SectionHeader title="Wallet Balance" className="mb-2" />
+            <div className="text-3xl font-bold text-primary mb-1">
+              ₦{walletBalance.toLocaleString()}
+            </div>
+            <Link href="/patient/dashboard/wallet" className="text-sm font-medium text-accent-cyan flex items-center hover:underline mt-4">
+              <Plus className="h-4 w-4 mr-1" /> Add Funds
+            </Link>
+          </Card>
+        </div>
+
+        <div className="grid gap-8 md:grid-cols-2">
+          {/* Quick Links Group */}
+          <div className="space-y-4">
+            <SectionHeader title="Quick Actions" />
+            <div className="grid grid-cols-2 gap-4">
+              <Link href="/patient/dashboard/book-specialist">
+                <Card hover className="h-full flex flex-col items-center justify-center p-6 text-center gap-3">
+                  <div className="p-3 bg-accent-gold/10 text-accent-gold rounded-full">
+                    <Calendar className="h-6 w-6" />
                   </div>
-                  <p className="mt-1 text-xl font-bold text-[var(--text-primary)]">{stat.value}</p>
-                </div>
-              ))}
+                  <div className="font-medium">Book Specialist</div>
+                </Card>
+              </Link>
+              <Link href="/patient/pharmacy">
+                <Card hover className="h-full flex flex-col items-center justify-center p-6 text-center gap-3">
+                  <div className="p-3 bg-accent-cyan/10 text-accent-cyan rounded-full">
+                    <Package className="h-6 w-6" />
+                  </div>
+                  <div className="font-medium">Pharmacy</div>
+                </Card>
+              </Link>
             </div>
           </div>
-        </Card>
 
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {serviceCards.map((item) => (
-            <Link key={item.title} href={item.href} className="group block h-full">
-              <Card
-                hover
-                className={`h-full border ${item.accent} transition-transform duration-200 group-hover:-translate-y-1`}
-              >
-                <div className="flex h-full flex-col justify-between gap-5">
-                  <div>
-                    <div className="mb-3 inline-flex rounded-full bg-[var(--bg-card)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--accent-cyan)]">
-                      Service
-                    </div>
-                    <h2 className="text-lg font-semibold text-[var(--text-primary)]">{item.title}</h2>
-                    <p className="mt-2 text-sm text-[var(--text-secondary)]">{item.description}</p>
-                  </div>
-
-                  <div className="flex items-center justify-between text-sm text-[var(--accent-cyan)]">
-                    <span>Open</span>
-                    <span aria-hidden="true">→</span>
-                  </div>
-                </div>
-              </Card>
-            </Link>
-          ))}
+          {/* Recent Activity */}
+          <div className="space-y-4">
+            <SectionHeader 
+              title="Recent Activity" 
+              actions={
+                <Button variant="ghost" size="sm" asChild>
+                  <Link href="/patient/dashboard/medical-history">View all</Link>
+                </Button>
+              }
+            />
+            {recentAppointments.length > 0 ? (
+              <MobileList>
+                {recentAppointments.map(apt => (
+                  <MobileListItem 
+                    key={apt._id.toString()}
+                    icon={<Activity className="h-5 w-5" />}
+                    title={apt.consultation_type || "Consultation"}
+                    subtitle={new Date(apt.consultation_date).toLocaleDateString()}
+                    status={<Badge variant="default">{apt.consultation_status}</Badge>}
+                    actions={
+                      <Button variant="ghost" size="sm" className="w-full justify-between" asChild>
+                        <Link href={`/patient/dashboard/appointments/${apt._id}`}>
+                          View Details <ChevronRight className="h-4 w-4" />
+                        </Link>
+                      </Button>
+                    }
+                  />
+                ))}
+              </MobileList>
+            ) : (
+              <EmptyState 
+                icon={<Clock className="h-6 w-6" />}
+                title="No recent activity"
+                description="Your recent appointments and reports will appear here."
+                className="py-12"
+              />
+            )}
+          </div>
         </div>
       </div>
     </PortalDashboardShell>

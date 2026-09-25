@@ -138,11 +138,11 @@ export function UserDetailModal({
     <Modal open={open} onClose={onClose} title="User Profile & Access Control" className="max-w-2xl">
       <div className="space-y-6">
         {/* User Header */}
-        <div className="flex items-center gap-4 rounded-xl bg-white/5 p-4 border border-white/10">
+        <div className="flex items-center gap-4 rounded-xl bg-surface-elevated p-4 border border-border">
           <Avatar src={user.profilePhoto} name={user.fullName} size="lg" />
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <h3 className="text-xl font-bold text-white truncate">{user.fullName}</h3>
+              <h3 className="text-xl font-bold text-primary truncate">{user.fullName}</h3>
               <Badge variant={user.role === "admin" ? "gold" : user.role === "doctor" ? "cyan" : "default"}>
                 {user.role}
               </Badge>
@@ -163,11 +163,11 @@ export function UserDetailModal({
                 </Badge>
               )}
             </div>
-            <p className="mt-1 text-sm text-white/60 truncate flex items-center gap-2">
+            <p className="mt-1 text-sm text-muted truncate flex items-center gap-2">
               <Mail className="h-3.5 w-3.5" /> {user.email}
             </p>
             {user.phone && (
-              <p className="mt-0.5 text-sm text-white/60 truncate flex items-center gap-2">
+              <p className="mt-0.5 text-sm text-muted truncate flex items-center gap-2">
                 <Phone className="h-3.5 w-3.5" /> {user.phone}
               </p>
             )}
@@ -176,19 +176,19 @@ export function UserDetailModal({
 
         {/* Basic Metadata */}
         <div className="grid grid-cols-2 gap-4 text-sm">
-          <div className="rounded-lg bg-white/5 p-3 border border-white/5">
-            <span className="text-xs text-white/50 block">Account ID</span>
-            <span className="font-mono text-white/80 text-xs truncate block">{user._id}</span>
+          <div className="rounded-lg bg-surface-elevated p-3 border border-border">
+            <span className="text-xs text-muted block">Account ID</span>
+            <span className="font-mono text-secondary text-xs truncate block">{user._id}</span>
           </div>
-          <div className="rounded-lg bg-white/5 p-3 border border-white/5">
-            <span className="text-xs text-white/50 block">Clerk Auth ID</span>
-            <span className="font-mono text-white/80 text-xs truncate block">{user.clerkId}</span>
+          <div className="rounded-lg bg-surface-elevated p-3 border border-border">
+            <span className="text-xs text-muted block">Clerk Auth ID</span>
+            <span className="font-mono text-secondary text-xs truncate block">{user.clerkId}</span>
           </div>
-          <div className="col-span-2 rounded-lg bg-white/5 p-3 border border-white/5 flex items-center justify-between">
-            <span className="text-xs text-white/50 flex items-center gap-1.5">
+          <div className="col-span-2 rounded-lg bg-surface-elevated p-3 border border-border flex items-center justify-between">
+            <span className="text-xs text-muted flex items-center gap-1.5">
               <Calendar className="h-3.5 w-3.5" /> Joined Date
             </span>
-            <span className="text-white text-xs">
+            <span className="text-primary text-xs">
               {new Date(user.createdAt).toLocaleDateString("en-US", { dateStyle: "medium" })}
             </span>
           </div>
@@ -196,27 +196,27 @@ export function UserDetailModal({
 
         {/* Role Specific Details */}
         {user.roleDetails && (
-          <div className="rounded-xl bg-cyan/5 p-4 border border-cyan/20 space-y-2">
-            <h4 className="text-xs uppercase font-semibold text-cyan tracking-wider flex items-center gap-1.5">
+          <div className="rounded-xl bg-accent-cyan/10 p-4 border border-accent-cyan/20 space-y-2">
+            <h4 className="text-xs uppercase font-semibold text-accent-cyan tracking-wider flex items-center gap-1.5">
               <Award className="h-4 w-4" /> Role Credentials & Info
             </h4>
 
             {user.role === "doctor" && (
-              <div className="grid grid-cols-2 gap-2 text-sm text-white/80 pt-1">
+              <div className="grid grid-cols-2 gap-2 text-sm text-secondary pt-1">
                 <div>
-                  <span className="text-xs text-white/50 block">License Number</span>
-                  <span className="font-medium text-white">{user.roleDetails.license_number || "N/A"}</span>
+                  <span className="text-xs text-muted block">License Number</span>
+                  <span className="font-medium text-primary">{user.roleDetails.license_number || "N/A"}</span>
                 </div>
                 <div>
-                  <span className="text-xs text-white/50 block">Specialization</span>
-                  <span className="font-medium text-white">{user.roleDetails.specialization}</span>
+                  <span className="text-xs text-muted block">Specialization</span>
+                  <span className="font-medium text-primary">{user.roleDetails.specialization}</span>
                 </div>
                 <div>
-                  <span className="text-xs text-white/50 block">Hospital</span>
-                  <span className="font-medium text-white">{user.roleDetails.hospital || "Independent"}</span>
+                  <span className="text-xs text-muted block">Hospital</span>
+                  <span className="font-medium text-primary">{user.roleDetails.hospital || "Independent"}</span>
                 </div>
                 <div>
-                  <span className="text-xs text-white/50 block">Verification</span>
+                  <span className="text-xs text-muted block">Verification</span>
                   <Badge variant={user.roleDetails.verificationStatus === "verified" ? "success" : "warning"}>
                     {user.roleDetails.verificationStatus}
                   </Badge>
@@ -225,21 +225,21 @@ export function UserDetailModal({
             )}
 
             {user.role === "partner" && (
-              <div className="grid grid-cols-2 gap-2 text-sm text-white/80 pt-1">
+              <div className="grid grid-cols-2 gap-2 text-sm text-secondary pt-1">
                 <div>
-                  <span className="text-xs text-white/50 block">Business Name</span>
-                  <span className="font-medium text-white">{user.roleDetails.business_name}</span>
+                  <span className="text-xs text-muted block">Business Name</span>
+                  <span className="font-medium text-primary">{user.roleDetails.business_name}</span>
                 </div>
                 <div>
-                  <span className="text-xs text-white/50 block">License</span>
-                  <span className="font-medium text-white">{user.roleDetails.license}</span>
+                  <span className="text-xs text-muted block">License</span>
+                  <span className="font-medium text-primary">{user.roleDetails.license}</span>
                 </div>
                 <div>
-                  <span className="text-xs text-white/50 block">Owner Name</span>
-                  <span className="font-medium text-white">{user.roleDetails.owner_name}</span>
+                  <span className="text-xs text-muted block">Owner Name</span>
+                  <span className="font-medium text-primary">{user.roleDetails.owner_name}</span>
                 </div>
                 <div>
-                  <span className="text-xs text-white/50 block">Verification</span>
+                  <span className="text-xs text-muted block">Verification</span>
                   <Badge variant={user.roleDetails.verificationStatus === "verified" ? "success" : "warning"}>
                     {user.roleDetails.verificationStatus}
                   </Badge>
@@ -251,13 +251,13 @@ export function UserDetailModal({
 
         {/* KYC Application Details (Doctors & Pharmacists only) */}
         {(user.role === "doctor" || user.role === "partner") && (
-          <div className="rounded-xl bg-white/5 p-4 border border-white/10 space-y-3">
-            <h4 className="text-xs uppercase font-semibold text-cyan tracking-wider flex items-center gap-1.5">
+          <div className="rounded-xl bg-surface-elevated p-4 border border-border space-y-3">
+            <h4 className="text-xs uppercase font-semibold text-accent-cyan tracking-wider flex items-center gap-1.5">
               <FileText className="h-4 w-4" /> KYC Application Details
             </h4>
 
             {kycLoading ? (
-              <p className="text-sm text-white/50">Loading KYC data...</p>
+              <p className="text-sm text-muted">Loading KYC data...</p>
             ) : kyc ? (
               <div className="space-y-3">
                 {/* Doctor-specific KYC fields */}
@@ -265,44 +265,44 @@ export function UserDetailModal({
                   <div className="grid grid-cols-2 gap-3 text-sm">
                     {kyc.license_number && (
                       <div className="flex items-center gap-2">
-                        <Award className="h-3.5 w-3.5 text-white/40" />
+                        <Award className="h-3.5 w-3.5 text-muted" />
                         <div>
-                          <span className="text-xs text-white/50 block">Medical License</span>
-                          <span className="font-medium text-white">{kyc.license_number}</span>
+                          <span className="text-xs text-muted block">Medical License</span>
+                          <span className="font-medium text-primary">{kyc.license_number}</span>
                         </div>
                       </div>
                     )}
                     {kyc.specialization && (
                       <div className="flex items-center gap-2">
-                        <Briefcase className="h-3.5 w-3.5 text-white/40" />
+                        <Briefcase className="h-3.5 w-3.5 text-muted" />
                         <div>
-                          <span className="text-xs text-white/50 block">Specialization</span>
-                          <span className="font-medium text-white">{kyc.specialization}</span>
+                          <span className="text-xs text-muted block">Specialization</span>
+                          <span className="font-medium text-primary">{kyc.specialization}</span>
                         </div>
                       </div>
                     )}
                     {kyc.hospital && (
                       <div className="flex items-center gap-2">
-                        <Building className="h-3.5 w-3.5 text-white/40" />
+                        <Building className="h-3.5 w-3.5 text-muted" />
                         <div>
-                          <span className="text-xs text-white/50 block">Hospital</span>
-                          <span className="font-medium text-white">{kyc.hospital}</span>
+                          <span className="text-xs text-muted block">Hospital</span>
+                          <span className="font-medium text-primary">{kyc.hospital}</span>
                         </div>
                       </div>
                     )}
                     {kyc.medical_school && (
                       <div className="flex items-center gap-2">
-                        <GraduationCap className="h-3.5 w-3.5 text-white/40" />
+                        <GraduationCap className="h-3.5 w-3.5 text-muted" />
                         <div>
-                          <span className="text-xs text-white/50 block">Medical School</span>
-                          <span className="font-medium text-white">{kyc.medical_school}</span>
+                          <span className="text-xs text-muted block">Medical School</span>
+                          <span className="font-medium text-primary">{kyc.medical_school}</span>
                         </div>
                       </div>
                     )}
                     {kyc.years_of_experience !== undefined && (
                       <div>
-                        <span className="text-xs text-white/50 block">Years of Experience</span>
-                        <span className="font-medium text-white">{kyc.years_of_experience}</span>
+                        <span className="text-xs text-muted block">Years of Experience</span>
+                        <span className="font-medium text-primary">{kyc.years_of_experience}</span>
                       </div>
                     )}
                   </div>
@@ -313,25 +313,25 @@ export function UserDetailModal({
                   <div className="grid grid-cols-2 gap-3 text-sm">
                     {kyc.business_name && (
                       <div className="flex items-center gap-2">
-                        <Building className="h-3.5 w-3.5 text-white/40" />
+                        <Building className="h-3.5 w-3.5 text-muted" />
                         <div>
-                          <span className="text-xs text-white/50 block">Business Name</span>
-                          <span className="font-medium text-white">{kyc.business_name}</span>
+                          <span className="text-xs text-muted block">Business Name</span>
+                          <span className="font-medium text-primary">{kyc.business_name}</span>
                         </div>
                       </div>
                     )}
                     {kyc.business_registration_number && (
                       <div>
-                        <span className="text-xs text-white/50 block">CAC Registration No.</span>
-                        <span className="font-medium text-white">{kyc.business_registration_number}</span>
+                        <span className="text-xs text-muted block">CAC Registration No.</span>
+                        <span className="font-medium text-primary">{kyc.business_registration_number}</span>
                       </div>
                     )}
                     {kyc.pharmacist_license && (
                       <div className="flex items-center gap-2">
-                        <Award className="h-3.5 w-3.5 text-white/40" />
+                        <Award className="h-3.5 w-3.5 text-muted" />
                         <div>
-                          <span className="text-xs text-white/50 block">Pharmacist License</span>
-                          <span className="font-medium text-white">{kyc.pharmacist_license}</span>
+                          <span className="text-xs text-muted block">Pharmacist License</span>
+                          <span className="font-medium text-primary">{kyc.pharmacist_license}</span>
                         </div>
                       </div>
                     )}
@@ -339,31 +339,31 @@ export function UserDetailModal({
                 )}
 
                 {/* Shared KYC fields */}
-                <div className="grid grid-cols-2 gap-3 text-sm pt-2 border-t border-white/5">
+                <div className="grid grid-cols-2 gap-3 text-sm pt-2 border-t border-border">
                   {kyc.phone_number && (
                     <div className="flex items-center gap-2">
-                      <Phone className="h-3.5 w-3.5 text-white/40" />
+                      <Phone className="h-3.5 w-3.5 text-muted" />
                       <div>
-                        <span className="text-xs text-white/50 block">Phone</span>
-                        <span className="font-medium text-white">{kyc.phone_number}</span>
+                        <span className="text-xs text-muted block">Phone</span>
+                        <span className="font-medium text-primary">{kyc.phone_number}</span>
                       </div>
                     </div>
                   )}
                   {kyc.address && (
                     <div className="flex items-center gap-2">
-                      <MapPin className="h-3.5 w-3.5 text-white/40" />
+                      <MapPin className="h-3.5 w-3.5 text-muted" />
                       <div>
-                        <span className="text-xs text-white/50 block">Address</span>
-                        <span className="font-medium text-white">{kyc.address}</span>
+                        <span className="text-xs text-muted block">Address</span>
+                        <span className="font-medium text-primary">{kyc.address}</span>
                       </div>
                     </div>
                   )}
                   {kyc.submitted_at && (
                     <div className="flex items-center gap-2">
-                      <Calendar className="h-3.5 w-3.5 text-white/40" />
+                      <Calendar className="h-3.5 w-3.5 text-muted" />
                       <div>
-                        <span className="text-xs text-white/50 block">Submitted</span>
-                        <span className="font-medium text-white">
+                        <span className="text-xs text-muted block">Submitted</span>
+                        <span className="font-medium text-primary">
                           {new Date(kyc.submitted_at).toLocaleDateString("en-US", { dateStyle: "medium" })}
                         </span>
                       </div>
@@ -379,7 +379,7 @@ export function UserDetailModal({
                 )}
               </div>
             ) : (
-              <p className="text-sm text-white/40">No KYC application submitted yet.</p>
+              <p className="text-sm text-muted">No KYC application submitted yet.</p>
             )}
           </div>
         )}
@@ -398,13 +398,13 @@ export function UserDetailModal({
               placeholder="Review notes (optional)..."
               value={reviewNotes}
               onChange={(e) => setReviewNotes(e.target.value)}
-              className="mt-3 w-full rounded-lg border border-amber-500/20 bg-amber-500/5 px-3 py-2 text-sm text-white placeholder:text-white/30 focus:border-amber-400 focus:outline-none"
+              className="mt-3 w-full rounded-lg border border-amber-500/20 bg-amber-500/5 px-3 py-2 text-sm text-primary placeholder:text-primary/30 focus:border-amber-400 focus:outline-none"
             />
             <div className="mt-3 flex gap-3">
               <Button
                 variant="primary"
                 size="sm"
-                className="bg-emerald-600 hover:bg-emerald-500 text-white flex-1"
+                className="bg-emerald-600 hover:bg-emerald-500 text-primary flex-1"
                 disabled={loading}
                 onClick={() => handleKYCAction("approved")}
               >
@@ -436,7 +436,7 @@ export function UserDetailModal({
               <Button
                 variant="primary"
                 size="sm"
-                className="bg-emerald-600 hover:bg-emerald-500 text-white flex-1"
+                className="bg-emerald-600 hover:bg-emerald-500 text-primary flex-1"
                 disabled={loading}
                 onClick={() => handleAction(() => onVerifyChange(user._id, "verified"))}
               >
@@ -456,7 +456,7 @@ export function UserDetailModal({
         )}
 
         {/* Account Status Control Buttons */}
-        <div className="flex items-center justify-between pt-2 border-t border-white/10">
+        <div className="flex items-center justify-between pt-2 border-t border-border">
           <Button variant="ghost" size="sm" onClick={onClose}>
             Close
           </Button>
@@ -475,7 +475,7 @@ export function UserDetailModal({
             <Button
               variant="primary"
               size="sm"
-              className="bg-emerald-600 hover:bg-emerald-500 text-white"
+              className="bg-emerald-600 hover:bg-emerald-500 text-primary"
               disabled={loading}
               onClick={() => handleAction(() => onStatusChange(user._id, "active"))}
             >

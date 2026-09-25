@@ -15,6 +15,34 @@ const config: Config = {
         cyan: "#219EBC",
         gold: "#FFB703",
         white: "#FFFFFF",
+        surface: {
+          DEFAULT: "var(--surface)",
+          elevated: "var(--surface-elevated)",
+        },
+        success: {
+          DEFAULT: "var(--success)",
+          bg: "var(--success-bg)",
+          text: "var(--success-text)",
+        },
+        warning: {
+          DEFAULT: "var(--warning)",
+          bg: "var(--warning-bg)",
+          text: "var(--warning-text)",
+        },
+        danger: {
+          DEFAULT: "var(--danger)",
+          bg: "var(--danger-bg)",
+          text: "var(--danger-text)",
+        },
+        info: {
+          DEFAULT: "var(--info)",
+          bg: "var(--info-bg)",
+          text: "var(--info-text)",
+        },
+        disabled: {
+          DEFAULT: "var(--disabled)",
+          text: "var(--disabled-text)",
+        }
       },
       fontFamily: {
         sans: ["var(--font-geist-sans)", "system-ui", "sans-serif"],
@@ -38,14 +66,14 @@ const config: Config = {
         ".glass-card": {
           "border-radius": "1rem",
           "border": "1px solid var(--border)",
-          "background-color": "var(--bg-card)",
+          "background-color": "var(--surface)",
           "backdrop-filter": "blur(12px)",
           "box-shadow": "var(--shadow)",
         },
         ".glass-card-hover": {
           "border-radius": "1rem",
           "border": "1px solid var(--border)",
-          "background-color": "var(--bg-card)",
+          "background-color": "var(--surface)",
           "backdrop-filter": "blur(12px)",
           "box-shadow": "var(--shadow)",
           "transition": "all 200ms",
@@ -56,8 +84,8 @@ const config: Config = {
         },
         ".glass-panel": {
           "border-radius": "1rem",
-          "border": "1px solid var(--sidebar-border)",
-          "background-color": "var(--sidebar-bg)",
+          "border": "1px solid var(--border)",
+          "background-color": "var(--surface-elevated)",
           "backdrop-filter": "blur(12px)",
           "box-shadow": "var(--shadow)",
         },

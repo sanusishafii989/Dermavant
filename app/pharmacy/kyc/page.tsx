@@ -1,6 +1,8 @@
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { PortalDashboardShell } from "@/components/layout/PortalDashboardShell";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { Badge } from "@/components/ui/Badge";
 import { pharmacyNavLinks } from "@/lib/portal-nav";
 import { ROLE_DASHBOARD } from "@/lib/roles";
 import { KYCForm } from "@/components/shared/KYCForm";
@@ -17,13 +19,11 @@ export default async function PharmacyKYCPage() {
   return (
     <PortalDashboardShell title="E-Pharmacy Portal" links={pharmacyNavLinks}>
       <div className="mx-auto max-w-5xl space-y-6">
-        <div className="rounded-2xl border border-[var(--accent-cyan)]/30 bg-[var(--accent-cyan)]/5 p-5">
-          <p className="text-xs uppercase tracking-[0.2em] text-[var(--accent-cyan)]">Business Verification</p>
-          <h1 className="mt-2 text-3xl font-bold text-[var(--text-primary)]">KYC &amp; License Verification</h1>
-          <p className="mt-1 text-sm text-[var(--text-secondary)]">
-            Submit your pharmacy credentials for admin verification. Required before listing medicines.
-          </p>
-        </div>
+        <PageHeader 
+          title="KYC & License Verification"
+          description="Submit your pharmacy credentials for admin verification. Required before listing medicines."
+          badge={<Badge variant="cyan">Business Verification</Badge>}
+        />
         <KYCForm role="partner" />
       </div>
     </PortalDashboardShell>

@@ -7,6 +7,25 @@
   --bg-secondary: #F8FAFC;
   --bg-card: #FFFFFF;
   --bg-input: #F1F5F9;
+  
+  /* Semantic Tokens */
+  --surface: #FFFFFF;
+  --surface-elevated: #F8FAFC;
+  --success: #10B981;
+  --success-bg: #D1FAE5;
+  --success-text: #065F46;
+  --warning: #F59E0B;
+  --warning-bg: #FEF3C7;
+  --warning-text: #92400E;
+  --danger: #EF4444;
+  --danger-bg: #FEE2E2;
+  --danger-text: #991B1B;
+  --info: #3B82F6;
+  --info-bg: #DBEAFE;
+  --info-text: #1E40AF;
+  --disabled: #E2E8F0;
+  --disabled-text: #94A3B8;
+
   --text-primary: #0A1628;
   --text-secondary: #475569;
   --text-muted: #94A3B8;
@@ -27,6 +46,25 @@
   --bg-secondary: #023047;
   --bg-card: rgba(255, 255, 255, 0.05);
   --bg-input: rgba(255, 255, 255, 0.05);
+
+  /* Semantic Tokens */
+  --surface: #000814;
+  --surface-elevated: #023047;
+  --success: #10B981;
+  --success-bg: rgba(16, 185, 129, 0.1);
+  --success-text: #34D399;
+  --warning: #F59E0B;
+  --warning-bg: rgba(245, 158, 11, 0.1);
+  --warning-text: #FCD34D;
+  --danger: #EF4444;
+  --danger-bg: rgba(239, 68, 68, 0.1);
+  --danger-text: #F87171;
+  --info: #3B82F6;
+  --info-bg: rgba(59, 130, 246, 0.1);
+  --info-text: #60A5FA;
+  --disabled: #1E293B;
+  --disabled-text: #64748B;
+
   --text-primary: #FFFFFF;
   --text-secondary: rgba(255, 255, 255, 0.7);
   --text-muted: rgba(255, 255, 255, 0.45);

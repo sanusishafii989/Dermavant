@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { PortalDashboardShell } from "@/components/layout/PortalDashboardShell";
+import { PageHeader } from "@/components/ui/PageHeader";
 import { WalletCard } from "@/components/patient/WalletCard";
 import { Card } from "@/components/ui/Card";
 import { patientNavLinks } from "@/lib/portal-nav";
@@ -76,30 +77,28 @@ function WalletContent() {
   }, [searchParams]);
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-[var(--text-primary)]">Patient E-Wallet Ledger</h1>
-        <p className="text-xs text-[var(--text-secondary)]">
-          Manage your balance, add funds via Paystack, and view all consultation & pharmacy transactions.
-        </p>
-      </div>
+    <div className="space-y-6 max-w-4xl mx-auto">
+      <PageHeader 
+        title="Patient E-Wallet Ledger"
+        description="Manage your balance, add funds via Paystack, and view all consultation & pharmacy transactions."
+      />
 
       {successMsg && (
-        <Card className="flex items-center gap-3 border border-emerald-500/30 bg-emerald-500/10 p-4 text-sm text-emerald-300">
-          <CheckCircle2 className="h-5 w-5 text-emerald-400 shrink-0" />
+        <Card className="flex items-center gap-3 border border-success/30 bg-success-bg p-4 text-sm text-success-text">
+          <CheckCircle2 className="h-5 w-5 text-success shrink-0" />
           <span>{successMsg}</span>
         </Card>
       )}
 
       {error && (
-        <Card className="border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300">
+        <Card className="border border-danger/30 bg-danger-bg p-4 text-sm text-danger-text">
           {error}
         </Card>
       )}
 
       {loading ? (
-        <Card className="p-12 text-center text-[var(--text-secondary)]">
-          <RefreshCw className="mx-auto h-8 w-8 animate-spin text-[var(--accent-cyan)]" />
+        <Card className="p-12 text-center text-secondary">
+          <RefreshCw className="mx-auto h-8 w-8 animate-spin text-accent-cyan" />
           <p className="mt-3 text-sm font-medium">Processing wallet data...</p>
         </Card>
       ) : (
@@ -118,8 +117,8 @@ export default function PatientWalletPage() {
   return (
     <PortalDashboardShell title="E-Wallet Management" links={patientNavLinks}>
       <Suspense fallback={
-        <Card className="p-12 text-center text-[var(--text-secondary)]">
-          <RefreshCw className="mx-auto h-8 w-8 animate-spin text-[var(--accent-cyan)]" />
+        <Card className="p-12 text-center text-secondary">
+          <RefreshCw className="mx-auto h-8 w-8 animate-spin text-accent-cyan" />
           <p className="mt-3 text-sm font-medium">Loading e-wallet...</p>
         </Card>
       }>

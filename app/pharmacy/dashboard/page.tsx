@@ -1,9 +1,12 @@
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { PortalDashboardShell } from "@/components/layout/PortalDashboardShell";
-import { Avatar } from "@/components/ui/Avatar";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { SectionHeader } from "@/components/ui/SectionHeader";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { MobileList, MobileListItem } from "@/components/ui/MobileList";
 import { pharmacyNavLinks } from "@/lib/portal-nav";
 import { ROLE_DASHBOARD } from "@/lib/roles";
 import { ensurePartnerProfile } from "@/lib/ensure-partner";
@@ -84,112 +87,110 @@ export default async function PharmacyDashboardPage() {
 
   return (
     <PortalDashboardShell title="E-Pharmacy Portal" links={pharmacyNavLinks}>
-      <div className="space-y-6">
-        <Card>
-          <div className="flex items-center gap-4">
-            <Avatar src={user?.imageUrl} name={fullName} size="lg" />
-            <div>
-              <p className="text-sm uppercase tracking-[0.2em] text-[var(--accent-cyan)]">Welcome back</p>
-              <h1 className="mt-1 text-3xl font-bold text-[var(--text-primary)]">{fullName}</h1>
-              <div className="mt-2 flex items-center gap-2">
-                <Badge variant="cyan">partner</Badge>
-                {partner?.status === "verified" ? (
-                  <Badge variant="success">Verified</Badge>
-                ) : (
-                  <Badge variant="warning">Pending verification</Badge>
-                )}
-              </div>
+      <div className="space-y-6 max-w-5xl mx-auto">
+        <PageHeader 
+          title={`Welcome back, ${fullName}`}
+          description="Manage inventory, process orders, and view your revenue stream."
+          actions={
+            <div className="flex items-center gap-2">
+              <Badge variant="cyan">Partner</Badge>
+              {partner?.status === "verified" ? (
+                <Badge variant="success">Verified</Badge>
+              ) : (
+                <Badge variant="warning">Pending verification</Badge>
+              )}
             </div>
-          </div>
-        </Card>
+          }
+        />
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <Card className="space-y-2">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--accent-cyan)]/15 text-[var(--accent-cyan)]">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-surface-elevated text-accent-cyan">
                 <Package className="h-5 w-5" />
               </div>
               <div>
-                <p className="text-xs uppercase tracking-[0.2em] text-[var(--text-muted)]">Medicines</p>
-                <p className="text-2xl font-bold text-[var(--text-primary)]">{totalMedicines}</p>
+                <p className="text-xs uppercase tracking-[0.2em] text-muted">Medicines</p>
+                <p className="text-2xl font-bold text-primary">{totalMedicines}</p>
               </div>
             </div>
           </Card>
 
           <Card className="space-y-2">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/15 text-amber-400">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-surface-elevated text-warning">
                 <Clock className="h-5 w-5" />
               </div>
               <div>
-                <p className="text-xs uppercase tracking-[0.2em] text-[var(--text-muted)]">Pending orders</p>
-                <p className="text-2xl font-bold text-[var(--text-primary)]">{pendingOrders}</p>
+                <p className="text-xs uppercase tracking-[0.2em] text-muted">Pending orders</p>
+                <p className="text-2xl font-bold text-primary">{pendingOrders}</p>
               </div>
             </div>
           </Card>
 
           <Card className="space-y-2">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/15 text-emerald-400">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-surface-elevated text-success">
                 <ClipboardList className="h-5 w-5" />
               </div>
               <div>
-                <p className="text-xs uppercase tracking-[0.2em] text-[var(--text-muted)]">Active orders</p>
-                <p className="text-2xl font-bold text-[var(--text-primary)]">{activeOrders}</p>
+                <p className="text-xs uppercase tracking-[0.2em] text-muted">Active orders</p>
+                <p className="text-2xl font-bold text-primary">{activeOrders}</p>
               </div>
             </div>
           </Card>
 
           <Card className="space-y-2">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--accent-gold)]/15 text-[var(--accent-gold)]">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-surface-elevated text-accent-gold">
                 <TrendingUp className="h-5 w-5" />
               </div>
               <div>
-                <p className="text-xs uppercase tracking-[0.2em] text-[var(--text-muted)]">Revenue</p>
-                <p className="text-2xl font-bold text-[var(--text-primary)]">₦{totalRevenue.toLocaleString()}</p>
+                <p className="text-xs uppercase tracking-[0.2em] text-muted">Revenue</p>
+                <p className="text-2xl font-bold text-primary">₦{totalRevenue.toLocaleString()}</p>
               </div>
             </div>
           </Card>
         </div>
 
-        <Card>
-          <div className="mb-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-[var(--accent-cyan)]">Recent orders</p>
-            <h2 className="mt-1 text-xl font-semibold text-[var(--text-primary)]">Latest pharmacy orders</h2>
-          </div>
+        <div className="space-y-4">
+          <SectionHeader 
+            title="Recent orders"
+            description="Latest pharmacy orders"
+          />
 
           {recentOrders.length === 0 ? (
-            <p className="py-8 text-center text-[var(--text-secondary)]">No orders yet. Orders will appear here when patients purchase medicines.</p>
+            <EmptyState 
+              title="No orders yet"
+              description="Orders will appear here when patients purchase medicines."
+              className="py-12"
+            />
           ) : (
-            <div className="space-y-3">
+            <MobileList>
               {recentOrders.map((order) => (
-                <div key={order._id} className="flex items-center justify-between rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--accent-cyan)]/15 text-[var(--accent-cyan)]">
-                      <ClipboardList className="h-4 w-4" />
+                <MobileListItem
+                  key={order._id}
+                  icon={<ClipboardList className="h-5 w-5" />}
+                  title={order.patient_name}
+                  subtitle={new Date(order.created_at).toLocaleDateString("en-NG", { month: "short", day: "numeric", year: "numeric" })}
+                  status={
+                    <div className="flex flex-col items-end gap-1">
+                      <span className="text-sm font-medium text-primary">₦{order.total.toLocaleString()}</span>
+                      <div className="flex gap-1">
+                        <Badge variant={order.payment_status === "paid" ? "success" : "warning"}>
+                          {order.payment_status}
+                        </Badge>
+                        <Badge variant={order.delivery_status === "delivered" ? "success" : "cyan"}>
+                          {order.delivery_status}
+                        </Badge>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-medium text-[var(--text-primary)]">{order.patient_name}</p>
-                      <p className="text-sm text-[var(--text-secondary)]">
-                        {new Date(order.created_at).toLocaleDateString("en-NG", { month: "short", day: "numeric", year: "numeric" })}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-sm font-medium text-[var(--text-primary)]">₦{order.total.toLocaleString()}</span>
-                    <Badge variant={order.payment_status === "paid" ? "success" : "warning"}>
-                      {order.payment_status}
-                    </Badge>
-                    <Badge variant={order.delivery_status === "delivered" ? "success" : "cyan"}>
-                      {order.delivery_status}
-                    </Badge>
-                  </div>
-                </div>
+                  }
+                />
               ))}
-            </div>
+            </MobileList>
           )}
-        </Card>
+        </div>
       </div>
     </PortalDashboardShell>
   );
