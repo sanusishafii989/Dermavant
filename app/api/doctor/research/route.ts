@@ -80,9 +80,27 @@ export async function POST(req: Request) {
     const groqData = await groqResponse.json();
 
     if (!groqResponse.ok) {
-      console.error("[DOCTOR RESEARCH] Groq API error:", groqData);
+      const providerErrorCode = groqData?.error?.code;
+      const providerErrorMessage = groqData?.error?.message;
+      const isCredentialError =
+        groqResponse.status === 401 ||
+        groqResponse.status === 403 ||
+        providerErrorCode === "expired_api_key" ||
+        providerErrorCode === "invalid_api_key";
+
+      console.error("[DOCTOR RESEARCH] Groq API error:", {
+        status: groqResponse.status,
+        code: providerErrorCode,
+        message: providerErrorMessage,
+      });
+
       return NextResponse.json(
-        { ok: false, error: groqData?.error?.message || "Groq API error", details: groqData },
+        {
+          ok: false,
+          error: isCredentialError
+            ? "The research service is temporarily unavailable. Please contact support."
+            : "The research service could not process your request.",
+        },
         { status: 502 }
       );
     }
