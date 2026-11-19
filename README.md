@@ -153,7 +153,7 @@ Visit `http://localhost:3000`. Confirm the terminal reports the app is running o
 
 ```env
 # Database
-MONGODB_URI=                     # MongoDB Atlas standard (non-SRV) connection string
+MONGODB_URI=
 
 # Authentication (Clerk)
 CLERK_SECRET_KEY=
@@ -163,17 +163,17 @@ NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
 GROQ_API_KEY=
 
 # Payments (Paystack — TEST keys only in development)
-PAYSTACK_SECRET_KEY=              # sk_test_...
-PAYSTACK_PUBLIC_KEY=              # pk_test_...
+PAYSTACK_SECRET_KEY=
+PAYSTACK_PUBLIC_KEY=
 
 # Dev-only test data seeding
-DEV_SEED_ROLES=true
+DEV_SEED_ROLES=
 DEV_SEED_SECRET=
 DOCTOR_CLERK_ID=
 PATIENT_CLERK_ID=
 PARTNER_CLERK_ID=
 ADMIN_CLERK_ID=
-UPDATE_CLERK_METADATA=true
+UPDATE_CLERK_METADATA=
 ```
 
 > ⚠️ **Note on `MONGODB_URI`:** this project uses the **standard (non-SRV)** connection string format (`mongodb://...` with explicit shard hosts), not `mongodb+srv://`. This was a deliberate fix for a network-specific DNS issue. If your network handles SRV lookups fine, `mongodb+srv://` may also work for you — but don't change the shared default without checking with the team first.
