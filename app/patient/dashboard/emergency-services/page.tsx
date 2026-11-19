@@ -15,7 +15,7 @@ const FAQS = [
   },
   {
     q: "How does the AI dermatology triage work?",
-    a: "Open 'Start AI Consultation' from your dashboard. Describe your symptoms in detail. The AI will analyze them and provide possible conditions with confidence scores. Always follow up with a licensed doctor for diagnosis.",
+    a: "Open 'Start AI Consultation' from your dashboard. Describe your symptoms and optionally upload a skin image. The AI provides preliminary possible explanations; it does not diagnose, and its estimates are not validated probabilities. Follow up with a licensed doctor for diagnosis.",
   },
   {
     q: "How do I order medicine from the e-pharmacy?",

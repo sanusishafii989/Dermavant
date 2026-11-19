@@ -1,7 +1,16 @@
 import { auth } from "@clerk/nextjs/server";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
 import { User, ChatHistory } from "@/models";
+
+const AI_PROVIDER = (process.env.AI_PROVIDER || "gemini").trim().toLowerCase();
+const GEMINI_MODEL = process.env.GEMINI_MODEL?.trim() || "gemini-3.5-flash-lite";
+const GROQ_MODEL = process.env.GROQ_MODEL?.trim() || "openai/gpt-oss-120b";
+const MAX_IMAGE_BYTES = 3 * 1024 * 1024;
+
+type ResearchMessage = { role: "user" | "assistant"; content: string };
+type ResearchImage = { mimeType: "image/jpeg" | "image/png" | "image/webp"; data: string };
 
 const RESEARCH_SYSTEM_PROMPT = `You are a medical research assistant for licensed healthcare professionals on the Aetheris Health platform.
 
@@ -15,34 +24,100 @@ Your role:
 - If a topic is outside your knowledge or requires real-time data (e.g., breaking drug recalls), state the limitation.
 
 Format your responses with clear headings, bullet points, and concise paragraphs. Use markdown for structure.
-Always include a brief disclaimer that the information is AI-generated and should be verified against primary sources before clinical decision-making.`;
+Never invent citations, study titles, or URLs. When you cannot verify a reference, say so and suggest where the doctor can check.
+Do not treat this chat as a patient-specific diagnosis. Always include a brief disclaimer that the information is AI-generated and should be verified against primary sources before clinical decision-making.`;
+
+function parseImage(value: unknown): ResearchImage | null {
+  if (value === undefined || value === null || value === "") return null;
+  if (typeof value !== "string") throw new Error("Upload a JPEG, PNG, or WebP image.");
+  const match = value.match(/^data:(image\/(?:jpeg|png|webp));base64,([A-Za-z0-9+/]+={0,2})$/i);
+  if (!match) throw new Error("Upload a JPEG, PNG, or WebP image.");
+  const bytes = Buffer.from(match[2], "base64");
+  if (bytes.byteLength === 0 || bytes.byteLength > MAX_IMAGE_BYTES) throw new Error("Image must be 3 MB or smaller.");
+  return { mimeType: match[1].toLowerCase() as ResearchImage["mimeType"], data: match[2] };
+}
+
+async function generateGeminiAnswer(messages: ResearchMessage[], image: ResearchImage | null) {
+  const apiKey = process.env.GEMINI_API_KEY?.trim() || process.env.GOOGLE_API_KEY?.trim();
+  if (!apiKey) throw new Error("Gemini is not configured.");
+  const client = new GoogleGenerativeAI(apiKey);
+  const model = client.getGenerativeModel({
+    model: GEMINI_MODEL,
+    systemInstruction: image
+      ? `${RESEARCH_SYSTEM_PROMPT}\nFor an attached image, describe observable features and limitations first. Do not identify a definitive diagnosis from an image alone.`
+      : RESEARCH_SYSTEM_PROMPT,
+    generationConfig: { temperature: 0.3, maxOutputTokens: 1200 },
+  });
+  const history = messages.slice(0, -1).map((message) => ({
+    role: message.role === "assistant" ? "model" : "user",
+    parts: [{ text: message.content }],
+  }));
+  const chat = model.startChat({ history });
+  const lastMessage = messages[messages.length - 1];
+  const parts = image
+    ? [{ text: lastMessage.content }, { inlineData: { mimeType: image.mimeType, data: image.data } }]
+    : [{ text: lastMessage.content }];
+  const result = await chat.sendMessage(parts);
+  return result.response.text();
+}
+
+async function generateGroqAnswer(messages: ResearchMessage[]) {
+  const apiKey = process.env.GROQ_API_KEY?.trim();
+  if (!apiKey) throw new Error("Groq is not configured.");
+  const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: GROQ_MODEL,
+      temperature: 0.3,
+      max_tokens: 1200,
+      messages: [
+        { role: "system", content: RESEARCH_SYSTEM_PROMPT },
+        ...messages.map((message) => ({ role: message.role, content: message.content })),
+      ],
+    }),
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error("The research service could not process your request.");
+  return String(data?.choices?.[0]?.message?.content || "");
+}
 
 export async function POST(req: Request) {
   try {
-    const GROQ_API_KEY = process.env.GROQ_API_KEY?.trim();
-    const GROQ_MODEL = process.env.GROQ_MODEL?.trim() || "openai/gpt-oss-120b";
-
-    if (!GROQ_API_KEY) {
-      return NextResponse.json(
-        { ok: false, error: "Groq API key is not configured." },
-        { status: 500 }
-      );
-    }
-
     const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
+    if (!userId) return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
+
+    if (AI_PROVIDER !== "gemini" && AI_PROVIDER !== "groq") {
+      return NextResponse.json({ ok: false, error: "AI provider is not configured correctly." }, { status: 500 });
     }
 
     const body = await req.json();
-    const messages = body.messages;
+    const rawMessages = body.messages;
     const conversationId = body.conversationId;
+    if (!Array.isArray(rawMessages) || rawMessages.length === 0 || rawMessages.length > 40) {
+      return NextResponse.json({ ok: false, error: "Provide between 1 and 40 chat messages." }, { status: 400 });
+    }
+    const messages = rawMessages as ResearchMessage[];
+    if (messages.some((message) =>
+      !message || !["user", "assistant"].includes(message.role) || typeof message.content !== "string" || message.content.length > 5000
+    ) || messages[messages.length - 1].role !== "user") {
+      return NextResponse.json({ ok: false, error: "The research message format is invalid." }, { status: 400 });
+    }
 
-    if (!Array.isArray(messages) || messages.length === 0) {
-      return NextResponse.json(
-        { ok: false, error: "messages array is required" },
-        { status: 400 }
-      );
+    let image: ResearchImage | null;
+    try {
+      image = parseImage(body.image);
+    } catch (error) {
+      return NextResponse.json({ ok: false, error: error instanceof Error ? error.message : "Invalid image upload." }, { status: 400 });
+    }
+    if (AI_PROVIDER === "groq" && image) {
+      return NextResponse.json({ ok: false, error: "Image review requires Gemini. Set AI_PROVIDER=gemini to analyze images." }, { status: 400 });
+    }
+    if (AI_PROVIDER === "gemini" && !process.env.GEMINI_API_KEY?.trim() && !process.env.GOOGLE_API_KEY?.trim()) {
+      return NextResponse.json({ ok: false, error: "Gemini is not configured. Add GEMINI_API_KEY to the server environment.", retryable: false }, { status: 503 });
+    }
+    if (AI_PROVIDER === "groq" && !process.env.GROQ_API_KEY?.trim()) {
+      return NextResponse.json({ ok: false, error: "Groq is not configured. Add GROQ_API_KEY to the server environment.", retryable: false }, { status: 503 });
     }
 
     await connectDB();
@@ -55,69 +130,19 @@ export async function POST(req: Request) {
       );
     }
 
-    const groqMessages: any[] = [
-      { role: "system", content: RESEARCH_SYSTEM_PROMPT },
-      ...messages.map((msg: { role: string; content: string }) => ({
-        role: msg.role,
-        content: msg.content,
-      })),
-    ];
-
-    const groqResponse = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${GROQ_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: GROQ_MODEL,
-        temperature: 0.3,
-        max_tokens: 1200,
-        messages: groqMessages,
-      }),
-    });
-
-    const groqData = await groqResponse.json();
-
-    if (!groqResponse.ok) {
-      const providerErrorCode = groqData?.error?.code;
-      const providerErrorMessage = groqData?.error?.message;
-      const isCredentialError =
-        groqResponse.status === 401 ||
-        groqResponse.status === 403 ||
-        providerErrorCode === "expired_api_key" ||
-        providerErrorCode === "invalid_api_key";
-
-      console.error("[DOCTOR RESEARCH] Groq API error:", {
-        status: groqResponse.status,
-        code: providerErrorCode,
-        message: providerErrorMessage,
-      });
-
-      return NextResponse.json(
-        {
-          ok: false,
-          error: isCredentialError
-            ? "The research service is temporarily unavailable. Please contact support."
-            : "The research service could not process your request.",
-          retryable: !isCredentialError,
-        },
-        { status: 502 }
-      );
-    }
-
-    const responseText = groqData?.choices?.[0]?.message?.content || "";
+    const responseText = AI_PROVIDER === "gemini"
+      ? await generateGeminiAnswer(messages, image)
+      : await generateGroqAnswer(messages);
 
     if (!responseText) {
-      return NextResponse.json(
-        { ok: false, error: "Groq returned an empty response" },
-        { status: 502 }
-      );
+      return NextResponse.json({ ok: false, error: "The research service returned an empty response.", retryable: true }, { status: 502 });
     }
 
     // Save chat history
     const lastUserMsg = messages[messages.length - 1];
     const title = lastUserMsg?.content?.slice(0, 50) || "Research conversation";
+    const provider = AI_PROVIDER;
+    const model = AI_PROVIDER === "gemini" ? GEMINI_MODEL : GROQ_MODEL;
 
     if (conversationId) {
       // Append to existing conversation
@@ -150,15 +175,17 @@ export async function POST(req: Request) {
         ok: true,
         response: responseText,
         conversationId: newChat?._id?.toString?.() || newChat?._id,
+        provider,
+        model,
       });
     }
 
-    return NextResponse.json({ ok: true, response: responseText, conversationId });
+    return NextResponse.json({ ok: true, response: responseText, conversationId, provider, model });
   } catch (error: any) {
     console.error("[DOCTOR RESEARCH] Error:", error?.message || String(error));
     return NextResponse.json(
-      { ok: false, error: error?.message || "Failed to process research query" },
-      { status: 500 }
+      { ok: false, error: "The research service could not process your request.", retryable: true },
+      { status: 502 }
     );
   }
 }

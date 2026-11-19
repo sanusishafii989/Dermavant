@@ -207,17 +207,31 @@ export function generateMedicalHistoryPDF({ patientName, vitals, items }: Export
         doc.setFont("helvetica", "bold");
         doc.setFontSize(8.5);
         doc.setTextColor(180, 83, 9);
-        doc.text("Diagnosis:", margin + 4, y);
+        doc.text(item.category === "ai_triage" ? "Possible explanations (AI triage):" : "Diagnosis:", margin + 4, y);
         y += 4;
 
         doc.setFont("helvetica", "normal");
         doc.setTextColor(51, 65, 85);
         item.diagnosis.forEach((d) => {
-          const diagStr = typeof d === "string" ? d : `${d.condition} (${(d.confidence * 100).toFixed(0)}% confidence)`;
+          const diagStr = typeof d === "string"
+            ? d
+            : item.category === "ai_triage"
+              ? `${d.condition} (AI estimate: ${(d.confidence * 100).toFixed(0)}%)`
+              : `${d.condition} (${(d.confidence * 100).toFixed(0)}% confidence)`;
           checkPageBreak(4);
           doc.text(`• ${diagStr}`, margin + 8, y);
           y += 4;
         });
+        if (item.category === "ai_triage") {
+          doc.setFont("helvetica", "italic");
+          doc.setFontSize(7.5);
+          doc.setTextColor(100, 116, 139);
+          const note = "AI estimates are model-generated and are not validated diagnostic probabilities.";
+          const wrappedNote = doc.splitTextToSize(note, contentWidth - 12);
+          checkPageBreak(wrappedNote.length * 3.5);
+          doc.text(wrappedNote, margin + 8, y);
+          y += wrappedNote.length * 3.5;
+        }
       }
 
       // Prescriptions

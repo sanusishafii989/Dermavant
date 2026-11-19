@@ -42,7 +42,7 @@ async function postResearchMessage(payload: object) {
   throw new Error("Research service did not respond");
 }
 
-export function ResearchChat() {
+export function ResearchChat({ aiProvider }: { aiProvider: "gemini" | "groq" }) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -126,12 +126,22 @@ export function ResearchChat() {
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (!file.type.startsWith("image/")) {
-      setError("Please upload an image file");
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+      setError("Please upload a JPEG, PNG, or WebP image.");
+      e.target.value = "";
+      return;
+    }
+    if (file.size > 3 * 1024 * 1024) {
+      setError("Please choose an image that is 3 MB or smaller.");
+      e.target.value = "";
       return;
     }
     const reader = new FileReader();
-    reader.onload = () => setSelectedImage(reader.result as string);
+    reader.onload = () => {
+      setError("");
+      setSelectedImage(reader.result as string);
+    };
+    reader.onerror = () => setError("The image could not be opened. Please choose another file.");
     reader.readAsDataURL(file);
   };
 
@@ -154,7 +164,7 @@ export function ResearchChat() {
               <Stethoscope className="h-6 w-6" />
             </div>
             <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-[var(--accent-cyan)]">Research assistant</p>
+              <p className="text-xs uppercase tracking-[0.2em] text-[var(--accent-cyan)]">Research assistant · {aiProvider === "gemini" ? "Gemini" : "Groq"}</p>
               <h1 className="mt-1 text-xl font-semibold text-[var(--text-primary)]">Medical research chat</h1>
             </div>
           </div>
@@ -195,15 +205,15 @@ export function ResearchChat() {
                 {ttsEnabled ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
               </button>
             ) : null}
-            {/* Image upload */}
-            <button
+            {/* Gemini image review */}
+            {aiProvider === "gemini" ? <button
               onClick={() => fileInputRef.current?.click()}
               className="flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-secondary)] transition-colors hover:text-[var(--accent-cyan)]"
               title="Upload medical image"
             >
               <ImageIcon className="h-5 w-5" />
-            </button>
-            <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+            </button> : null}
+            <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp" onChange={handleImageUpload} className="hidden" />
           </div>
         </div>
         {isListening ? (
@@ -301,8 +311,8 @@ export function ResearchChat() {
       {selectedImage ? (
         <div className="flex items-center gap-3 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-3">
           <img src={selectedImage} alt="Selected" className="h-16 w-16 rounded-xl object-cover" />
-          <span className="flex-1 text-sm text-[var(--text-secondary)]">Image ready to send</span>
-          <button onClick={() => setSelectedImage(null)} className="text-[var(--text-muted)] hover:text-rose-500">
+          <span className="flex-1 text-sm text-[var(--text-secondary)]">Image ready for Gemini · up to 3 MB</span>
+          <button onClick={() => { setSelectedImage(null); if (fileInputRef.current) fileInputRef.current.value = ""; }} className="text-[var(--text-muted)] hover:text-rose-500" aria-label="Remove uploaded image">
             <X className="h-4 w-4" />
           </button>
         </div>

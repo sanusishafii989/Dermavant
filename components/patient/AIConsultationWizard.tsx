@@ -19,9 +19,15 @@ type ConsultationResult = {
   followUpGuidance: string;
   confidenceScore: number;
   needsImmediateProfessionalCare: boolean;
+  provider: "gemini" | "groq";
+  model: string;
+  includedImage: boolean;
 };
 
-export function AIConsultationWizard() {
+const MAX_IMAGE_BYTES = 3 * 1024 * 1024;
+const SUPPORTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
+
+export function AIConsultationWizard({ aiProvider }: { aiProvider: "gemini" | "groq" }) {
   const [symptoms, setSymptoms] = useState("");
   const [result, setResult] = useState<ConsultationResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -49,7 +55,7 @@ export function AIConsultationWizard() {
       const response = await fetch("/api/ai/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ symptoms: trimmed || "Please analyze the uploaded skin image.", image: selectedImage || undefined }),
+        body: JSON.stringify({ symptoms: trimmed, image: selectedImage || undefined }),
       });
 
       const contentType = response.headers.get("content-type") || "";
@@ -79,11 +85,26 @@ export function AIConsultationWizard() {
     const file = e.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith("image/")) {
-      setFeedback("Please upload an image file");
+      setFeedback("Please choose a JPEG, PNG, or WebP image.");
+      e.target.value = "";
+      return;
+    }
+    if (!SUPPORTED_IMAGE_TYPES.includes(file.type)) {
+      setFeedback("Gemini image analysis supports JPEG, PNG, or WebP images.");
+      e.target.value = "";
+      return;
+    }
+    if (file.size > MAX_IMAGE_BYTES) {
+      setFeedback("Please choose an image that is 3 MB or smaller.");
+      e.target.value = "";
       return;
     }
     const reader = new FileReader();
-    reader.onload = () => setSelectedImage(reader.result as string);
+    reader.onload = () => {
+      setFeedback(null);
+      setSelectedImage(reader.result as string);
+    };
+    reader.onerror = () => setFeedback("The image could not be opened. Please choose another file.");
     reader.readAsDataURL(file);
   };
 
@@ -138,15 +159,15 @@ export function AIConsultationWizard() {
                   {ttsEnabled ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
                 </button>
               ) : null}
-              <button
+              {aiProvider === "gemini" ? <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 className="flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-secondary)] transition-colors hover:text-[var(--accent-cyan)]"
                 title="Upload skin image"
               >
                 <ImageIcon className="h-5 w-5" />
-              </button>
-              <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+              </button> : null}
+              <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp" onChange={handleImageUpload} className="hidden" />
             </div>
           </div>
 
@@ -163,9 +184,9 @@ export function AIConsultationWizard() {
               <img src={selectedImage} alt="Skin condition" className="h-24 w-24 rounded-xl object-cover" />
               <div className="flex-1">
                 <p className="text-sm font-medium text-[var(--text-primary)]">Skin image uploaded</p>
-                <p className="text-xs text-[var(--text-secondary)]">The AI will analyze this image alongside your symptoms.</p>
+                <p className="text-xs text-[var(--text-secondary)]">Gemini will review this image with your symptom description. JPEG, PNG, or WebP · up to 3 MB.</p>
               </div>
-              <button type="button" onClick={() => setSelectedImage(null)} className="text-[var(--text-muted)] hover:text-rose-500">
+              <button type="button" onClick={() => { setSelectedImage(null); if (fileInputRef.current) fileInputRef.current.value = ""; }} className="text-[var(--text-muted)] hover:text-rose-500" aria-label="Remove uploaded image">
                 <X className="h-5 w-5" />
               </button>
             </div>
@@ -187,12 +208,12 @@ export function AIConsultationWizard() {
 
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <Button type="submit" variant="gold" size="lg" disabled={isLoading}>
-              {isLoading ? "Analyzing…" : "Start dermatology consultation"}
+              {isLoading ? (selectedImage ? "Analyzing image…" : "Preparing triage report…") : "Start AI-assisted triage"}
             </Button>
             <div className="flex flex-wrap items-center gap-3 text-sm text-[var(--text-secondary)]">
               <span className="flex items-center gap-1"><Mic className="h-3.5 w-3.5" /> Voice input</span>
               <span className="flex items-center gap-1"><Volume2 className="h-3.5 w-3.5" /> Voice output</span>
-              <span className="flex items-center gap-1"><ImageIcon className="h-3.5 w-3.5" /> Image upload</span>
+              {aiProvider === "gemini" ? <span className="flex items-center gap-1"><ImageIcon className="h-3.5 w-3.5" /> Image upload</span> : null}
             </div>
           </div>
 
@@ -207,8 +228,22 @@ export function AIConsultationWizard() {
       {result ? (
         <Card className="max-w-5xl space-y-6">
           <div>
-            <p className="text-xs uppercase tracking-[0.32em] text-[var(--accent-cyan)]">Consultation result</p>
-            <h2 className="mt-2 text-2xl font-semibold text-[var(--text-primary)]">Dermatology summary</h2>
+            <div className="flex flex-wrap items-center gap-3">
+              <p className="text-xs uppercase tracking-[0.32em] text-[var(--accent-cyan)]">AI-assisted triage report</p>
+              {result.provider === "gemini" ? (
+                <span className="rounded-full border border-[#8ab4f8]/25 bg-[#8ab4f8]/10 px-3 py-1 text-xs font-medium text-[#8ab4f8]">
+                  Powered by Gemini · {result.model}
+                </span>
+              ) : (
+                <span className="rounded-full border border-[var(--border)] px-3 py-1 text-xs font-medium text-[var(--text-secondary)]">
+                  Powered by Groq · {result.model}
+                </span>
+              )}
+            </div>
+            <h2 className="mt-2 text-2xl font-semibold text-[var(--text-primary)]">Preliminary skin assessment</h2>
+            <p className="mt-2 text-sm text-[var(--text-secondary)]">
+              {result.includedImage ? "The uploaded image and symptom description were sent for analysis." : "This report is based on the symptom description only."}
+            </p>
           </div>
 
           <div className="space-y-4">
@@ -218,14 +253,11 @@ export function AIConsultationWizard() {
             </div>
 
             <div className="space-y-4">
-              <p className="text-sm uppercase tracking-[0.24em] text-[var(--accent-cyan)]">Possible dermatology conditions</p>
+              <p className="text-sm uppercase tracking-[0.24em] text-[var(--accent-cyan)]">Possible explanations · not a diagnosis</p>
               {result.possibleConditions.map((condition) => (
                 <div key={condition.condition} className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
                   <div className="flex items-center justify-between gap-4">
                     <p className="text-lg font-semibold text-[var(--text-primary)]">{condition.condition}</p>
-                    <span className="rounded-full bg-[var(--accent-cyan)]/10 px-3 py-1 text-xs uppercase tracking-[0.24em] text-[var(--accent-cyan)]">
-                      {(condition.confidence * 100).toFixed(0)}%
-                    </span>
                   </div>
                   <p className="mt-2 text-sm text-[var(--text-primary)]">{condition.reasoning}</p>
                 </div>
@@ -234,9 +266,9 @@ export function AIConsultationWizard() {
 
             <div className="grid gap-4 md:grid-cols-2">
               <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
-                <p className="text-sm uppercase tracking-[0.24em] text-[var(--accent-cyan)]">Confidence score</p>
+                <p className="text-sm uppercase tracking-[0.24em] text-[var(--accent-cyan)]">AI estimate</p>
                 <p className="mt-2 text-3xl font-semibold text-[var(--text-primary)]">{(result.confidenceScore * 100).toFixed(0)}%</p>
-                <p className="mt-1 text-sm text-[var(--text-secondary)]">Based on the symptom description.</p>
+                <p className="mt-1 text-sm text-[var(--text-secondary)]">A model-generated estimate, not a validated probability or diagnosis.</p>
               </div>
               <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
                 <p className="text-sm uppercase tracking-[0.24em] text-[var(--accent-cyan)]">Immediate care</p>
@@ -267,10 +299,10 @@ export function AIConsultationWizard() {
           <div>
             <p className="text-sm font-medium text-[var(--text-primary)]">Medical Disclaimer</p>
             <p className="mt-1 text-xs text-[var(--text-secondary)]">
-              The AI dermatological triage tool provides preliminary assessments only and is not a medical diagnosis.
-              It does not replace consultation with a licensed healthcare professional. Always seek professional medical
-              advice for diagnosis and treatment. Aetheris Health is not liable for clinical decisions made based solely
-              on AI triage results. This service is intended for adults 18 years and older.
+              This AI-powered demonstration provides preliminary information only. It cannot diagnose a skin condition,
+              assess an image as reliably as a clinician, or replace care from a licensed healthcare professional. AI estimates
+              may be wrong or incomplete. Seek professional advice for diagnosis and treatment, and urgent care for severe or
+              rapidly worsening symptoms. This service is intended for adults 18 years and older.
             </p>
           </div>
         </div>

@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { RegisterSW } from "@/components/pwa/RegisterSW";
+import { DevFestBanner } from "@/components/shared/DevFestBanner";
 import "leaflet/dist/leaflet.css";
 import "./globals.css";
 
@@ -16,10 +17,16 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const devFestMode = process.env.NEXT_PUBLIC_DEVFEST_MODE !== "false";
+
 export const metadata: Metadata = {
-  title: "Aetheris Health — AI-Powered Digital Healthcare Ecosystem",
+  title: devFestMode
+    ? "Aetheris Health — GDG Yola DevFest Demo"
+    : "Aetheris Health — AI-Powered Digital Healthcare Ecosystem",
   description:
-    "Connecting patients to instant dermatological triage, licensed doctors, and verified medicine — all in one platform.",
+    devFestMode
+      ? "A community demo for GDG Yola DevFest, featuring Gemini-powered visual skin triage."
+      : "Connecting patients to instant dermatological triage, licensed doctors, and verified medicine — all in one platform.",
   manifest: "/manifest.json",
   icons: {
     icon: [
@@ -31,7 +38,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "Aetheris Health",
+    title: devFestMode ? "Aetheris DevFest" : "Aetheris Health",
   },
 };
 
@@ -68,6 +75,7 @@ export default function RootLayout({
         </head>
         <body className="min-h-full flex flex-col bg-background text-primary">
           <ThemeProvider>
+            <DevFestBanner />
             {children}
             <RegisterSW />
           </ThemeProvider>

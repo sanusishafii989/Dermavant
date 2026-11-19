@@ -140,7 +140,9 @@ export function MedicalHistoryTimeline({ items }: MedicalHistoryTimelineProps) {
                 {/* Diagnosis Breakdown */}
                 {item.diagnosis && item.diagnosis.length > 0 && (
                   <div className="mt-3">
-                    <span className="font-semibold text-[var(--accent-gold)] uppercase tracking-wider text-[10px]">Diagnosis Breakdown:</span>
+                    <span className="font-semibold text-[var(--accent-gold)] uppercase tracking-wider text-[10px]">
+                      {item.category === "ai_triage" ? "Possible Explanations (AI Triage):" : "Diagnosis Breakdown:"}
+                    </span>
                     <div className="mt-1.5 space-y-1.5">
                       {Array.isArray(item.diagnosis) &&
                         item.diagnosis.map((d, idx) => {
@@ -155,11 +157,18 @@ export function MedicalHistoryTimeline({ items }: MedicalHistoryTimelineProps) {
                           return (
                             <div key={idx} className="flex items-center justify-between rounded-md bg-[var(--bg-card)] px-3 py-1.5 text-xs">
                               <span className="font-medium text-[var(--text-primary)]">{d.condition}</span>
-                              <span className="text-[var(--accent-cyan)] font-semibold">{(d.confidence * 100).toFixed(0)}% Confidence</span>
+                              <span className="text-[var(--accent-cyan)] font-semibold">
+                                {item.category === "ai_triage" ? `AI estimate: ${(d.confidence * 100).toFixed(0)}%` : `${(d.confidence * 100).toFixed(0)}% confidence`}
+                              </span>
                             </div>
                           );
                         })}
                     </div>
+                    {item.category === "ai_triage" ? (
+                      <p className="mt-2 text-[10px] text-[var(--text-muted)]">
+                        AI estimates are not validated diagnostic probabilities.
+                      </p>
+                    ) : null}
                   </div>
                 )}
 

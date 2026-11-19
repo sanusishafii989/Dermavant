@@ -69,7 +69,7 @@ Each portal has its own login/signup flow and is strictly access-controlled — 
 | Backend | Next.js API Routes (Node.js) |
 | Database | MongoDB (via MongoDB Atlas) + Mongoose ODM |
 | Authentication | Clerk (role-based access control) |
-| AI | Groq API (dermatology-focused triage; previously Gemini — see [Migration Notes](#build-status)) |
+| AI | Gemini API (multimodal skin triage and doctor research chat; Groq is an optional text-only fallback) |
 | Payments | Paystack (card + bank transfer, Nigeria) |
 | Maps (planned) | OpenStreetMap / Leaflet |
 
@@ -128,7 +128,7 @@ Each role (`patient`, `doctor`, `partner`, `admin`) has a dedicated collection l
 - Node.js (LTS version)
 - A MongoDB Atlas account and cluster
 - A Clerk account (for authentication)
-- A Groq API key (for AI consultation)
+- A Gemini API key from Google AI Studio (for the DevFest AI consultation demo)
 - A Paystack account with test-mode API keys
 
 ### Installation
@@ -159,8 +159,17 @@ MONGODB_URI=
 CLERK_SECRET_KEY=
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
 
-# AI (Groq)
+# Temporary GDG Yola DevFest demo
+NEXT_PUBLIC_DEVFEST_MODE=true
+
+# AI (Gemini supports image + text; Groq can be selected for text-only fallback)
+AI_PROVIDER=gemini
+GEMINI_API_KEY=
+GEMINI_MODEL=gemini-3.5-flash-lite
+GEMINI_EMBEDDING_MODEL=gemini-embedding-001
+# Optional fallback:
 GROQ_API_KEY=
+GROQ_MODEL=openai/gpt-oss-120b
 
 # Payments (Paystack — TEST keys only in development)
 PAYSTACK_SECRET_KEY=
@@ -186,7 +195,9 @@ UPDATE_CLERK_METADATA=
 
 Full, current, honest status of every feature — see the companion documents in the repo root:
 - **`AETHERIS_HEALTH_Project_Roadmap.md`** — plain-language breakdown of every portal, feature, and technology choice, for the whole team including non-technical stakeholders.
-- **`AETHERIS_HEALTH_Team_Handoff.md`** — detailed technical status, environment setup, and a record of debugging history (notably the AI provider migration from Gemini to Groq, and the local dev environment fixes around MongoDB Atlas connectivity).
+- **`AETHERIS_HEALTH_Team_Handoff.md`** — detailed technical status, environment setup, and project debugging history.
+
+For the temporary festival presentation, see [`DEVFEST_TEMPORARY_SETUP.md`](./DEVFEST_TEMPORARY_SETUP.md) for setup and rollback instructions.
 
 **Quick summary:**
 | Area | Status |
@@ -195,7 +206,7 @@ Full, current, honest status of every feature — see the companion documents in
 | Patient dashboard | ✅ Done |
 | Doctor booking flow (end-to-end, DB-verified) | ✅ Done |
 | Paystack payment integration | ✅ Done, verified (success + failure paths) |
-| AI dermatology consultation | ✅ In progress (Ahmed) |
+| AI dermatology consultation | 🛠 Gemini text and image demo path implemented; deployment needs Gemini configuration |
 | E-Pharmacy marketplace | ⬜ Not started |
 | Doctor/Partner/Admin full feature sets | ⬜ Not started |
 | Telemedicine (video/voice calling) | ⬜ Not started, provider not yet chosen |

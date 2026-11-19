@@ -7,6 +7,10 @@ import { Button } from "@/components/ui/Button";
 import { AIConsultationWizard } from "@/components/patient/AIConsultationWizard";
 import { Brain, History, ChevronRight, AlertCircle } from "lucide-react";
 
+interface AIConsultationTabsProps {
+  aiProvider: "gemini" | "groq";
+}
+
 interface AIReport {
   _id: string;
   report_id: string;
@@ -23,7 +27,7 @@ interface AIReport {
   generated_at: string;
 }
 
-export function AIConsultationTabs() {
+export function AIConsultationTabs({ aiProvider }: AIConsultationTabsProps) {
   const [activeTab, setActiveTab] = useState<"new" | "history">("new");
   const [reports, setReports] = useState<AIReport[]>([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
@@ -84,7 +88,7 @@ export function AIConsultationTabs() {
 
       {/* New consultation tab */}
       {activeTab === "new" ? (
-        <AIConsultationWizard />
+        <AIConsultationWizard aiProvider={aiProvider} />
       ) : (
         /* History tab */
         <div className="space-y-4">
@@ -120,11 +124,15 @@ export function AIConsultationTabs() {
                 <div key={i} className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
                   <div className="flex items-center justify-between gap-4">
                     <p className="font-semibold text-[var(--text-primary)]">{d.condition}</p>
-                    <Badge variant="cyan">{(d.confidence * 100).toFixed(0)}% confidence</Badge>
+                    <Badge variant="cyan">AI estimate: {(d.confidence * 100).toFixed(0)}%</Badge>
                   </div>
                   <p className="mt-2 text-sm text-[var(--text-secondary)]">{d.reasoning}</p>
                 </div>
               ))}
+
+              <p className="text-xs text-[var(--text-muted)]">
+                AI estimates are model-generated and are not validated diagnostic probabilities.
+              </p>
 
               {selectedReport.recommendation ? (
                 <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
@@ -163,7 +171,7 @@ export function AIConsultationTabs() {
                   {" — "}
                   {report.diagnosis?.[0]?.condition || "Analysis completed"}
                   {" — "}
-                  {(report.confidence_score * 100).toFixed(0)}% confidence
+                  AI triage estimate
                 </p>
               </Card>
             ))
