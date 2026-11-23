@@ -2,9 +2,6 @@
 
 **AI-Powered Digital Healthcare Ecosystem** — connecting patients to instant dermatological triage, licensed doctors, and verified medicine, all in one platform.
 
-Built by **Danhaire Medical Services** | Founder: Ibrahim Hussaini Danhaire
-NextGen Innovation Challenge 2026 — National Showcase, Abuja
-
 ---
 
 ## 📋 Table of Contents
