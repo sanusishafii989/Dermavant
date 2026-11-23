@@ -1,6 +1,13 @@
+"use client";
+
 import { Sparkles } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 export function DevFestBanner() {
+  const pathname = usePathname();
+
+  // Keep the public landing page focused on the Aetheris Health brand.
+  if (pathname === "/") return null;
   if (process.env.NEXT_PUBLIC_DEVFEST_MODE === "false") return null;
   const usingGroq = process.env.AI_PROVIDER?.trim().toLowerCase() === "groq";
 
