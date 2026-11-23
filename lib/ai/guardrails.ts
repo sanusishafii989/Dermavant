@@ -1,6 +1,6 @@
-import { SchemaType, type ObjectSchema } from "@google/generative-ai";
+import { Type, type Schema } from "@google/genai";
 
-export type DermatologyPossibleCondition = {
+export type PossibleCondition = {
   condition: string;
   confidence: number;
   reasoning: string;
@@ -8,57 +8,47 @@ export type DermatologyPossibleCondition = {
 
 export type DermatologyResponse = {
   clinicalSummary: string;
-  possibleConditions: DermatologyPossibleCondition[];
+  possibleConditions: PossibleCondition[];
   recommendedNextSteps: string;
   followUpGuidance: string;
   confidenceScore: number;
   needsImmediateProfessionalCare: boolean;
 };
 
-export function createDermatologyResponseSchema(): ObjectSchema {
+export function createDermatologyResponseSchema(): Schema {
   return {
-    type: SchemaType.OBJECT,
+    type: Type.OBJECT,
     properties: {
       clinicalSummary: {
-        type: SchemaType.STRING,
-        description: "Short dermatology summary for the patient",
+        type: Type.STRING,
+        description: "Summary of reported skin symptoms and visible features",
       },
       possibleConditions: {
-        type: SchemaType.ARRAY,
-        minItems: 1,
+        type: Type.ARRAY,
         items: {
-          type: SchemaType.OBJECT,
+          type: Type.OBJECT,
           properties: {
-            condition: {
-              type: SchemaType.STRING,
-              description: "Likely dermatological condition name",
-            },
-            confidence: {
-              type: SchemaType.NUMBER,
-              description: "Confidence score between 0.0 and 1.0",
-            },
-            reasoning: {
-              type: SchemaType.STRING,
-              description: "Short reasoning for why this condition is possible",
-            },
+            condition: { type: Type.STRING },
+            confidence: { type: Type.NUMBER },
+            reasoning: { type: Type.STRING },
           },
           required: ["condition", "confidence", "reasoning"],
         },
       },
       recommendedNextSteps: {
-        type: SchemaType.STRING,
-        description: "Recommended next steps for the patient",
+        type: Type.STRING,
+        description: "Recommended non-prescriptive next steps for the patient",
       },
       followUpGuidance: {
-        type: SchemaType.STRING,
+        type: Type.STRING,
         description: "Follow-up guidance for monitoring the condition",
       },
       confidenceScore: {
-        type: SchemaType.NUMBER,
-        description: "Overall confidence score from 0.0 to 1.0",
+        type: Type.NUMBER,
+        description: "Overall model estimate score from 0.0 to 1.0 (not a clinical probability)",
       },
       needsImmediateProfessionalCare: {
-        type: SchemaType.BOOLEAN,
+        type: Type.BOOLEAN,
         description: "Whether the patient should seek immediate professional care",
       },
     },
@@ -138,7 +128,7 @@ export function extractJsonFromText(text: string): unknown {
     try {
       return JSON.parse(candidate);
     } catch {
-      // fall through to a balanced-object scan below
+      // fall through to balanced-object scan
     }
   }
 
@@ -147,16 +137,14 @@ export function extractJsonFromText(text: string): unknown {
 
 export function isValidDermatologyResponse(value: unknown): value is DermatologyResponse {
   if (!value || typeof value !== "object") return false;
-
   const response = value as Record<string, unknown>;
 
   if (!isNonEmptyString(response.clinicalSummary)) return false;
   if (!isNonEmptyString(response.recommendedNextSteps)) return false;
   if (!isNonEmptyString(response.followUpGuidance)) return false;
-  if (typeof response.confidenceScore !== "number") return false;
+  if (typeof response.confidenceScore !== "number" || !Number.isFinite(response.confidenceScore)) return false;
   if (response.confidenceScore < 0 || response.confidenceScore > 1) return false;
   if (typeof response.needsImmediateProfessionalCare !== "boolean") return false;
-
   if (!Array.isArray(response.possibleConditions) || response.possibleConditions.length === 0) {
     return false;
   }
@@ -167,6 +155,7 @@ export function isValidDermatologyResponse(value: unknown): value is Dermatology
     return (
       isNonEmptyString(conditionItem.condition) &&
       typeof conditionItem.confidence === "number" &&
+      Number.isFinite(conditionItem.confidence) &&
       conditionItem.confidence >= 0 &&
       conditionItem.confidence <= 1 &&
       isNonEmptyString(conditionItem.reasoning)

@@ -7,10 +7,6 @@ import { Button } from "@/components/ui/Button";
 import { AIConsultationWizard } from "@/components/patient/AIConsultationWizard";
 import { Brain, History, ChevronRight, AlertCircle } from "lucide-react";
 
-interface AIConsultationTabsProps {
-  aiProvider: "gemini" | "groq";
-}
-
 interface AIReport {
   _id: string;
   report_id: string;
@@ -27,7 +23,7 @@ interface AIReport {
   generated_at: string;
 }
 
-export function AIConsultationTabs({ aiProvider }: AIConsultationTabsProps) {
+export function AIConsultationTabs() {
   const [activeTab, setActiveTab] = useState<"new" | "history">("new");
   const [reports, setReports] = useState<AIReport[]>([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
@@ -88,7 +84,7 @@ export function AIConsultationTabs({ aiProvider }: AIConsultationTabsProps) {
 
       {/* New consultation tab */}
       {activeTab === "new" ? (
-        <AIConsultationWizard aiProvider={aiProvider} />
+        <AIConsultationWizard />
       ) : (
         /* History tab */
         <div className="space-y-4">

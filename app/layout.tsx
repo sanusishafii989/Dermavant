@@ -21,11 +21,11 @@ const devFestMode = process.env.NEXT_PUBLIC_DEVFEST_MODE !== "false";
 
 export const metadata: Metadata = {
   title: devFestMode
-    ? "Aetheris Health — GDG Yola DevFest Demo"
+    ? "Dermavant (Aetheris Health) — GDG Yola DevFest 2026"
     : "Aetheris Health — AI-Powered Digital Healthcare Ecosystem",
   description:
     devFestMode
-      ? "A community demo for GDG Yola DevFest, featuring Gemini-powered visual skin triage."
+      ? "Built by Sanusi Shafii for GDG Yola DevFest 2026, powered by free Google Gemini multimodal skin triage."
       : "Connecting patients to instant dermatological triage, licensed doctors, and verified medicine — all in one platform.",
   manifest: "/manifest.json",
   icons: {
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: devFestMode ? "Aetheris DevFest" : "Aetheris Health",
+    title: devFestMode ? "Dermavant DevFest" : "Dermavant (Aetheris Health)",
   },
 };
 

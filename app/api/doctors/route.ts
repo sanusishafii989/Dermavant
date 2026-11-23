@@ -47,7 +47,6 @@ export async function GET(req: Request) {
           ? {
               id: user._id.toString(),
               fullName: user.fullName,
-              email: user.email,
               imageUrl: user.profilePhoto,
             }
           : null,

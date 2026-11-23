@@ -1,8 +1,13 @@
+import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { getPaystackSecret, markAppointmentPaid, markPharmacyOrderPaid, markWalletTopUpPaid, validatePaystackEnvKeys } from "@/lib/paystack";
 
 export async function POST(req: Request) {
   try {
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
+    }
     const body = await req.json();
     const reference = body.reference;
 
@@ -39,7 +44,6 @@ export async function POST(req: Request) {
         {
           ok: false,
           error: isNotFound ? "Transaction not found on Paystack. If you completed payment, your wallet will be credited shortly." : (data.message || "Unable to verify payment"),
-          details: data,
         },
         { status: isNotFound ? 404 : 502 }
       );

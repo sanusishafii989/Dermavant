@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import crypto from "crypto";
 import { connectDB } from "@/lib/db";
 import { COMMISSION } from "@/lib/commission";
@@ -69,14 +70,23 @@ export async function markAppointmentPaid(params: {
   await connectDB();
 
   const referenceAppointmentId = extractAppointmentIdFromReference(params.reference);
-  const appointment = await Appointment.findOne({
-    $or: [
-      { _id: params.appointmentIdentifier },
-      { appointment_id: params.appointmentIdentifier },
-      { _id: referenceAppointmentId },
-      { appointment_id: referenceAppointmentId },
-    ],
-  });
+  const aptOrFilters: Record<string, unknown>[] = [];
+  if (params.appointmentIdentifier) {
+    if (mongoose.Types.ObjectId.isValid(params.appointmentIdentifier)) {
+      aptOrFilters.push({ _id: params.appointmentIdentifier });
+    }
+    aptOrFilters.push({ appointment_id: params.appointmentIdentifier });
+  }
+  if (referenceAppointmentId) {
+    if (mongoose.Types.ObjectId.isValid(referenceAppointmentId)) {
+      aptOrFilters.push({ _id: referenceAppointmentId });
+    }
+    aptOrFilters.push({ appointment_id: referenceAppointmentId });
+  }
+  if (aptOrFilters.length === 0) {
+    return null;
+  }
+  const appointment = await Appointment.findOne({ $or: aptOrFilters } as any);
 
   if (!appointment) {
     return null;
@@ -137,14 +147,23 @@ export async function markPharmacyOrderPaid(params: {
   await connectDB();
 
   const referenceOrderId = extractPharmacyOrderIdFromReference(params.reference);
-  const order = await PharmacyOrder.findOne({
-    $or: [
-      { _id: params.orderIdentifier },
-      { order_id: params.orderIdentifier },
-      { _id: referenceOrderId },
-      { order_id: referenceOrderId },
-    ],
-  });
+  const orderOrFilters: Record<string, unknown>[] = [];
+  if (params.orderIdentifier) {
+    if (mongoose.Types.ObjectId.isValid(params.orderIdentifier)) {
+      orderOrFilters.push({ _id: params.orderIdentifier });
+    }
+    orderOrFilters.push({ order_id: params.orderIdentifier });
+  }
+  if (referenceOrderId) {
+    if (mongoose.Types.ObjectId.isValid(referenceOrderId)) {
+      orderOrFilters.push({ _id: referenceOrderId });
+    }
+    orderOrFilters.push({ order_id: referenceOrderId });
+  }
+  if (orderOrFilters.length === 0) {
+    return null;
+  }
+  const order = await PharmacyOrder.findOne({ $or: orderOrFilters } as any);
 
   if (!order) {
     return null;

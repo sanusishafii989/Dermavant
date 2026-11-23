@@ -56,9 +56,9 @@ export default function HomePage() {
   const companyTagline = process.env.NEXT_PUBLIC_COMPANY_TAGLINE || "Digital Healthcare Ecosystem";
   const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL || "support@aetherishealth.ng";
   const contactPhone = process.env.NEXT_PUBLIC_CONTACT_PHONE || "+234 800 000 0000";
-  const contactAddress = process.env.NEXT_PUBLIC_CONTACT_ADDRESS || "Abuja, Nigeria";
-  const founderName = process.env.NEXT_PUBLIC_FOUNDER_NAME || "Ibrahim Hussaini Danhaire";
-  const founderTitle = process.env.NEXT_PUBLIC_FOUNDER_TITLE || "Founder, Danhaire Medical Services";
+  const contactAddress = process.env.NEXT_PUBLIC_CONTACT_ADDRESS || "Yola, Adamawa State, Nigeria";
+  const founderName = process.env.NEXT_PUBLIC_FOUNDER_NAME || "Sanusi Shafii";
+  const founderTitle = process.env.NEXT_PUBLIC_FOUNDER_TITLE || "Creator & Technical Lead — Dermavant";
   const socialGithub = process.env.NEXT_PUBLIC_SOCIAL_GITHUB;
   const socialTwitter = process.env.NEXT_PUBLIC_SOCIAL_TWITTER;
   const socialLinkedin = process.env.NEXT_PUBLIC_SOCIAL_LINKEDIN;
@@ -76,7 +76,7 @@ export default function HomePage() {
           <div className="mx-auto max-w-3xl text-center">
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-surface px-4 py-1.5 text-sm text-secondary">
               <span className="flex h-2 w-2 rounded-full bg-emerald-500" />
-              NextGen Innovation Challenge 2026 — National Showcase
+              GDG Yola DevFest 2026 Showcase · Powered by Google Gemini
             </div>
             <h1 className="text-4xl font-bold leading-tight text-primary md:text-6xl">
               AI-Powered Healthcare
@@ -286,7 +286,7 @@ export default function HomePage() {
             <div>
               <p className="text-xs uppercase tracking-[0.2em] text-accent-cyan">About Us</p>
               <h2 className="mt-2 text-3xl font-bold text-primary md:text-4xl">
-                Built by Danhaire Medical Services
+                Built by Sanusi Shafii for GDG Yola DevFest
               </h2>
               <p className="mt-6 text-secondary">
                 {companyName} is an AI-powered digital healthcare ecosystem that bridges the gap between patients and quality healthcare.
@@ -475,7 +475,7 @@ export default function HomePage() {
 
           <div className="mt-8 border-t border-border pt-6 text-center">
             <p className="text-sm text-muted">
-              © 2026 Danhaire Medical Services. All rights reserved. Built for the NextGen Innovation Challenge 2026.
+              © 2026 Sanusi Shafii · Dermavant (Aetheris Health). Built for GDG Yola DevFest 2026.
             </p>
           </div>
         </div>

@@ -19,7 +19,7 @@ type ConsultationResult = {
   followUpGuidance: string;
   confidenceScore: number;
   needsImmediateProfessionalCare: boolean;
-  provider: "gemini" | "groq";
+  provider: "gemini";
   model: string;
   includedImage: boolean;
 };
@@ -27,7 +27,7 @@ type ConsultationResult = {
 const MAX_IMAGE_BYTES = 3 * 1024 * 1024;
 const SUPPORTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
 
-export function AIConsultationWizard({ aiProvider }: { aiProvider: "gemini" | "groq" }) {
+export function AIConsultationWizard() {
   const [symptoms, setSymptoms] = useState("");
   const [result, setResult] = useState<ConsultationResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -159,14 +159,14 @@ export function AIConsultationWizard({ aiProvider }: { aiProvider: "gemini" | "g
                   {ttsEnabled ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
                 </button>
               ) : null}
-              {aiProvider === "gemini" ? <button
+              <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 className="flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-secondary)] transition-colors hover:text-[var(--accent-cyan)]"
                 title="Upload skin image"
               >
                 <ImageIcon className="h-5 w-5" />
-              </button> : null}
+              </button>
               <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp" onChange={handleImageUpload} className="hidden" />
             </div>
           </div>
@@ -213,7 +213,7 @@ export function AIConsultationWizard({ aiProvider }: { aiProvider: "gemini" | "g
             <div className="flex flex-wrap items-center gap-3 text-sm text-[var(--text-secondary)]">
               <span className="flex items-center gap-1"><Mic className="h-3.5 w-3.5" /> Voice input</span>
               <span className="flex items-center gap-1"><Volume2 className="h-3.5 w-3.5" /> Voice output</span>
-              {aiProvider === "gemini" ? <span className="flex items-center gap-1"><ImageIcon className="h-3.5 w-3.5" /> Image upload</span> : null}
+              <span className="flex items-center gap-1"><ImageIcon className="h-3.5 w-3.5" /> Image upload</span>
             </div>
           </div>
 
@@ -230,15 +230,9 @@ export function AIConsultationWizard({ aiProvider }: { aiProvider: "gemini" | "g
           <div>
             <div className="flex flex-wrap items-center gap-3">
               <p className="text-xs uppercase tracking-[0.32em] text-[var(--accent-cyan)]">AI-assisted triage report</p>
-              {result.provider === "gemini" ? (
-                <span className="rounded-full border border-[#8ab4f8]/25 bg-[#8ab4f8]/10 px-3 py-1 text-xs font-medium text-[#8ab4f8]">
-                  Powered by Gemini · {result.model}
-                </span>
-              ) : (
-                <span className="rounded-full border border-[var(--border)] px-3 py-1 text-xs font-medium text-[var(--text-secondary)]">
-                  Powered by Groq · {result.model}
-                </span>
-              )}
+              <span className="rounded-full border border-[#8ab4f8]/25 bg-[#8ab4f8]/10 px-3 py-1 text-xs font-medium text-[#8ab4f8]">
+                Powered by Google Gemini · {result.model}
+              </span>
             </div>
             <h2 className="mt-2 text-2xl font-semibold text-[var(--text-primary)]">Preliminary skin assessment</h2>
             <p className="mt-2 text-sm text-[var(--text-secondary)]">
