@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
@@ -61,24 +62,38 @@ export async function POST(req: Request) {
         return NextResponse.json({ ok: false, error: "All pharmacy order items must belong to the same partner" }, { status: 400 });
       }
 
-      // Recalculate total from DB to prevent price tampering
-      const medicineIds = items.map((item: any) => item.medicineId);
-      const dbMedicines = await Medicine.find({ _id: { $in: medicineIds } as any }).lean();
+      // Recalculate total from DB to prevent price/quantity tampering
+      const medicineIds = items
+        .map((item: any) => String(item?.medicineId || ""))
+        .filter((id: string) => mongoose.Types.ObjectId.isValid(id));
+      if (medicineIds.length !== items.length) {
+        return NextResponse.json({ ok: false, error: "One or more medicine IDs are invalid" }, { status: 400 });
+      }
+      const dbMedicines = await Medicine.find({ _id: { $in: medicineIds } as any, status: { $ne: "delisted" } }).lean();
       const medicineMap = new Map(dbMedicines.map((m: any) => [m._id.toString(), m]));
 
       let totalAmount = 0;
-      const validatedItems = items.map((item: any) => {
-        const dbMed = medicineMap.get(item.medicineId);
-        const unitPrice = dbMed?.price ?? 0;
-        const qty = Number(item.qty) || 1;
-        totalAmount += unitPrice * qty;
-        return {
+      const validatedItems = [];
+      for (const item of items) {
+        const dbMed = medicineMap.get(String(item.medicineId));
+        if (!dbMed || typeof dbMed.price !== "number" || dbMed.price <= 0) {
+          return NextResponse.json({ ok: false, error: "One or more medicines are unavailable" }, { status: 400 });
+        }
+        const qty = Number(item.qty);
+        if (!Number.isInteger(qty) || qty < 1 || qty > 100) {
+          return NextResponse.json({ ok: false, error: "Item quantities must be positive whole numbers" }, { status: 400 });
+        }
+        if (typeof dbMed.quantity === "number" && dbMed.quantity < qty) {
+          return NextResponse.json({ ok: false, error: `Insufficient stock for ${dbMed.name}` }, { status: 400 });
+        }
+        totalAmount += dbMed.price * qty;
+        validatedItems.push({
           medicine_id: item.medicineId,
-          name: dbMed?.name || item.name,
+          name: dbMed.name,
           qty,
-          unit_price: unitPrice,
-        };
-      });
+          unit_price: dbMed.price,
+        });
+      }
 
       if (totalAmount <= 0) {
         return NextResponse.json({ ok: false, error: "Order total must be greater than zero" }, { status: 400 });
@@ -105,9 +120,10 @@ export async function POST(req: Request) {
       };
       amountInKobo = toKobo(totalAmount);
     } else {
-      const appointment = await Appointment.findOne({
-        $or: [{ _id: appointmentIdentifier }, { appointment_id: appointmentIdentifier }],
-      }).lean();
+      const aptQuery = mongoose.Types.ObjectId.isValid(String(appointmentIdentifier))
+        ? { $or: [{ _id: appointmentIdentifier }, { appointment_id: appointmentIdentifier }] }
+        : { appointment_id: appointmentIdentifier };
+      const appointment = await Appointment.findOne(aptQuery as any).lean();
 
       if (!appointment) {
         return NextResponse.json({ ok: false, error: "Appointment not found" }, { status: 404 });
@@ -143,8 +159,18 @@ export async function POST(req: Request) {
     }
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || `https://${req.headers.get("host")}`;
-    const callbackBase = callbackUrl || `${appUrl}/patient/dashboard/payment/success`;
-    const callbackUrlWithReference = new URL(callbackBase, appUrl);
+    const defaultCallback = `${appUrl}/patient/dashboard/payment/success`;
+    let callbackUrlWithReference = new URL(defaultCallback);
+    if (callbackUrl) {
+      try {
+        const candidate = new URL(String(callbackUrl), appUrl);
+        if (candidate.origin === new URL(appUrl).origin) {
+          callbackUrlWithReference = candidate;
+        }
+      } catch {
+        // Ignore malformed callbackUrl and keep safe default
+      }
+    }
     callbackUrlWithReference.searchParams.set("reference", reference);
     callbackUrlWithReference.searchParams.set("status", "success");
 

@@ -15,7 +15,7 @@ export default function PrivacyPage() {
         <Card className="space-y-4 text-sm leading-relaxed text-primary">
           <section>
             <h2 className="mb-2 text-lg font-semibold text-primary">1. Introduction</h2>
-            <p>Aetheris Health, operated by Danhaire Medical Services, is committed to protecting your privacy. This Privacy Policy explains how we collect, use, store, and protect your personal and medical data.</p>
+            <p>Dermavant (Aetheris Health), led by Sanusi Shafii, is committed to protecting your privacy. This Privacy Policy explains how we collect, use, store, and protect your personal and medical data.</p>
           </section>
 
           <section>

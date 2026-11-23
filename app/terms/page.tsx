@@ -67,7 +67,7 @@ export default function TermsPage() {
 
           <section>
             <h2 className="mb-2 text-lg font-semibold text-primary">8. Limitation of Liability</h2>
-            <p>Aetheris Health, operated by Danhaire Medical Services, is not liable for any indirect, incidental, or consequential damages arising from the use of the platform. Medical professionals are independently responsible for their clinical decisions.</p>
+            <p>Dermavant (Aetheris Health), led by Sanusi Shafii, is not liable for any indirect, incidental, or consequential damages arising from the use of the platform. Medical professionals are independently responsible for their clinical decisions.</p>
           </section>
 
           <section>

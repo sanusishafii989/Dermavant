@@ -42,7 +42,7 @@ async function postResearchMessage(payload: object) {
   throw new Error("Research service did not respond");
 }
 
-export function ResearchChat({ aiProvider }: { aiProvider: "gemini" | "groq" }) {
+export function ResearchChat() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -164,7 +164,7 @@ export function ResearchChat({ aiProvider }: { aiProvider: "gemini" | "groq" }) 
               <Stethoscope className="h-6 w-6" />
             </div>
             <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-[var(--accent-cyan)]">Research assistant · {aiProvider === "gemini" ? "Gemini" : "Groq"}</p>
+              <p className="text-xs uppercase tracking-[0.2em] text-[var(--accent-cyan)]">Research assistant · Google Gemini</p>
               <h1 className="mt-1 text-xl font-semibold text-[var(--text-primary)]">Medical research chat</h1>
             </div>
           </div>
@@ -206,13 +206,13 @@ export function ResearchChat({ aiProvider }: { aiProvider: "gemini" | "groq" }) 
               </button>
             ) : null}
             {/* Gemini image review */}
-            {aiProvider === "gemini" ? <button
+            <button
               onClick={() => fileInputRef.current?.click()}
               className="flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-secondary)] transition-colors hover:text-[var(--accent-cyan)]"
               title="Upload medical image"
             >
               <ImageIcon className="h-5 w-5" />
-            </button> : null}
+            </button>
             <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp" onChange={handleImageUpload} className="hidden" />
           </div>
         </div>

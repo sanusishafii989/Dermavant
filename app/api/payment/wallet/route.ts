@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
@@ -35,8 +36,11 @@ export async function POST(req: Request) {
 
     if (type === "appointment") {
       // Pay for appointment from wallet
+      const aptFilter = mongoose.Types.ObjectId.isValid(String(appointmentId))
+        ? { $or: [{ _id: appointmentId }, { appointment_id: appointmentId }] }
+        : { appointment_id: appointmentId };
       const appointment = await Appointment.findOne({
-        $or: [{ _id: appointmentId }, { appointment_id: appointmentId }],
+        ...aptFilter,
         patient_id: patient._id as any,
       } as any);
 
@@ -147,8 +151,11 @@ export async function POST(req: Request) {
 
     if (type === "pharmacy") {
       // Pay for pharmacy order from wallet
+      const orderFilter = mongoose.Types.ObjectId.isValid(String(orderId))
+        ? { $or: [{ _id: orderId }, { order_id: orderId }] }
+        : { order_id: orderId };
       const order = await PharmacyOrder.findOne({
-        $or: [{ _id: orderId }, { order_id: orderId }],
+        ...orderFilter,
         patient_id: patient._id as any,
       } as any);
 
