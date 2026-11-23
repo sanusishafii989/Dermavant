@@ -224,14 +224,6 @@ For the temporary festival presentation, see [`DEVFEST_TEMPORARY_SETUP.md`](./DE
 
 ---
 
-## Team
-
-| Name | Role |
-|---|---|
-| **Ibrahim Hussaini Danhaire** | Founder, Danhaire Medical Services — Project Owner |
-| **MD Sanusi Shafii** | Technical Lead / Build Direction |
-| **Ahmed** | Technical Collaborator |
-
 ---
 
 ## License
