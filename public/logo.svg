@@ -1,18 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 48" fill="none">
-  <!-- Hexagon with medical cross -->
-  <g transform="translate(0, 0)">
-    <polygon
-      points="24,2 44,14 44,34 24,46 4,34 4,14"
-      fill="none"
-      stroke="#219EBC"
-      stroke-width="2"
-      stroke-linejoin="round"
-    />
-    <rect x="17" y="14" width="14" height="20" rx="2" fill="#219EBC" />
-    <rect x="10" y="21" width="28" height="6" rx="2" fill="#219EBC" />
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 48" fill="none">
+  <g transform="translate(2, 4)">
+    <path d="M20 2L36 10.5V22.5C36 31.4 29.1 37.8 20 40C10.9 37.8 4 31.4 4 22.5V10.5L20 2Z" stroke="#219EBC" stroke-width="2.2" stroke-linejoin="round" fill="#023047" fill-opacity="0.72"/>
+    <path d="M12 18C15.5 15.2 24.5 15.2 28 18" stroke="#67E8F9" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M11 23.5C15.5 20.8 24.5 20.8 29 23.5" stroke="#219EBC" stroke-width="1.8" stroke-linecap="round"/>
+    <rect x="18.2" y="12.5" width="3.6" height="16" rx="1.8" fill="#FFFFFF"/>
+    <rect x="12" y="18.7" width="16" height="3.6" rx="1.8" fill="#FFFFFF"/>
+    <circle cx="29" cy="11.5" r="2.6" fill="#FFB703"/>
   </g>
-  <!-- Aetheris text -->
-  <text x="58" y="28" font-family="system-ui, -apple-system, sans-serif" font-size="20" font-weight="700" fill="#FFFFFF" letter-spacing="0.5">Aetheris</text>
-  <!-- Health subtitle -->
-  <text x="58" y="42" font-family="system-ui, -apple-system, sans-serif" font-size="9" font-weight="600" fill="#219EBC" letter-spacing="2">HEALTH</text>
+  <text x="50" y="30" font-family="system-ui, -apple-system, sans-serif" font-size="22" font-weight="700" fill="#FFFFFF" letter-spacing="-0.4">Dermavant</text>
 </svg>

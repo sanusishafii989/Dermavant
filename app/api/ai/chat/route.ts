@@ -35,7 +35,7 @@ function parseImageDataUrl(value: unknown): InlineImage | null {
 }
 
 function buildDermatologyPrompt(symptoms: string, clinicalContext: string, hasImage: boolean): string {
-  return `You are a cautious dermatology triage assistant for Aetheris Health (Dermavant).
+  return `You are a cautious dermatology triage assistant for Dermavant.
 Provide preliminary educational triage only — never a definitive medical diagnosis and never prescribe medication.
 
 Rules:

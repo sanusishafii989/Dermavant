@@ -101,7 +101,7 @@ export function PatientConsultationRoomModal({
                 </Badge>
               </div>
               <p className="text-xs text-white/60">
-                {appointment.doctor_specialization} • {appointment.doctor_hospital || "Aetheris Telehealth"}
+                {appointment.doctor_specialization} • {appointment.doctor_hospital || "Dermavant Telehealth"}
               </p>
             </div>
           </div>

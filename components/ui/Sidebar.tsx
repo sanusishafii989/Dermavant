@@ -22,7 +22,7 @@ export interface SidebarProps {
   className?: string;
 }
 
-export function Sidebar({ links, title = "Aetheris Health", footer, mobileHeaderActions, className }: SidebarProps) {
+export function Sidebar({ links, title = "Dermavant", footer, mobileHeaderActions, className }: SidebarProps) {
   const rawPathname = usePathname();
   const pathname = rawPathname ?? "";
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -88,7 +88,7 @@ export function Sidebar({ links, title = "Aetheris Health", footer, mobileHeader
         <>
           <Image
             src="/logo.svg"
-            alt="Aetheris Health"
+            alt="Dermavant"
             width={130}
             height={26}
             priority
@@ -96,7 +96,7 @@ export function Sidebar({ links, title = "Aetheris Health", footer, mobileHeader
           />
           <Image
             src="/logo-light.svg"
-            alt="Aetheris Health"
+            alt="Dermavant"
             width={130}
             height={26}
             priority
@@ -148,7 +148,7 @@ export function Sidebar({ links, title = "Aetheris Health", footer, mobileHeader
           </button>
           <div className="min-w-0 flex-1 px-3">
             <p className="truncate text-sm font-semibold text-primary">{title}</p>
-            <p className="text-[11px] font-medium text-accent-cyan">Aetheris Health</p>
+            <p className="text-[11px] font-medium text-accent-cyan">Dermavant</p>
           </div>
           <div className="flex shrink-0 items-center gap-2">
             {mobileHeaderActions}
@@ -166,7 +166,7 @@ export function Sidebar({ links, title = "Aetheris Health", footer, mobileHeader
               <div className="mb-6 flex items-center justify-between">
                 <Image
                   src="/logo.svg"
-                  alt="Aetheris Health"
+                  alt="Dermavant"
                   width={130}
                   height={26}
                   priority
@@ -174,7 +174,7 @@ export function Sidebar({ links, title = "Aetheris Health", footer, mobileHeader
                 />
                 <Image
                   src="/logo-light.svg"
-                  alt="Aetheris Health"
+                  alt="Dermavant"
                   width={130}
                   height={26}
                   priority

@@ -9,7 +9,7 @@ const MAX_IMAGE_BYTES = 3 * 1024 * 1024;
 type ResearchMessage = { role: "user" | "assistant"; content: string };
 type ResearchImage = { mimeType: "image/jpeg" | "image/png" | "image/webp"; data: string };
 
-const RESEARCH_SYSTEM_PROMPT = `You are a medical research assistant for licensed healthcare professionals on the Aetheris Health (Dermavant) platform.
+const RESEARCH_SYSTEM_PROMPT = `You are a medical research assistant for licensed healthcare professionals on the Dermavant platform.
 
 Your role:
 - Provide evidence-based medical research summaries, clinical insights, and literature references.

@@ -15,17 +15,17 @@ export default function TermsPage() {
         <Card className="space-y-4 text-sm leading-relaxed text-primary">
           <section>
             <h2 className="mb-2 text-lg font-semibold text-primary">1. Acceptance of Terms</h2>
-            <p>By creating an account on Aetheris Health, you agree to be bound by these Terms &amp; Conditions. If you do not agree, you may not access or use the platform.</p>
+            <p>By creating an account on Dermavant, you agree to be bound by these Terms &amp; Conditions. If you do not agree, you may not access or use the platform.</p>
           </section>
 
           <section>
             <h2 className="mb-2 text-lg font-semibold text-primary">2. Platform Description</h2>
-            <p>Aetheris Health is an AI-powered digital healthcare ecosystem connecting patients with licensed doctors and verified pharmacies. The platform offers AI-assisted dermatological triage, specialist booking, e-pharmacy services, and consultation tools.</p>
+            <p>Dermavant is an AI-powered digital healthcare ecosystem connecting patients with licensed doctors and verified pharmacies. The platform offers AI-assisted dermatological triage, specialist booking, e-pharmacy services, and consultation tools.</p>
           </section>
 
           <section>
             <h2 className="mb-2 text-lg font-semibold text-primary">3. Commission &amp; Fees</h2>
-            <p>Aetheris Health operates on a commission-based revenue model:</p>
+            <p>Dermavant operates on a commission-based revenue model:</p>
             <ul className="ml-4 list-disc space-y-1 text-secondary">
               <li><strong className="text-primary">Doctor consultations:</strong> A 10% commission is deducted from each consultation payment. Doctors receive 90% of the consultation fee.</li>
               <li><strong className="text-primary">Pharmacy orders:</strong> A 5% commission is deducted from each medicine order. Pharmacy partners receive 95% of the order total.</li>
@@ -46,7 +46,7 @@ export default function TermsPage() {
 
           <section>
             <h2 className="mb-2 text-lg font-semibold text-primary">5. AI Consultation Disclaimer</h2>
-            <p>The AI dermatological triage tool provides preliminary assessments only. It is not a medical diagnosis and should not replace consultation with a licensed healthcare professional. Aetheris Health is not liable for decisions made based solely on AI triage results.</p>
+            <p>The AI dermatological triage tool provides preliminary assessments only. It is not a medical diagnosis and should not replace consultation with a licensed healthcare professional. Dermavant is not liable for decisions made based solely on AI triage results.</p>
           </section>
 
           <section>
@@ -67,7 +67,7 @@ export default function TermsPage() {
 
           <section>
             <h2 className="mb-2 text-lg font-semibold text-primary">8. Limitation of Liability</h2>
-            <p>Dermavant (Aetheris Health), led by Sanusi Shafii, is not liable for any indirect, incidental, or consequential damages arising from the use of the platform. Medical professionals are independently responsible for their clinical decisions.</p>
+            <p>Dermavant, led by Sanusi Shafii, is not liable for any indirect, incidental, or consequential damages arising from the use of the platform. Medical professionals are independently responsible for their clinical decisions.</p>
           </section>
 
           <section>
@@ -77,7 +77,7 @@ export default function TermsPage() {
 
           <section>
             <h2 className="mb-2 text-lg font-semibold text-primary">10. Contact</h2>
-            <p>For questions regarding these Terms, contact: <span className="text-accent-cyan">support@aetherishealth.ng</span></p>
+            <p>For questions regarding these Terms, contact: <span className="text-accent-cyan">sanusishafii989@gmail.com</span></p>
           </section>
         </Card>
       </div>

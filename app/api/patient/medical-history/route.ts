@@ -18,7 +18,7 @@ export async function GET() {
     if (!userDoc) {
       const createdUser = await User.create({
         clerkId: userId,
-        fullName: "Aetheris Patient",
+        fullName: "Dermavant Patient",
         email: `${userId}@example.com`,
         role: "patient",
         status: "pending_verification",

@@ -77,7 +77,7 @@ export function WalletCard({ balance, currency, transactions, onRefresh }: Walle
           <div>
             <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-[var(--accent-cyan)]">
               <Wallet className="h-4 w-4" />
-              <span>Aetheris Patient E-Wallet</span>
+              <span>Dermavant Patient E-Wallet</span>
             </div>
             <div className="mt-3">
               <p className="text-xs text-[var(--text-muted)]">Available Balance</p>

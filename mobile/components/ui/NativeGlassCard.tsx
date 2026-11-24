@@ -1,6 +1,6 @@
 import React, { type ReactNode } from 'react';
 import { View, StyleSheet, type ViewStyle } from 'react-native';
-import { AetherisColors } from '../../constants/Colors';
+import { DermavantColors } from '../../constants/Colors';
 
 export interface NativeGlassCardProps {
   children: ReactNode;
@@ -24,10 +24,10 @@ export function NativeGlassCard({ children, style, accentBorder }: NativeGlassCa
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: AetherisColors.glassBg,
+    backgroundColor: DermavantColors.glassBg,
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: AetherisColors.glassBorder,
+    borderColor: DermavantColors.glassBorder,
     padding: 16,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 8 },

@@ -8,7 +8,7 @@ import {
   SafeAreaView,
   TextInput,
 } from 'react-native';
-import { AetherisColors } from '../../constants/Colors';
+import { DermavantColors } from '../../constants/Colors';
 import { NativeGlassCard } from '../../components/ui/NativeGlassCard';
 import { NativeBadge } from '../../components/ui/NativeBadge';
 import { NativeButton } from '../../components/ui/NativeButton';
@@ -87,7 +87,7 @@ export default function MobilePharmacyScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: AetherisColors.dark,
+    backgroundColor: DermavantColors.dark,
   },
   scrollContent: {
     padding: 16,
@@ -101,10 +101,10 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     paddingHorizontal: 16,
     paddingVertical: 12,
-    color: AetherisColors.white,
+    color: DermavantColors.white,
     fontSize: 13,
     borderWidth: 1,
-    borderColor: AetherisColors.glassBorder,
+    borderColor: DermavantColors.glassBorder,
   },
   cartBar: {
     backgroundColor: 'rgba(255, 183, 3, 0.1)',
@@ -118,12 +118,12 @@ const styles = StyleSheet.create({
   cartTitle: {
     fontSize: 14,
     fontWeight: '800',
-    color: AetherisColors.gold,
+    color: DermavantColors.gold,
   },
   sectionTitle: {
     fontSize: 16,
     fontWeight: '800',
-    color: AetherisColors.white,
+    color: DermavantColors.white,
   },
   grid: {
     gap: 12,
@@ -139,16 +139,16 @@ const styles = StyleSheet.create({
   priceText: {
     fontSize: 15,
     fontWeight: '800',
-    color: AetherisColors.gold,
+    color: DermavantColors.gold,
   },
   medName: {
     fontSize: 15,
     fontWeight: '800',
-    color: AetherisColors.white,
+    color: DermavantColors.white,
     marginTop: 4,
   },
   stockText: {
     fontSize: 11,
-    color: AetherisColors.textMuted,
+    color: DermavantColors.textMuted,
   },
 });

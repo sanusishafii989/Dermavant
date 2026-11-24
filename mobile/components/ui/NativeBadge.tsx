@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { AetherisColors } from '../../constants/Colors';
+import { DermavantColors } from '../../constants/Colors';
 
 export interface NativeBadgeProps {
   label: string;
@@ -10,24 +10,24 @@ export interface NativeBadgeProps {
 export function NativeBadge({ label, variant = 'cyan' }: NativeBadgeProps) {
   let bg = 'rgba(33, 158, 188, 0.15)';
   let border = 'rgba(33, 158, 188, 0.4)';
-  let text = AetherisColors.cyan;
+  let text = DermavantColors.cyan;
 
   if (variant === 'gold') {
     bg = 'rgba(255, 183, 3, 0.15)';
     border = 'rgba(255, 183, 3, 0.4)';
-    text = AetherisColors.gold;
+    text = DermavantColors.gold;
   } else if (variant === 'success') {
     bg = 'rgba(16, 185, 129, 0.15)';
     border = 'rgba(16, 185, 129, 0.4)';
-    text = AetherisColors.success;
+    text = DermavantColors.success;
   } else if (variant === 'danger') {
     bg = 'rgba(239, 68, 68, 0.15)';
     border = 'rgba(239, 68, 68, 0.4)';
-    text = AetherisColors.danger;
+    text = DermavantColors.danger;
   } else if (variant === 'warning') {
     bg = 'rgba(245, 158, 11, 0.15)';
     border = 'rgba(245, 158, 11, 0.4)';
-    text = AetherisColors.warning;
+    text = DermavantColors.warning;
   }
 
   return (

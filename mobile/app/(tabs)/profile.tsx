@@ -8,7 +8,7 @@ import {
   TextInput,
   TouchableOpacity,
 } from 'react-native';
-import { AetherisColors } from '../../constants/Colors';
+import { DermavantColors } from '../../constants/Colors';
 import { NativeGlassCard } from '../../components/ui/NativeGlassCard';
 import { NativeBadge } from '../../components/ui/NativeBadge';
 import { NativeButton } from '../../components/ui/NativeButton';
@@ -105,7 +105,7 @@ export default function MobileProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: AetherisColors.dark,
+    backgroundColor: DermavantColors.dark,
   },
   scrollContent: {
     padding: 16,
@@ -122,23 +122,23 @@ const styles = StyleSheet.create({
     borderRadius: 27,
     backgroundColor: 'rgba(33, 158, 188, 0.2)',
     borderWidth: 2,
-    borderColor: AetherisColors.cyan,
+    borderColor: DermavantColors.cyan,
     alignItems: 'center',
     justifyContent: 'center',
   },
   avatarText: {
     fontSize: 22,
     fontWeight: '800',
-    color: AetherisColors.cyan,
+    color: DermavantColors.cyan,
   },
   userName: {
     fontSize: 18,
     fontWeight: '800',
-    color: AetherisColors.white,
+    color: DermavantColors.white,
   },
   userEmail: {
     fontSize: 12,
-    color: AetherisColors.textMuted,
+    color: DermavantColors.textMuted,
     marginTop: 2,
   },
   sectionCard: {
@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
   sectionHeader: {
     fontSize: 15,
     fontWeight: '800',
-    color: AetherisColors.white,
+    color: DermavantColors.white,
     marginBottom: 4,
   },
   grid2: {
@@ -162,17 +162,17 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 11,
     fontWeight: '700',
-    color: AetherisColors.textMuted,
+    color: DermavantColors.textMuted,
   },
   input: {
     backgroundColor: 'rgba(255, 255, 255, 0.08)',
     borderRadius: 12,
     paddingHorizontal: 12,
     paddingVertical: 10,
-    color: AetherisColors.white,
+    color: DermavantColors.white,
     fontSize: 13,
     borderWidth: 1,
-    borderColor: AetherisColors.glassBorder,
+    borderColor: DermavantColors.glassBorder,
   },
   emergencyCard: {
     borderColor: 'rgba(239, 68, 68, 0.4)',
@@ -180,7 +180,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   successText: {
-    color: AetherisColors.success,
+    color: DermavantColors.success,
     fontSize: 13,
     fontWeight: '700',
     textAlign: 'center',

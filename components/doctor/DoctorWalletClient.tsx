@@ -156,7 +156,7 @@ export function DoctorWalletClient({
           <div>
             <p className="text-xs uppercase tracking-[0.2em] text-[var(--accent-cyan)]">Platform commission</p>
             <p className="text-sm text-[var(--text-primary)]">
-              Aetheris Health charges <span className="font-semibold text-[var(--text-primary)]">{commissionRate}%</span> commission on each consultation.
+              Dermavant charges <span className="font-semibold text-[var(--text-primary)]">{commissionRate}%</span> commission on each consultation.
               Gross earnings: <span className="font-semibold text-[var(--text-primary)]">₦{initialEarnings.toLocaleString()}</span> ·
               Platform fee: <span className="font-semibold text-[var(--accent-gold)]">₦{Math.round(initialEarnings * commissionRate / 100).toLocaleString()}</span> ·
               Net earnings: <span className="font-semibold text-emerald-400">₦{Math.round(initialEarnings * (100 - commissionRate) / 100).toLocaleString()}</span>

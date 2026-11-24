@@ -14,7 +14,6 @@ const config: Config = {
         dark: "#000814",
         cyan: "#219EBC",
         gold: "#FFB703",
-        white: "#FFFFFF",
         surface: {
           DEFAULT: "var(--surface)",
           elevated: "var(--surface-elevated)",
@@ -42,11 +41,11 @@ const config: Config = {
         disabled: {
           DEFAULT: "var(--disabled)",
           text: "var(--disabled-text)",
-        }
+        },
       },
       fontFamily: {
-        sans: ["var(--font-geist-sans)", "system-ui", "sans-serif"],
-        mono: ["var(--font-geist-mono)", "monospace"],
+        sans: ["var(--font-sans)", "system-ui", "sans-serif"],
+        mono: ["var(--font-mono)", "monospace"],
       },
       boxShadow: {
         glass: "var(--shadow)",

@@ -1,4 +1,4 @@
-# Dermavant (Aetheris Health)
+# Dermavant
 
 **Free Google Gemini-Powered Dermatology Triage & Digital Healthcare Ecosystem** — connecting patients to preliminary multimodal skin triage, licensed doctors, nearby clinics/pharmacies, and verified medicine in one platform.
 

@@ -5,7 +5,7 @@ import { Phone, Mail, MessageSquare, AlertCircle, ChevronDown } from "lucide-rea
 
 export const dynamic = "force-dynamic";
 
-const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL || "support@aetherishealth.ng";
+const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL || "sanusishafii989@gmail.com";
 const contactPhone = process.env.NEXT_PUBLIC_CONTACT_PHONE || "+234 800 000 0000";
 
 const FAQS = [

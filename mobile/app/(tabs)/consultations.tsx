@@ -8,7 +8,7 @@ import {
   SafeAreaView,
   Modal,
 } from 'react-native';
-import { AetherisColors } from '../../constants/Colors';
+import { DermavantColors } from '../../constants/Colors';
 import { NativeGlassCard } from '../../components/ui/NativeGlassCard';
 import { NativeBadge } from '../../components/ui/NativeBadge';
 import { NativeButton } from '../../components/ui/NativeButton';
@@ -18,7 +18,7 @@ const mockAppointments = [
     id: 'apt_101',
     doctorName: 'Dr. Sarah Jenkins',
     specialization: 'Cardiology Specialist',
-    hospital: 'Aetheris Medical Centre',
+    hospital: 'Dermavant Medical Centre',
     date: 'Mon, Oct 12',
     time: '10:30 AM',
     type: 'video',
@@ -38,7 +38,7 @@ const mockAppointments = [
     id: 'apt_103',
     doctorName: 'Dr. Elena Rostova',
     specialization: 'General Practitioner',
-    hospital: 'Aetheris Telehealth Network',
+    hospital: 'Dermavant Telehealth Network',
     date: 'Sep 28, 2026',
     time: '11:00 AM',
     type: 'chat',
@@ -141,7 +141,7 @@ export default function MobileConsultationsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: AetherisColors.dark,
+    backgroundColor: DermavantColors.dark,
   },
   scrollContent: {
     padding: 16,
@@ -158,15 +158,15 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.06)',
   },
   filterBtnActive: {
-    backgroundColor: AetherisColors.cyan,
+    backgroundColor: DermavantColors.cyan,
   },
   filterText: {
     fontSize: 11,
     fontWeight: '800',
-    color: AetherisColors.textMuted,
+    color: DermavantColors.textMuted,
   },
   filterTextActive: {
-    color: AetherisColors.dark,
+    color: DermavantColors.dark,
   },
   apptCard: {
     gap: 12,
@@ -178,17 +178,17 @@ const styles = StyleSheet.create({
   doctorName: {
     fontSize: 16,
     fontWeight: '800',
-    color: AetherisColors.white,
+    color: DermavantColors.white,
   },
   specText: {
     fontSize: 12,
     fontWeight: '700',
-    color: AetherisColors.cyan,
+    color: DermavantColors.cyan,
     marginTop: 2,
   },
   hospitalText: {
     fontSize: 11,
-    color: AetherisColors.textMuted,
+    color: DermavantColors.textMuted,
     marginTop: 2,
   },
   detailsRow: {
@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
   detailText: {
     fontSize: 11,
     fontWeight: '700',
-    color: AetherisColors.white,
+    color: DermavantColors.white,
   },
   actionRow: {
     flexDirection: 'row',
@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   modalContent: {
-    backgroundColor: AetherisColors.navy,
+    backgroundColor: DermavantColors.navy,
     borderRadius: 20,
     padding: 20,
     gap: 16,
@@ -221,21 +221,21 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 18,
     fontWeight: '800',
-    color: AetherisColors.white,
+    color: DermavantColors.white,
   },
   modalSub: {
     fontSize: 14,
-    color: AetherisColors.cyan,
+    color: DermavantColors.cyan,
   },
   videoSimBox: {
     height: 200,
-    backgroundColor: AetherisColors.dark,
+    backgroundColor: DermavantColors.dark,
     borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
   },
   simText: {
-    color: AetherisColors.cyan,
+    color: DermavantColors.cyan,
     fontWeight: '700',
   },
 });

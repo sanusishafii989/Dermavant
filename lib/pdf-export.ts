@@ -37,7 +37,7 @@ export function generateMedicalHistoryPDF({ patientName, vitals, items }: Export
     doc.setTextColor(0, 229, 255); // Cyan
     doc.setFont("helvetica", "bold");
     doc.setFontSize(14);
-    doc.text("AETHERIS HEALTH", margin, 12);
+    doc.text("DERMAVANT", margin, 12);
 
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(10);
@@ -279,7 +279,7 @@ export function generateMedicalHistoryPDF({ patientName, vitals, items }: Export
     doc.setFont("helvetica", "normal");
     doc.setFontSize(7.5);
     doc.setTextColor(148, 163, 184);
-    doc.text("Aetheris Health • Confidential Medical Document", margin, pageHeight - 7);
+    doc.text("Dermavant • Confidential Medical Document", margin, pageHeight - 7);
 
     const pageStr = `Page ${i} of ${totalPages}`;
     doc.text(pageStr, pageWidth - margin - doc.getTextWidth(pageStr), pageHeight - 7);
@@ -288,5 +288,5 @@ export function generateMedicalHistoryPDF({ patientName, vitals, items }: Export
   // Save PDF
   const safeName = patientName.replace(/[^a-z0-9]/gi, "_").toLowerCase();
   const dateSuffix = new Date().toISOString().slice(0, 10);
-  doc.save(`Aetheris_Medical_History_${safeName}_${dateSuffix}.pdf`);
+  doc.save(`Dermavant_Medical_History_${safeName}_${dateSuffix}.pdf`);
 }

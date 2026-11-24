@@ -84,7 +84,7 @@ function SignUpContent() {
                 <a href="/terms" target="_blank" className="text-accent-cyan underline hover:text-accent-cyan/80">Terms &amp; Conditions</a>{" "}
                 and{" "}
                 <a href="/privacy" target="_blank" className="text-accent-cyan underline hover:text-accent-cyan/80">Privacy Policy</a>.
-                I understand that Aetheris Health charges a 10% commission on doctor consultations and 5% on pharmacy orders.
+                I understand that Dermavant charges a 10% commission on doctor consultations and 5% on pharmacy orders.
               </span>
             </label>
           </div>

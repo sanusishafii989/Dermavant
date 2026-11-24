@@ -53,7 +53,7 @@ export async function POST(req: Request) {
       patientUser = await User.create({
         clerkId: `dev_patient_${Date.now()}`,
         fullName: "Test Patient",
-        email: `testpatient_${Date.now()}@aetheris.health`,
+        email: `testpatient_${Date.now()}@dermavant.health`,
         role: "patient",
         status: "active",
       } as any);

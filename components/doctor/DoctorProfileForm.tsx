@@ -136,7 +136,7 @@ export function DoctorProfileForm() {
               label="Hospital / Clinic"
               value={profile.hospital}
               onChange={(e) => setProfile({ ...profile, hospital: e.target.value })}
-              placeholder="e.g. Aetheris Medical Centre"
+              placeholder="e.g. Dermavant Medical Centre"
             />
           </div>
 

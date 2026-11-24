@@ -8,7 +8,7 @@ import {
   SafeAreaView,
 } from 'react-native';
 import { router } from 'expo-router';
-import { AetherisColors } from '../../constants/Colors';
+import { DermavantColors } from '../../constants/Colors';
 import { NativeGlassCard } from '../../components/ui/NativeGlassCard';
 import { NativeBadge } from '../../components/ui/NativeBadge';
 import { getMobileSession } from '../../services/auth';
@@ -18,28 +18,28 @@ const serviceCards = [
     title: 'Start AI Triage',
     desc: 'Guided clinical symptom assessment & precautions.',
     icon: '🤖',
-    accent: AetherisColors.cyan,
+    accent: DermavantColors.cyan,
     route: 'ai-suite',
   },
   {
     title: 'Book Specialist',
     desc: 'Choose doctor specialty and reserve appointment slot.',
     icon: '🩺',
-    accent: AetherisColors.gold,
+    accent: DermavantColors.gold,
     route: 'consultations',
   },
   {
     title: 'Global E-Pharmacy',
     desc: 'Browse prescription medicines and nearby fulfillment.',
     icon: '💊',
-    accent: AetherisColors.cyan,
+    accent: DermavantColors.cyan,
     route: 'pharmacy',
   },
   {
     title: 'Medical Profile',
     desc: 'Manage biometrics, vitals, allergies & emergency info.',
     icon: '👤',
-    accent: AetherisColors.gold,
+    accent: DermavantColors.gold,
     route: 'profile',
   },
 ];
@@ -123,7 +123,7 @@ export default function MobileDashboardScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: AetherisColors.dark,
+    backgroundColor: DermavantColors.dark,
   },
   scrollContent: {
     padding: 16,
@@ -140,17 +140,17 @@ const styles = StyleSheet.create({
   welcomeSub: {
     fontSize: 10,
     fontWeight: '800',
-    color: AetherisColors.cyan,
+    color: DermavantColors.cyan,
     letterSpacing: 1.5,
   },
   welcomeName: {
     fontSize: 24,
     fontWeight: '800',
-    color: AetherisColors.white,
+    color: DermavantColors.white,
   },
   welcomeDesc: {
     fontSize: 13,
-    color: AetherisColors.textMuted,
+    color: DermavantColors.textMuted,
     lineHeight: 18,
   },
   snapshotCard: {
@@ -165,17 +165,17 @@ const styles = StyleSheet.create({
   snapshotLabel: {
     fontSize: 10,
     fontWeight: '800',
-    color: AetherisColors.cyan,
+    color: DermavantColors.cyan,
     letterSpacing: 1,
   },
   snapshotBalance: {
     fontSize: 22,
     fontWeight: '800',
-    color: AetherisColors.white,
+    color: DermavantColors.white,
     marginTop: 2,
   },
   topupBtn: {
-    backgroundColor: AetherisColors.cyan,
+    backgroundColor: DermavantColors.cyan,
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 12,
@@ -183,12 +183,12 @@ const styles = StyleSheet.create({
   topupBtnText: {
     fontSize: 12,
     fontWeight: '800',
-    color: AetherisColors.dark,
+    color: DermavantColors.dark,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '800',
-    color: AetherisColors.white,
+    color: DermavantColors.white,
     marginTop: 8,
   },
   grid: {
@@ -209,11 +209,11 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 14,
     fontWeight: '700',
-    color: AetherisColors.white,
+    color: DermavantColors.white,
   },
   cardDesc: {
     fontSize: 11,
-    color: AetherisColors.textMuted,
+    color: DermavantColors.textMuted,
     lineHeight: 15,
   },
   cardFooter: {
@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
   emergencyTitle: {
     fontSize: 15,
     fontWeight: '800',
-    color: AetherisColors.white,
+    color: DermavantColors.white,
   },
   emergencyDesc: {
     fontSize: 12,

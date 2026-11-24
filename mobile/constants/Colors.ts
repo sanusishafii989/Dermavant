@@ -1,4 +1,4 @@
-export const AetherisColors = {
+export const DermavantColors = {
   navy: '#023047',
   dark: '#000814',
   cyan: '#219EBC',
@@ -12,19 +12,19 @@ export const AetherisColors = {
   warning: '#F59E0B',
 };
 
-const tintColorDark = AetherisColors.cyan;
+const tintColorDark = DermavantColors.cyan;
 
 export default {
   light: {
-    text: AetherisColors.white,
-    background: AetherisColors.dark,
+    text: DermavantColors.white,
+    background: DermavantColors.dark,
     tint: tintColorDark,
     tabIconDefault: 'rgba(255, 255, 255, 0.4)',
     tabIconSelected: tintColorDark,
   },
   dark: {
-    text: AetherisColors.white,
-    background: AetherisColors.dark,
+    text: DermavantColors.white,
+    background: DermavantColors.dark,
     tint: tintColorDark,
     tabIconDefault: 'rgba(255, 255, 255, 0.4)',
     tabIconSelected: tintColorDark,

@@ -11,7 +11,7 @@ function SignInContent() {
   const searchParams = useSearchParams();
   const portal = searchParams?.get("portal");
   const role = isUserRole(portal) ? portal : null;
-  const portalLabel = role ? PORTAL_LABELS[role] : "Aetheris Health";
+  const portalLabel = role ? PORTAL_LABELS[role] : "Dermavant";
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12">

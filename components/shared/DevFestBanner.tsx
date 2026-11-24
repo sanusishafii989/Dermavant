@@ -10,7 +10,7 @@ export function DevFestBanner() {
         <span className="font-semibold">GDG Yola DevFest 2026 Demo</span>
         <span className="hidden text-white/45 sm:inline">·</span>
         <span className="text-white/75">
-          Dermavant (Aetheris Health) — Free Google Gemini multimodal skin triage
+          Dermavant — Free Google Gemini multimodal skin triage
         </span>
       </div>
     </div>
