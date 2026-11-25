@@ -1,17 +1,29 @@
 "use client";
 
-import { SignIn } from "@clerk/nextjs";
+import { SignIn, useUser } from "@clerk/nextjs";
 import { useSearchParams } from "next/navigation";
-import { Suspense } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { Card } from "@/components/ui/Card";
 import { clerkAppearance } from "@/lib/clerk-appearance";
 import { isUserRole, PORTAL_LABELS, ROLE_DASHBOARD } from "@/lib/roles";
 
 function SignInContent() {
+  const { isLoaded } = useUser();
+  const [clerkTimedOut, setClerkTimedOut] = useState(false);
   const searchParams = useSearchParams();
   const portal = searchParams?.get("portal");
   const role = isUserRole(portal) ? portal : null;
   const portalLabel = role ? PORTAL_LABELS[role] : "Aetheris Health";
+
+  useEffect(() => {
+    if (isLoaded) {
+      setClerkTimedOut(false);
+      return;
+    }
+
+    const timeout = window.setTimeout(() => setClerkTimedOut(true), 12000);
+    return () => window.clearTimeout(timeout);
+  }, [isLoaded]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
@@ -22,13 +34,29 @@ function SignInContent() {
           <p className="mt-2 text-secondary">Sign in to continue to your dashboard.</p>
         </div>
 
-        <Card className="flex justify-center p-4">
-          <SignIn
-            appearance={clerkAppearance}
-            fallbackRedirectUrl="/redirect"
-            signUpUrl={role ? `/sign-up?role=${role}` : "/sign-up"}
-          />
-        </Card>
+        {clerkTimedOut && !isLoaded ? (
+          <Card className="space-y-4 p-6 text-center">
+            <p className="font-semibold text-primary">Sign-in service is not responding</p>
+            <p className="text-sm text-secondary">
+              Check your connection and Clerk configuration, then try loading sign-in again.
+            </p>
+            <button
+              type="button"
+              onClick={() => window.location.reload()}
+              className="rounded-xl bg-accent-cyan px-5 py-3 font-semibold text-slate-950"
+            >
+              Retry sign in
+            </button>
+          </Card>
+        ) : (
+          <Card className="flex min-h-32 justify-center p-4">
+            <SignIn
+              appearance={clerkAppearance}
+              fallbackRedirectUrl="/redirect"
+              signUpUrl={role ? `/sign-up?role=${role}` : "/sign-up"}
+            />
+          </Card>
+        )}
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-const CACHE_NAME = "aetheris-health-v1";
+const CACHE_NAME = "aetheris-health-v2";
 const STATIC_ASSETS = ["/", "/manifest.json", "/logo.svg", "/logo-light.svg"];
 
 // Install — cache static assets
@@ -32,6 +32,14 @@ self.addEventListener("fetch", (event) => {
 
   // Skip Clerk auth requests
   if (url.hostname.includes("clerk")) return;
+
+  // Sign-in callbacks must always reach Next.js directly. Never serve cached
+  // app content for Clerk's redirect handoff routes.
+  if (["/redirect", "/sign-in", "/sign-up"].some((path) =>
+    url.pathname === path || url.pathname.startsWith(`${path}/`)
+  )) {
+    return;
+  }
 
   // Skip authenticated dashboard pages — caching them causes stale user data
   if (

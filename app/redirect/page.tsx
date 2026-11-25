@@ -1,38 +1,35 @@
-"use client";
-
-import { useUser } from "@clerk/nextjs";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-import { ROLE_DASHBOARD } from "@/lib/roles";
+import { clerkClient, currentUser } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
+import { isUserRole, ROLE_DASHBOARD, type UserRole } from "@/lib/roles";
 
 export const dynamic = "force-dynamic";
 
-export default function PostLoginRedirect() {
-  const { user, isLoaded } = useUser();
-  const router = useRouter();
+const SELF_SIGNUP_ROLES: UserRole[] = ["patient", "doctor", "partner"];
 
-  useEffect(() => {
-    if (!isLoaded) return;
-    if (!user) {
-      router.push("/sign-in");
-      return;
-    }
+export default async function PostLoginRedirect() {
+  const user = await currentUser();
 
-    const role = (user as any)?.publicMetadata?.role;
-    if (role && ROLE_DASHBOARD[role as keyof typeof ROLE_DASHBOARD]) {
-      router.push(ROLE_DASHBOARD[role as keyof typeof ROLE_DASHBOARD]);
-    } else {
-      // Default to patient dashboard
-      router.push("/patient/dashboard");
-    }
-  }, [isLoaded, user, router]);
+  if (!user) {
+    redirect("/sign-in");
+  }
 
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-[var(--bg-primary)]">
-      <div className="text-center">
-        <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-[var(--accent-cyan)] border-t-transparent" />
-        <p className="mt-3 text-sm text-[var(--text-secondary)]">Redirecting to your dashboard...</p>
-      </div>
-    </div>
-  );
+  const publicRole = user.publicMetadata?.role;
+  if (typeof publicRole === "string" && isUserRole(publicRole)) {
+    redirect(ROLE_DASHBOARD[publicRole]);
+  }
+
+  // Sign-up records the chosen role in unsafeMetadata. Copy only a permitted
+  // self-signup role into trusted publicMetadata on the server. Admin is never
+  // accepted from user-controlled metadata.
+  const requestedRole = user.unsafeMetadata?.role;
+  const role: UserRole = SELF_SIGNUP_ROLES.includes(requestedRole as UserRole)
+    ? (requestedRole as UserRole)
+    : "patient";
+
+  const clerk = await clerkClient();
+  await clerk.users.updateUserMetadata(user.id, {
+    publicMetadata: { role },
+  });
+
+  redirect(ROLE_DASHBOARD[role]);
 }
