@@ -98,7 +98,7 @@ export default function HomePage() {
       <section className="relative overflow-hidden">
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-gradient-to-br from-cyan/10 via-transparent to-gold/5"
+          className="pointer-events-none absolute inset-0 bg-gradient-to-br from-teal-500/[0.04] via-transparent to-transparent dark:from-teal-400/[0.05]"
         />
         <div className="relative mx-auto max-w-7xl px-6 pb-16 pt-12 md:pb-20 md:pt-16">
           <div className="grid items-stretch gap-10 lg:grid-cols-12 lg:gap-12">
@@ -419,7 +419,7 @@ export default function HomePage() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/25 to-transparent" />
                 <div className="absolute inset-x-0 bottom-0 p-6 text-white">
-                  <p className="text-xs font-medium text-cyan-300">Community-Centered Care</p>
+                  <p className="text-xs font-medium text-teal-300">Community-Centered Care</p>
                   <p className="mt-1 text-base font-semibold">
                     Practical clinical tools built in Yola for everyday healthcare access
                   </p>

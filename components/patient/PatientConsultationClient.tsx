@@ -108,9 +108,9 @@ export function PatientConsultationClient() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-white flex items-center gap-2.5">
-            <Stethoscope className="h-7 w-7 text-cyan" /> Patient Consultation Center
+            <Stethoscope className="h-7 w-7 text-accent-cyan" /> Patient Consultation Center
           </h1>
-          <p className="text-sm text-white/60">
+          <p className="text-sm text-secondary">
             Manage your doctor appointments, join live video consultations, and review clinical summaries.
           </p>
         </div>
@@ -121,13 +121,13 @@ export function PatientConsultationClient() {
             size="sm"
             onClick={fetchAppointments}
             disabled={loading}
-            className="text-cyan hover:bg-cyan/10"
+            className="text-accent-cyan hover:bg-accent-cyan/10"
           >
             <RefreshCw className={`mr-1.5 h-4 w-4 ${loading ? "animate-spin" : ""}`} /> Refresh
           </Button>
 
           <Link href="/patient/dashboard/book-specialist">
-            <Button className="bg-cyan text-dark font-bold hover:bg-cyan/90">
+            <Button className="bg-[var(--accent-primary)] text-white font-semibold hover:bg-[var(--accent-primary-hover)]">
               <Plus className="mr-1.5 h-4 w-4" /> Book Specialist
             </Button>
           </Link>
@@ -148,8 +148,8 @@ export function PatientConsultationClient() {
               onClick={() => setStatusFilter(tab.value)}
               className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
                 statusFilter === tab.value
-                  ? "bg-cyan text-dark shadow-md shadow-cyan/20"
-                  : "bg-white/5 text-white/70 hover:bg-white/10 hover:text-white"
+                  ? "bg-[var(--accent-primary)] text-white shadow-sm"
+                  : "bg-surface-elevated text-secondary hover:text-primary border border-border"
               }`}
             >
               {tab.label}
@@ -160,23 +160,23 @@ export function PatientConsultationClient() {
 
       {/* Appointments List */}
       {loading ? (
-        <Card className="p-12 text-center text-white/60">
-          <RefreshCw className="mx-auto h-8 w-8 animate-spin text-cyan mb-3" />
+        <Card className="p-12 text-center text-secondary">
+          <RefreshCw className="mx-auto h-8 w-8 animate-spin text-accent-cyan mb-3" />
           Loading your consultations...
         </Card>
       ) : filteredAppointments.length === 0 ? (
         <Card className="p-12 text-center space-y-4">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-cyan/10 text-cyan">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-accent-cyan/10 text-accent-cyan">
             <Stethoscope className="h-8 w-8" />
           </div>
           <div>
-            <h3 className="text-lg font-bold text-white">No Consultations Found</h3>
-            <p className="text-sm text-white/60 max-w-md mx-auto mt-1">
+            <h3 className="text-lg font-bold text-primary">No Consultations Found</h3>
+            <p className="text-sm text-secondary max-w-md mx-auto mt-1">
               You do not have any consultations under the selected filter. Book a specialist to start your care journey.
             </p>
           </div>
           <Link href="/patient/dashboard/book-specialist" className="inline-block">
-            <Button className="bg-cyan text-dark font-bold hover:bg-cyan/90">
+            <Button className="bg-[var(--accent-primary)] text-white font-semibold hover:bg-[var(--accent-primary-hover)]">
               <Plus className="mr-1.5 h-4 w-4" /> Book a Consultation Now
             </Button>
           </Link>
@@ -186,7 +186,7 @@ export function PatientConsultationClient() {
           {filteredAppointments.map((apt) => (
             <Card
               key={apt._id}
-              className="flex flex-col justify-between space-y-4 border-white/10 hover:border-cyan/40 transition-all duration-200"
+              className="flex flex-col justify-between space-y-4 border-border hover:border-cyan/40 transition-all duration-200"
             >
               {/* Doctor Header */}
               <div className="flex items-start justify-between gap-3">
@@ -196,9 +196,9 @@ export function PatientConsultationClient() {
                     <h3 className="font-bold text-white text-base leading-tight">
                       {apt.doctor_name}
                     </h3>
-                    <p className="text-xs text-cyan font-medium">{apt.doctor_specialization}</p>
+                    <p className="text-xs text-accent-cyan font-medium">{apt.doctor_specialization}</p>
                     {apt.doctor_hospital && (
-                      <p className="text-[11px] text-white/50 flex items-center gap-1 mt-0.5">
+                      <p className="text-[11px] text-secondary flex items-center gap-1 mt-0.5">
                         <Building className="h-3 w-3" /> {apt.doctor_hospital}
                       </p>
                     )}
@@ -219,12 +219,12 @@ export function PatientConsultationClient() {
               </div>
 
               {/* Date & Time Info */}
-              <div className="rounded-xl border border-white/5 bg-white/5 p-3 space-y-2 text-xs">
-                <div className="flex items-center justify-between text-white/80">
-                  <span className="flex items-center gap-1.5 text-white/60">
-                    <Calendar className="h-3.5 w-3.5 text-cyan" /> Date:
+              <div className="rounded-xl border border-border bg-surface-elevated p-3 space-y-2 text-xs">
+                <div className="flex items-center justify-between text-primary">
+                  <span className="flex items-center gap-1.5 text-secondary">
+                    <Calendar className="h-3.5 w-3.5 text-accent-cyan" /> Date:
                   </span>
-                  <span className="font-semibold text-white">
+                  <span className="font-semibold text-primary">
                     {new Date(apt.date).toLocaleDateString("en-US", {
                       weekday: "short",
                       month: "short",
@@ -233,34 +233,34 @@ export function PatientConsultationClient() {
                   </span>
                 </div>
 
-                <div className="flex items-center justify-between text-white/80">
-                  <span className="flex items-center gap-1.5 text-white/60">
-                    <Clock className="h-3.5 w-3.5 text-gold" /> Time:
+                <div className="flex items-center justify-between text-primary">
+                  <span className="flex items-center gap-1.5 text-secondary">
+                    <Clock className="h-3.5 w-3.5 text-accent-gold" /> Time:
                   </span>
-                  <span className="font-mono font-bold text-gold">{apt.time}</span>
+                  <span className="font-mono font-bold text-accent-gold">{apt.time}</span>
                 </div>
 
-                <div className="flex items-center justify-between text-white/80">
-                  <span className="flex items-center gap-1.5 text-white/60">
+                <div className="flex items-center justify-between text-primary">
+                  <span className="flex items-center gap-1.5 text-secondary">
                     {apt.type === "video" ? (
-                      <Video className="h-3.5 w-3.5 text-cyan" />
+                      <Video className="h-3.5 w-3.5 text-accent-cyan" />
                     ) : apt.type === "voice" ? (
-                      <Mic className="h-3.5 w-3.5 text-cyan" />
+                      <Mic className="h-3.5 w-3.5 text-accent-cyan" />
                     ) : (
-                      <MessageSquare className="h-3.5 w-3.5 text-cyan" />
+                      <MessageSquare className="h-3.5 w-3.5 text-accent-cyan" />
                     )}
                     Channel:
                   </span>
-                  <span className="capitalize font-semibold text-cyan">{apt.type} Telehealth</span>
+                  <span className="capitalize font-semibold text-accent-cyan">{apt.type} Telehealth</span>
                 </div>
               </div>
 
               {/* Action Controls */}
-              <div className="flex items-center gap-2 pt-2 border-t border-white/10">
+              <div className="flex items-center gap-2 pt-2 border-t border-border">
                 {apt.consultation_status === "scheduled" && (
                   <>
                     <Button
-                      className="flex-1 bg-cyan text-dark font-bold hover:bg-cyan/90 text-xs py-2"
+                      className="flex-1 bg-[var(--accent-primary)] text-white font-semibold hover:bg-[var(--accent-primary-hover)] text-xs py-2"
                       onClick={() => setActiveRoomAppt(apt as TelemedicineAppointment)}
                     >
                       <Video className="mr-1.5 h-3.5 w-3.5" /> Join Consultation
@@ -269,7 +269,7 @@ export function PatientConsultationClient() {
                       variant="ghost"
                       size="sm"
                       onClick={() => setCancellingAppt(apt)}
-                      className="text-xs px-2.5 py-2 bg-rose-500/20 text-rose-300 border border-rose-500/30 hover:bg-rose-500/30"
+                      className="text-xs px-2.5 py-2 bg-danger-bg text-danger-text border border-danger/30 hover:opacity-90"
                     >
                       Cancel
                     </Button>
@@ -279,7 +279,7 @@ export function PatientConsultationClient() {
                 {apt.consultation_status === "completed" && (
                   <Button
                     variant="ghost"
-                    className="w-full text-cyan hover:bg-cyan/10 border border-cyan/30 text-xs py-2"
+                    className="w-full text-accent-cyan hover:bg-accent-cyan/10 border border-accent-cyan/30 text-xs py-2"
                     onClick={() => setInspectingAppt(apt)}
                   >
                     <FileText className="mr-1.5 h-3.5 w-3.5" /> View Clinical Notes
@@ -287,7 +287,7 @@ export function PatientConsultationClient() {
                 )}
 
                 {apt.consultation_status === "cancelled" && (
-                  <p className="w-full text-center text-xs text-white/40 italic py-1">
+                  <p className="w-full text-center text-xs text-muted italic py-1">
                     This consultation was cancelled.
                   </p>
                 )}
@@ -311,13 +311,13 @@ export function PatientConsultationClient() {
         title="Cancel Consultation"
       >
         <div className="space-y-4">
-          <p className="text-sm text-white/80">
+          <p className="text-sm text-primary">
             Are you sure you want to cancel your upcoming consultation with{" "}
-            <span className="font-bold text-white">{cancellingAppt?.doctor_name}</span> scheduled for{" "}
-            <span className="font-mono text-cyan">{cancellingAppt?.time}</span>?
+            <span className="font-bold text-primary">{cancellingAppt?.doctor_name}</span> scheduled for{" "}
+            <span className="font-mono text-accent-cyan">{cancellingAppt?.time}</span>?
           </p>
 
-          <div className="flex justify-end gap-3 pt-2 border-t border-white/10">
+          <div className="flex justify-end gap-3 pt-2 border-t border-border">
             <Button variant="ghost" onClick={() => setCancellingAppt(null)}>
               Keep Appointment
             </Button>
@@ -341,19 +341,19 @@ export function PatientConsultationClient() {
       >
         {inspectingAppt && (
           <div className="space-y-4 text-xs">
-            <div className="rounded-xl border border-white/10 bg-white/5 p-4 space-y-2">
-              <div className="flex items-center justify-between text-cyan font-bold">
+            <div className="rounded-xl border border-border bg-surface-elevated p-4 space-y-2">
+              <div className="flex items-center justify-between text-accent-cyan font-bold">
                 <span>{inspectingAppt.doctor_name}</span>
                 <Badge variant="success">Completed</Badge>
               </div>
-              <p className="text-white/60">{inspectingAppt.doctor_specialization}</p>
+              <p className="text-secondary">{inspectingAppt.doctor_specialization}</p>
             </div>
 
-            <div className="rounded-xl border border-white/10 bg-dark/80 p-4 space-y-2">
-              <p className="font-bold text-gold flex items-center gap-1.5 text-sm">
+            <div className="rounded-xl border border-border bg-surface-elevated p-4 space-y-2">
+              <p className="font-bold text-accent-gold flex items-center gap-1.5 text-sm">
                 <FileText className="h-4 w-4" /> Consultation Diagnosis & Plan
               </p>
-              <p className="text-white/80 leading-relaxed">
+              <p className="text-primary leading-relaxed">
                 Patient completed a digital telehealth consultation. Vital metrics stable. Follow care instructions and maintain prescribed medications.
               </p>
             </div>

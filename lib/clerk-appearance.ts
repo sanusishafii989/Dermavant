@@ -3,24 +3,23 @@ import type { Appearance } from "@clerk/types";
 export const clerkAppearance: Appearance = {
   variables: {
     colorPrimary: "#0D9488",
-    colorBackground: "#023047",
-    colorText: "#FFFFFF",
-    colorInputBackground: "rgba(255,255,255,0.05)",
-    colorInputText: "#FFFFFF",
     borderRadius: "0.75rem",
   },
   elements: {
     rootBox: "mx-auto w-full",
-    card: "rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md shadow-lg p-6",
-    headerTitle: "text-white font-semibold text-lg",
-    headerSubtitle: "text-white/60 text-sm",
+    card: "rounded-2xl border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] shadow-none p-6",
+    headerTitle: "text-[var(--text-primary)] font-semibold text-lg",
+    headerSubtitle: "text-[var(--text-secondary)] text-sm",
     socialButtonsBlockButton:
-      "border border-white/10 bg-white/5 text-white hover:bg-white/10 rounded-xl",
-    formButtonPrimary: "bg-[#0D9488] text-white hover:opacity-90 rounded-xl font-medium",
-    footerActionLink: "text-[#0D9488] hover:opacity-80",
+      "border border-[var(--border)] bg-[var(--bg-input)] text-[var(--text-primary)] hover:bg-[var(--surface-elevated)] rounded-xl",
+    formButtonPrimary:
+      "bg-[#0D9488] text-white hover:bg-[#0F766E] rounded-xl font-medium",
+    footerActionLink: "text-[var(--accent-cyan)] hover:opacity-80",
     formFieldInput:
-      "border border-white/10 bg-white/5 text-white placeholder:text-white/40 rounded-xl",
-    formFieldLabel: "text-white/70 text-sm",
-    identityPreviewEditButton: "text-[#0D9488]",
+      "border border-[var(--border)] bg-[var(--bg-input)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] rounded-xl",
+    formFieldLabel: "text-[var(--text-secondary)] text-sm",
+    dividerLine: "bg-[var(--border)]",
+    dividerText: "text-[var(--text-muted)]",
+    identityPreviewEditButton: "text-[var(--accent-cyan)]",
   },
 };

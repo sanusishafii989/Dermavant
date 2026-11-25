@@ -72,7 +72,7 @@ export function WalletCard({ balance, currency, transactions, onRefresh }: Walle
   return (
     <div className="space-y-6">
       {/* Wallet Balance Hero Card */}
-      <Card className="relative overflow-hidden border border-[var(--accent-cyan)]/30 bg-gradient-to-r from-navy via-dark to-cyan/10 p-6 shadow-2xl backdrop-blur-md">
+      <Card className="relative overflow-hidden border border-border bg-surface p-6 shadow-theme">
         <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-[var(--accent-cyan)]">
@@ -91,7 +91,7 @@ export function WalletCard({ balance, currency, transactions, onRefresh }: Walle
             <Button
               variant="primary"
               onClick={() => setIsTopUpOpen(true)}
-              className="flex items-center gap-2 shadow-lg shadow-cyan/20"
+              className="flex items-center gap-2 "
             >
               <PlusCircle className="h-4 w-4" />
               <span>Add Funds</span>
@@ -167,7 +167,7 @@ export function WalletCard({ balance, currency, transactions, onRefresh }: Walle
 
         {transactions.length === 0 ? (
           <Card className="border-dashed border-[var(--border)] p-8 text-center text-[var(--text-muted)]">
-            <CreditCard className="mx-auto h-10 w-10 text-white/20" />
+            <CreditCard className="mx-auto h-10 w-10 text-muted" />
             <p className="mt-2 text-xs font-medium">No transactions recorded yet</p>
           </Card>
         ) : (
@@ -175,7 +175,7 @@ export function WalletCard({ balance, currency, transactions, onRefresh }: Walle
             {transactions.map((tx) => (
               <Card
                 key={tx.id}
-                className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border border-[var(--border)] bg-[var(--bg-primary)]/60 p-4 backdrop-blur-md"
+                className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border border-border bg-surface p-4"
               >
                 <div className="flex items-center gap-3">
                   <div

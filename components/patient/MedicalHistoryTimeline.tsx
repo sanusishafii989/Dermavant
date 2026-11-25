@@ -52,7 +52,7 @@ export function MedicalHistoryTimeline({ items }: MedicalHistoryTimelineProps) {
   return (
     <div className="space-y-6">
       {/* Category Filter Tabs */}
-      <div className="flex flex-wrap gap-2 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-1.5 backdrop-blur-md">
+      <div className="flex flex-wrap gap-2 rounded-2xl border border-border bg-surface p-1.5">
         {[
           { id: "all", label: `All Records (${items.length})` },
           { id: "ai_triage", label: "AI Triages" },
@@ -64,7 +64,7 @@ export function MedicalHistoryTimeline({ items }: MedicalHistoryTimelineProps) {
             onClick={() => setActiveFilter(tab.id)}
             className={`rounded-xl px-4 py-2 text-xs font-semibold tracking-wide transition-all ${
               activeFilter === tab.id
-                ? "bg-[var(--accent-cyan)] text-white shadow-md"
+                ? "bg-[var(--accent-primary)] text-white shadow-sm"
                 : "text-[var(--text-secondary)] hover:bg-[var(--bg-input)] hover:text-[var(--text-primary)]"
             }`}
           >
@@ -76,14 +76,14 @@ export function MedicalHistoryTimeline({ items }: MedicalHistoryTimelineProps) {
       {/* Timeline Items */}
       {filteredItems.length === 0 ? (
         <Card className="border-dashed border-[var(--border)] p-12 text-center text-[var(--text-secondary)]">
-          <FileText className="mx-auto h-12 w-12 text-white/20" />
+          <FileText className="mx-auto h-12 w-12 text-muted" />
           <p className="mt-3 text-sm font-medium">No medical history records found</p>
           <p className="mt-1 text-xs text-[var(--text-muted)]">
             Records will automatically populate as you complete consultations and AI triages.
           </p>
         </Card>
       ) : (
-        <div className="relative space-y-6 before:absolute before:left-6 before:top-3 before:bottom-3 before:w-0.5 before:bg-gradient-to-b before:from-cyan/40 before:via-white/10 before:to-transparent">
+        <div className="relative space-y-6 before:absolute before:left-6 before:top-3 before:bottom-3 before:w-0.5 before:bg-gradient-to-b before:from-cyan/40 before:via-[var(--border)] before:to-transparent">
           {filteredItems.map((item) => (
             <div key={item.id} className="relative pl-14">
               {/* Timeline Indicator Node */}
@@ -92,7 +92,7 @@ export function MedicalHistoryTimeline({ items }: MedicalHistoryTimelineProps) {
               </div>
 
               {/* Item Detail Card */}
-              <Card className="border border-[var(--border)] bg-[var(--bg-primary)]/60 p-5 backdrop-blur-md transition-all hover:border-[var(--accent-cyan)]/30">
+              <Card className="border border-border bg-surface p-5 transition-colors hover:border-[var(--border-hover)]">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-[var(--border)] pb-3">
                   <div>
                     <div className="flex items-center gap-2">

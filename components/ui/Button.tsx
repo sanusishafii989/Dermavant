@@ -11,10 +11,10 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variantStyles: Record<ButtonVariant, string> = {
-  primary: "bg-accent-cyan text-white hover:opacity-90",
-  secondary: "bg-transparent text-primary border border-border hover:border-accent-cyan",
-  ghost: "bg-transparent text-secondary hover:bg-surface-elevated",
-  gold: "bg-accent-gold text-white hover:opacity-90",
+  primary: "bg-[var(--accent-primary)] text-white hover:bg-[var(--accent-primary-hover)] shadow-sm",
+  secondary: "bg-surface text-primary border border-border hover:border-[var(--border-hover)] hover:bg-surface-elevated",
+  ghost: "bg-transparent text-secondary hover:bg-surface-elevated hover:text-primary",
+  gold: "bg-accent-gold text-white hover:opacity-90 shadow-sm",
 };
 
 const sizeStyles: Record<ButtonSize, string> = {
@@ -33,7 +33,7 @@ export function Button({
   ...props
 }: ButtonProps) {
   const buttonClassName = cn(
-    "inline-flex items-center justify-center rounded-xl font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-cyan)] disabled:pointer-events-none disabled:opacity-50",
+    "inline-flex items-center justify-center rounded-xl font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-cyan)] disabled:pointer-events-none disabled:opacity-50",
     variantStyles[variant],
     sizeStyles[size],
     className

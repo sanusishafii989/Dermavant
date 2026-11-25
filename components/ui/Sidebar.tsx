@@ -138,7 +138,7 @@ export function Sidebar({ links, title = "Dermavant", footer, mobileHeaderAction
     return (
       <>
         {/* Mobile app bar */}
-        <header className="fixed left-0 right-0 top-0 z-40 flex min-h-[4.5rem] items-center justify-between border-b border-border bg-background/90 px-4 pb-3 pt-[calc(0.75rem+env(safe-area-inset-top))] backdrop-blur-xl md:hidden">
+        <header className="fixed left-0 right-0 top-0 z-40 flex min-h-[4.5rem] items-center justify-between border-b border-border bg-background/95 px-4 pb-3 pt-[calc(0.75rem+env(safe-area-inset-top))] md:hidden">
           <button
             onClick={() => setMobileOpen(true)}
             className="flex h-10 w-10 items-center justify-center rounded-2xl border border-border bg-surface text-secondary active:scale-95"
@@ -196,7 +196,7 @@ export function Sidebar({ links, title = "Dermavant", footer, mobileHeaderAction
           </div>
         ) : null}
 
-        <nav aria-label="Primary navigation" className="fixed bottom-0 left-0 right-0 z-40 grid grid-cols-5 border-t border-border bg-surface/95 px-1 pb-[max(0.35rem,env(safe-area-inset-bottom))] pt-1.5 backdrop-blur-xl md:hidden">
+        <nav aria-label="Primary navigation" className="fixed bottom-0 left-0 right-0 z-40 grid grid-cols-5 border-t border-border bg-surface px-1 pb-[max(0.35rem,env(safe-area-inset-bottom))] pt-1.5 md:hidden">
           {primaryMobileLinks.map((link) => (
             <Link
               key={link.href}
@@ -230,7 +230,7 @@ export function Sidebar({ links, title = "Dermavant", footer, mobileHeaderAction
   return (
     <aside
       className={cn(
-        "glass-panel sticky top-0 flex h-screen shrink-0 flex-col p-4 transition-all duration-200",
+        "sticky top-0 flex h-screen shrink-0 flex-col border-r border-[var(--sidebar-border)] bg-[var(--sidebar-bg)] p-4 transition-all duration-200",
         sidebarWidth,
         className
       )}

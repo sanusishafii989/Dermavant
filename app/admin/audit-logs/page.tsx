@@ -64,10 +64,10 @@ export default function AdminAuditLogsPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-              <Shield className="h-6 w-6 text-cyan" /> System Security & Audit Logs
+            <h1 className="text-2xl font-bold text-primary flex items-center gap-2">
+              <Shield className="h-6 w-6 text-accent-cyan" /> System Security & Audit Logs
             </h1>
-            <p className="text-sm text-white/60">
+            <p className="text-sm text-secondary">
               Immutable accountability logs for system actions, user verification, and admin controls
             </p>
           </div>
@@ -76,7 +76,7 @@ export default function AdminAuditLogsPage() {
             size="sm"
             onClick={fetchLogs}
             disabled={loading}
-            className="text-cyan hover:bg-cyan/10 self-start sm:self-auto"
+            className="text-accent-cyan hover:bg-accent-cyan/10 self-start sm:self-auto"
           >
             <RefreshCw className={`mr-1.5 h-4 w-4 ${loading ? "animate-spin" : ""}`} /> Refresh Logs
           </Button>
@@ -97,8 +97,8 @@ export default function AdminAuditLogsPage() {
                 onClick={() => setActionFilter(tab.value)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
                   actionFilter === tab.value
-                    ? "bg-cyan text-dark font-bold"
-                    : "bg-white/5 text-white/70 hover:bg-white/10"
+                    ? "bg-[var(--accent-primary)] text-white font-semibold"
+                    : "bg-surface-elevated text-secondary hover:text-primary border border-border"
                 }`}
               >
                 {tab.label}
@@ -112,12 +112,12 @@ export default function AdminAuditLogsPage() {
           {/* Mobile View */}
           <div className="block md:hidden">
             {loading ? (
-              <div className="py-12 text-center text-white/50">
-                <RefreshCw className="mx-auto h-6 w-6 animate-spin text-cyan mb-2" />
+              <div className="py-12 text-center text-secondary">
+                <RefreshCw className="mx-auto h-6 w-6 animate-spin text-accent-cyan mb-2" />
                 Loading system audit trail...
               </div>
             ) : logs.length === 0 ? (
-              <div className="py-12 text-center text-white/40">
+              <div className="py-12 text-center text-muted">
                 No audit log entries found for selected filter.
               </div>
             ) : (
@@ -155,13 +155,13 @@ export default function AdminAuditLogsPage() {
 
             {/* Mobile Expanded JSON Inspector */}
             {expandedId && (
-              <div className="mt-4 rounded-xl bg-dark/95 p-4 border border-white/10 space-y-2">
-                <div className="flex items-center justify-between text-xs text-cyan font-mono">
+              <div className="mt-4 rounded-xl bg-surface p-4 border border-border space-y-2">
+                <div className="flex items-center justify-between text-xs text-accent-cyan font-mono">
                   <span className="flex items-center gap-1.5">
                     <Terminal className="h-3.5 w-3.5" /> Payload Metadata
                   </span>
                 </div>
-                <pre className="overflow-x-auto text-[11px] font-mono text-emerald-300 leading-relaxed bg-black/60 p-3 rounded-lg border border-white/5">
+                <pre className="overflow-x-auto text-[11px] font-mono text-emerald-300 leading-relaxed bg-slate-950 p-3 rounded-lg border border-border">
                   {JSON.stringify(logs.find(l => l._id === expandedId)?.metadata || {}, null, 2)}
                 </pre>
               </div>
@@ -266,7 +266,7 @@ export default function AdminAuditLogsPage() {
                                 </span>
                                 <span>Log ID: {log._id}</span>
                               </div>
-                              <pre className="overflow-x-auto text-[11px] font-mono text-emerald-300 leading-relaxed bg-black/60 p-3 rounded-lg border border-white/5">
+                              <pre className="overflow-x-auto text-[11px] font-mono text-emerald-300 leading-relaxed bg-slate-950 p-3 rounded-lg border border-border">
                                 {JSON.stringify(log.metadata || {}, null, 2)}
                               </pre>
                             </div>

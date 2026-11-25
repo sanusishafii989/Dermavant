@@ -148,7 +148,7 @@ export function DoctorWalletClient({
       ) : null}
 
       {/* Commission info */}
-      <Card className="border border-cyan/20 bg-[var(--accent-cyan)]/5">
+      <Card className="border border-[var(--accent-cyan)]/25 bg-[var(--accent-cyan)]/5">
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--accent-cyan)]/15 text-[var(--accent-cyan)]">
             <Percent className="h-5 w-5" />

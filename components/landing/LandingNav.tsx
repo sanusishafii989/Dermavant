@@ -16,7 +16,7 @@ export function LandingNav() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 border-b border-[var(--border)] bg-[var(--bg-primary)]/90 backdrop-blur-md">
+    <header className="sticky top-0 z-50 border-b border-[var(--border)] bg-[var(--bg-primary)]">
       <div className="mx-auto flex min-h-[4.5rem] max-w-7xl items-center justify-between gap-8 px-4 pb-3 pt-[calc(0.75rem+env(safe-area-inset-top))] sm:px-6 md:py-4">
         <Link href="/" className="flex shrink-0 items-center whitespace-nowrap" aria-label="Dermavant home">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -59,7 +59,7 @@ export function LandingNav() {
           </Link>
           <Link
             href="/sign-up"
-            className="hidden whitespace-nowrap shrink-0 rounded-xl bg-[var(--accent-cyan)] px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90 sm:inline-flex"
+            className="hidden whitespace-nowrap shrink-0 rounded-xl bg-[var(--accent-primary)] hover:bg-[var(--accent-primary-hover)] px-4 py-2 text-sm font-semibold text-white transition-opacity transition-colors sm:inline-flex"
           >
             Get Started
           </Link>
@@ -100,7 +100,7 @@ export function LandingNav() {
               <Link
                 href="/sign-up"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center justify-center rounded-xl bg-[var(--accent-cyan)] px-4 py-2.5 text-sm font-medium text-white"
+                className="flex items-center justify-center rounded-xl bg-[var(--accent-primary)] hover:bg-[var(--accent-primary-hover)] px-4 py-2.5 text-sm font-medium text-white"
               >
                 Get Started
               </Link>

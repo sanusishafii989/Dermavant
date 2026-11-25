@@ -20,7 +20,7 @@ export function SafeClinicalPhoto({
 
   if (failed) {
     return (
-      <div className="flex h-full w-full flex-col items-center justify-center gap-2 bg-gradient-to-br from-[#023047] via-[#06182c] to-[#0a2f44] p-6 text-center text-white/80">
+      <div className="flex h-full w-full flex-col items-center justify-center gap-2 bg-gradient-to-br from-[#0B1220] via-[#111827] to-[#0F172A] p-6 text-center text-white/80">
         <Stethoscope className="h-8 w-8 text-[#22d3ee]" aria-hidden="true" />
         <p className="text-sm font-medium">{fallbackLabel || alt}</p>
       </div>

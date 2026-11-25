@@ -143,8 +143,8 @@ export function DermavantScene3D() {
     renderer.domElement.addEventListener("webglcontextrestored", onContextRestored);
 
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x041222);
-    scene.fog = new THREE.FogExp2(0x041222, 0.045);
+    scene.background = new THREE.Color(0x0A101D);
+    scene.fog = new THREE.FogExp2(0x0A101D, 0.045);
 
     const pmremGenerator = new THREE.PMREMGenerator(renderer);
     const envTex = pmremGenerator.fromScene(new RoomEnvironment(), 0.04).texture;
@@ -156,7 +156,7 @@ export function DermavantScene3D() {
     const camera = new THREE.PerspectiveCamera(36, width / height, 0.1, 100);
     camera.position.set(...SCAN_PRESETS_INITIAL);
 
-    const hemiLight = new THREE.HemisphereLight(0x8be9fd, 0x091a2e, 1.15);
+    const hemiLight = new THREE.HemisphereLight(0xa5f3fc, 0x0b1220, 1.15);
     scene.add(hemiLight);
 
     const keyLight = new THREE.DirectionalLight(0xfff1d6, 2.25);
@@ -173,7 +173,7 @@ export function DermavantScene3D() {
     keyLight.shadow.normalBias = 0.02;
     scene.add(keyLight);
 
-    const rimLight = new THREE.DirectionalLight(0x219ebc, 1.55);
+    const rimLight = new THREE.DirectionalLight(0x14b8a6, 1.55);
     rimLight.position.set(-5.2, 3.6, -4.4);
     scene.add(rimLight);
 
@@ -221,7 +221,7 @@ export function DermavantScene3D() {
     ];
     const plinthGeo = new THREE.LatheGeometry(lathePoints, 64);
     const plinthMat = new THREE.MeshPhysicalMaterial({
-      color: 0x102840,
+      color: 0x162032,
       metalness: 0.88,
       roughness: 0.26,
       clearcoat: 0.35,
@@ -666,11 +666,11 @@ export function DermavantScene3D() {
     <div
       data-testid="dermavant-3d-stage"
       data-preset={preset}
-      className="relative flex min-h-[460px] w-full flex-col overflow-hidden rounded-2xl border border-cyan/25 bg-[#041222] shadow-2xl lg:min-h-[540px]"
+      className="relative flex min-h-[460px] w-full flex-col overflow-hidden rounded-2xl border border-slate-800/80 dark:border-border bg-[#0A101D] shadow-theme-lg lg:min-h-[540px]"
     >
-      <div className="pointer-events-none relative z-10 flex items-center justify-between gap-4 border-b border-white/10 bg-[#06182c]/95 px-4 py-3">
+      <div className="pointer-events-none relative z-10 flex items-center justify-between gap-4 border-b border-white/10 bg-[#0D1424] px-4 py-3">
         <div className="flex items-center gap-2.5 min-w-0">
-          <ScanLine className="h-4 w-4 shrink-0 text-[#22d3ee]" aria-hidden="true" />
+          <ScanLine className="h-4 w-4 shrink-0 text-[#2DD4BF]" aria-hidden="true" />
           <span className="truncate text-xs font-semibold text-white">
             {activeSpec.layerTitle}
           </span>
@@ -694,8 +694,8 @@ export function DermavantScene3D() {
         />
 
         {contextLost ? (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#041222] p-6 text-center">
-            <Layers className="h-10 w-10 text-[#22d3ee]" />
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#0A101D] p-6 text-center">
+            <Layers className="h-10 w-10 text-[#2DD4BF]" />
             <p className="text-sm font-semibold text-white">Interactive 3D Dermal View</p>
             <p className="max-w-xs text-xs text-white/70">
               Hardware 3D context paused. Explore Epidermis, Dermis, and Subcutaneous triage workflows below.
@@ -704,7 +704,7 @@ export function DermavantScene3D() {
         ) : null}
       </div>
 
-      <div className="relative z-10 border-t border-white/10 bg-[#06182c] px-4 py-3">
+      <div className="relative z-10 border-t border-white/10 bg-[#0D1424] px-4 py-3">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="3D Dermal Scan Modes">
             {PRESET_ORDER.map((id) => {
@@ -717,7 +717,7 @@ export function DermavantScene3D() {
                   onClick={() => handlePresetChange(id)}
                   className={`whitespace-nowrap shrink-0 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
                     isSelected
-                      ? "bg-[#219ebc] text-white"
+                      ? "bg-[#0D9488] text-white"
                       : "bg-white/5 text-white/75 hover:bg-white/10 hover:text-white"
                   }`}
                 >

@@ -119,7 +119,7 @@ export function ClinicGallery() {
                   onClick={() => setFilter(item.id)}
                   className={`whitespace-nowrap shrink-0 rounded-lg px-3.5 py-2 text-xs font-medium transition-colors ${
                     active
-                      ? "bg-accent-cyan text-white shadow-sm"
+                      ? "bg-[var(--accent-primary)] text-white shadow-sm"
                       : "text-secondary hover:text-primary"
                   }`}
                 >
@@ -146,7 +146,7 @@ export function ClinicGallery() {
             return (
               <article
                 key={story.id}
-                className={`group relative flex overflow-hidden rounded-2xl border border-border bg-surface ${colSpanClass}`}
+                className={`group relative flex overflow-hidden rounded-2xl border border-border bg-surface transition-colors hover:border-[var(--border-hover)] ${colSpanClass}`}
               >
                 <div className={`relative w-full overflow-hidden ${heightClass}`}>
                   <SafeClinicalPhoto
@@ -157,7 +157,7 @@ export function ClinicGallery() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/35 to-transparent" />
                   <div className="absolute inset-x-0 bottom-0 p-6 text-white">
-                    <p className="text-xs font-medium text-cyan-300">
+                    <p className="text-xs font-medium text-teal-300">
                       {story.categoryLabel}
                     </p>
                     <h3 className="mt-1 text-lg font-semibold leading-snug text-white sm:text-xl">

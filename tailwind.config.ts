@@ -10,10 +10,16 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        navy: "#023047",
-        dark: "#000814",
-        cyan: "#219EBC",
-        gold: "#FFB703",
+        navy: "#111827",
+        dark: "#0B0F17",
+        cyan: "#14B8A6",
+        gold: "#F59E0B",
+        background: "var(--bg-primary)",
+        border: "var(--border)",
+        input: "var(--bg-input)",
+        "accent-cyan": "var(--accent-cyan)",
+        "accent-primary": "var(--accent-primary)",
+        "accent-gold": "var(--accent-gold)",
         surface: {
           DEFAULT: "var(--surface)",
           elevated: "var(--surface-elevated)",
@@ -66,26 +72,23 @@ const config: Config = {
           "border-radius": "1rem",
           "border": "1px solid var(--border)",
           "background-color": "var(--surface)",
-          "backdrop-filter": "blur(12px)",
           "box-shadow": "var(--shadow)",
         },
         ".glass-card-hover": {
           "border-radius": "1rem",
           "border": "1px solid var(--border)",
           "background-color": "var(--surface)",
-          "backdrop-filter": "blur(12px)",
           "box-shadow": "var(--shadow)",
-          "transition": "all 200ms",
+          "transition": "border-color 200ms, box-shadow 200ms, transform 200ms",
         },
         ".glass-card-hover:hover": {
-          "border-color": "var(--accent-cyan)",
+          "border-color": "var(--border-hover)",
           "box-shadow": "var(--shadow-lg)",
         },
         ".glass-panel": {
           "border-radius": "1rem",
           "border": "1px solid var(--border)",
           "background-color": "var(--surface-elevated)",
-          "backdrop-filter": "blur(12px)",
           "box-shadow": "var(--shadow)",
         },
       });
