@@ -2,13 +2,12 @@
 
 import { SignUp } from "@clerk/nextjs";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useMemo, useState, useEffect } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { Card } from "@/components/ui/Card";
 import { clerkAppearance } from "@/lib/clerk-appearance";
 import {
   isUserRole,
   PORTAL_LABELS,
-  ROLE_DASHBOARD,
   type UserRole,
 } from "@/lib/roles";
 
@@ -36,8 +35,6 @@ function SignUpContent() {
     isUserRole(initialRole) && initialRole !== "admin" ? initialRole : "patient"
   );
   const [agreed, setAgreed] = useState(false);
-
-  const redirectUrl = useMemo(() => ROLE_DASHBOARD[role], [role]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
@@ -93,7 +90,7 @@ function SignUpContent() {
             <SignUp
               appearance={clerkAppearance}
               unsafeMetadata={{ role }}
-              fallbackRedirectUrl={redirectUrl}
+              fallbackRedirectUrl="/redirect"
               signInUrl={`/sign-in?portal=${role}`}
             />
           ) : (
