@@ -27,6 +27,7 @@ const KYCApplicationSchema = new Schema(
     // Shared
     id_document_url: { type: String, default: "" },
     license_document_url: { type: String, default: "" },
+    business_document_url: { type: String, default: "" },
     phone_number: { type: String, default: "" },
     address: { type: String, default: "" },
     // Status

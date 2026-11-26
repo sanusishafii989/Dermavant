@@ -36,6 +36,7 @@ interface KYCDetail {
   address?: string;
   id_document_url?: string;
   license_document_url?: string;
+  business_document_url?: string;
   submitted_at?: string;
   reviewed_at?: string;
   review_notes?: string;
@@ -370,6 +371,26 @@ export function UserDetailModal({
                     </div>
                   )}
                 </div>
+
+                {(kyc.license_document_url || kyc.business_document_url || kyc.id_document_url) && (
+                  <div className="flex flex-wrap gap-3 border-t border-border pt-3 text-sm">
+                    {[
+                      { label: "Medical/pharmacist license", pathname: kyc.license_document_url },
+                      { label: "Business registration", pathname: kyc.business_document_url },
+                      { label: "Identity document", pathname: kyc.id_document_url },
+                    ].map(({ label, pathname }) => pathname ? (
+                      <a
+                        key={label}
+                        href={`/api/kyc/documents?pathname=${encodeURIComponent(pathname)}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-accent-cyan hover:border-accent-cyan"
+                      >
+                        <FileText className="h-4 w-4" /> Download {label}
+                      </a>
+                    ) : null)}
+                  </div>
+                )}
 
                 {kyc.review_notes && (
                   <div className="rounded-lg bg-warning-bg border border-warning/25 p-3 text-sm text-warning-text">

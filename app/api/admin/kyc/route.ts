@@ -62,6 +62,7 @@ export async function GET(req: Request) {
         address: app.address,
         id_document_url: app.id_document_url,
         license_document_url: app.license_document_url,
+        business_document_url: app.business_document_url,
         // User info
         user: u ? {
           _id: u._id.toString(),
