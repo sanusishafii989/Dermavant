@@ -21,13 +21,6 @@ function expectedPath(clerkId: string, kind: DocumentKind) {
 }
 
 export async function POST(request: Request) {
-  if (!process.env.BLOB_READ_WRITE_TOKEN) {
-    return NextResponse.json(
-      { error: "Private document storage is not configured for this deployment." },
-      { status: 503 },
-    );
-  }
-
   try {
     const body = (await request.json()) as HandleUploadBody;
     const result = await handleUpload({

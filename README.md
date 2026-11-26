@@ -36,7 +36,7 @@ Dermavant's AI and ML workflows depend exclusively on **free-tier Google tools**
 
 ### Private KYC document storage
 
-In the **Dermavant Vercel project**, create a **private** Blob store under **Storage** and enable its read-write token environment variable. Connect it to the environments where uploads will run; Vercel provides `BLOB_READ_WRITE_TOKEN`. Add that variable to `.env.local` for local development, and never commit its value. Redeploy after connecting the store. Uploads are rejected until the private store is configured.
+In the **Dermavant Vercel project**, create a **private** Blob store under **Storage** and connect it to the project. Vercel's current OIDC connection is supported by `@vercel/blob` and supplies short-lived credentials automatically; older token-based connections use `BLOB_READ_WRITE_TOKEN`. For local development, set up the store's supported credentials through the Vercel CLI (`vercel link`, then `vercel env pull`) and never commit secret values. Redeploy after connecting the store.
 
 ---
 

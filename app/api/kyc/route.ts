@@ -63,10 +63,6 @@ export async function POST(req: Request) {
   try {
     const { userId } = await auth();
     if (!userId) return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
-    if (!process.env.BLOB_READ_WRITE_TOKEN) {
-      return NextResponse.json({ ok: false, error: "Private document storage is not configured" }, { status: 503 });
-    }
-
     const body = await req.json() as Record<string, unknown>;
     const role = body.role;
     if (role !== "doctor" && role !== "partner") {
