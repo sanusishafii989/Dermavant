@@ -1,47 +1,48 @@
-import { Brain, FlaskConical, Sparkles } from "lucide-react";
-import { Card } from "@/components/ui/Card";
+"use client";
+
+import { LiteDermalOrb3D } from "@/components/patient/LiteDermalOrb3D";
+import { DERMAVANT_STUDIO_CAPABILITIES } from "@/lib/liteLensMath";
 
 export function DevFestToolsCard() {
   if (process.env.NEXT_PUBLIC_DEVFEST_MODE === "false") return null;
 
   return (
-    <Card className="max-w-5xl border border-border bg-surface">
-      <div className="flex items-start gap-3">
-        <div className="rounded-xl bg-accent-cyan/10 p-2 text-accent-cyan">
-          <Sparkles className="h-5 w-5" aria-hidden="true" />
+    <section
+      aria-label="Dermavant Clinical Triage Engine"
+      className="max-w-5xl rounded-2xl border border-border bg-surface p-6 shadow-theme"
+    >
+      <div className="grid items-center gap-8 lg:grid-cols-12">
+        <div className="lg:col-span-7">
+          <p className="text-xs font-medium tracking-[0.14em] text-accent-cyan uppercase">
+            Dermavant Clinical Suite · GDG Yola DevFest 2026
+          </p>
+          <h2 className="mt-2 text-xl font-semibold tracking-tight text-primary text-balance sm:text-2xl">
+            Structured Dermatology Triage &amp; Clinician Handoff
+          </h2>
+          <p className="mt-2 text-sm leading-relaxed text-secondary">
+            Built with Google Gemini multimodal reasoning and vector dermatology guidelines to prepare clear symptom briefs before consulting a specialist.
+          </p>
+
+          <dl className="mt-5 divide-y divide-border border-t border-border">
+            {DERMAVANT_STUDIO_CAPABILITIES.map((item) => (
+              <div key={item.id} className="flex items-baseline gap-4 py-3">
+                <dt className="w-6 shrink-0 font-mono text-xs font-semibold tabular-nums text-accent-cyan">
+                  {item.index}
+                </dt>
+                <dd className="min-w-0 text-sm">
+                  <span className="font-medium text-primary">{item.title}</span>
+                  <span className="mx-2 text-muted" aria-hidden="true">·</span>
+                  <span className="text-secondary">{item.detail}</span>
+                </dd>
+              </div>
+            ))}
+          </dl>
         </div>
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-accent-cyan">
-            Free Google tools powering this demo
-          </p>
-          <p className="mt-1 text-sm text-[var(--text-secondary)]">
-            Patient skin triage, RAG embeddings, and the doctor research assistant run exclusively on free-tier Google AI tools.
-          </p>
+
+        <div className="lg:col-span-5">
+          <LiteDermalOrb3D />
         </div>
       </div>
-      <div className="mt-5 grid gap-3 md:grid-cols-3">
-        <div className="rounded-xl border border-border bg-surface-elevated p-4">
-          <Brain className="h-4 w-4 text-accent-cyan" aria-hidden="true" />
-          <p className="mt-2 text-sm font-semibold text-[var(--text-primary)]">Gemini API (Free Tier)</p>
-          <p className="mt-1 text-xs leading-5 text-[var(--text-secondary)]">
-            Multimodal skin-image analysis, structured symptom triage, Gemini Embeddings RAG, and doctor research chat.
-          </p>
-        </div>
-        <div className="rounded-xl border border-border bg-surface-elevated p-4">
-          <Sparkles className="h-4 w-4 text-accent-gold" aria-hidden="true" />
-          <p className="mt-2 text-sm font-semibold text-[var(--text-primary)]">Google AI Studio</p>
-          <p className="mt-1 text-xs leading-5 text-[var(--text-secondary)]">
-            Prompt design, structured JSON schema prototyping, and free API key provisioning.
-          </p>
-        </div>
-        <div className="rounded-xl border border-border bg-surface-elevated p-4">
-          <FlaskConical className="h-4 w-4 text-success" aria-hidden="true" />
-          <p className="mt-2 text-sm font-semibold text-[var(--text-primary)]">Google Colab / Kaggle T4</p>
-          <p className="mt-1 text-xs leading-5 text-[var(--text-secondary)]">
-            Open EfficientNet-B0 dermatology CNN research notebooks (clinician-review baselines, separate from live triage).
-          </p>
-        </div>
-      </div>
-    </Card>
+    </section>
   );
 }

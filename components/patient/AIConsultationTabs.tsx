@@ -57,7 +57,7 @@ export function AIConsultationTabs() {
           onClick={() => setActiveTab("new")}
           className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-colors ${
             activeTab === "new"
-              ? "bg-[var(--accent-cyan)] text-white"
+              ? "bg-[var(--accent-primary)] text-white"
               : "border border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
           }`}
         >
@@ -68,14 +68,14 @@ export function AIConsultationTabs() {
           onClick={() => setActiveTab("history")}
           className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-colors ${
             activeTab === "history"
-              ? "bg-[var(--accent-cyan)] text-white"
+              ? "bg-[var(--accent-primary)] text-white"
               : "border border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
           }`}
         >
           <History className="h-4 w-4" />
           History
           {reports.length > 0 ? (
-            <span className="rounded-full bg-[var(--accent-cyan)]/20 px-2 py-0.5 text-xs text-[var(--accent-cyan)]">
+            <span className="rounded-md bg-teal-500/15 px-1.5 py-0.5 font-mono text-xs tabular-nums text-accent-cyan">
               {reports.length}
             </span>
           ) : null}
