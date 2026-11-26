@@ -1,8 +1,8 @@
 import { auth } from "@clerk/nextjs/server";
 import { head } from "@vercel/blob";
 import { NextResponse } from "next/server";
-import { connectDB } from "@/lib/db";
-import { User, KYCApplication, Doctor, Partner } from "@/models";
+import { ensureKycRoleUser } from "@/lib/ensure-role-user";
+import { KYCApplication, Doctor, Partner } from "@/models";
 
 const MAX_DOCUMENT_BYTES = 5 * 1024 * 1024;
 const ALLOWED_CONTENT_TYPES = new Set(["application/pdf", "image/jpeg", "image/png"]);
@@ -27,9 +27,10 @@ export async function GET() {
     const { userId } = await auth();
     if (!userId) return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
 
-    await connectDB();
-    const userDoc = await User.findOne({ clerkId: userId }).lean();
-    if (!userDoc) return NextResponse.json({ ok: false, error: "User not found" }, { status: 404 });
+    const account = await ensureKycRoleUser();
+    if (!account.ok) return NextResponse.json({ ok: false, error: account.error }, { status: account.status });
+    if (account.user.clerkId !== userId) return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
+    const userDoc = account.user;
 
     const application = await KYCApplication.findOne({ user_id: userDoc._id as any }).lean();
     return NextResponse.json({
@@ -69,10 +70,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: false, error: "Invalid role for KYC" }, { status: 400 });
     }
 
-    await connectDB();
-    const userDoc = await User.findOne({ clerkId: userId }).lean();
-    if (!userDoc) return NextResponse.json({ ok: false, error: "User not found" }, { status: 404 });
-    if (userDoc.role !== role) return NextResponse.json({ ok: false, error: "Role mismatch" }, { status: 403 });
+    const account = await ensureKycRoleUser(role);
+    if (!account.ok) return NextResponse.json({ ok: false, error: account.error }, { status: account.status });
+    if (account.user.clerkId !== userId) return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
+    const userDoc = account.user;
 
     const textField = (key: string) => typeof body[key] === "string" ? body[key].trim() : "";
     const licenseDocument = body.license_document_url;
