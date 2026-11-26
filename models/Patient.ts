@@ -2,8 +2,8 @@ import mongoose, { Schema, type InferSchemaType, type Model } from "mongoose";
 
 const EmergencyContactSchema = new Schema(
   {
-    name: { type: String, required: true },
-    phone: { type: String, required: true },
+    name: { type: String, default: "" },
+    phone: { type: String, default: "" },
   },
   { _id: false }
 );
