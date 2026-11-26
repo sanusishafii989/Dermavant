@@ -17,7 +17,7 @@ export function MedicalProfileCard({ vitals, onExportPDF }: MedicalProfileCardPr
   }
 
   return (
-    <Card className="border border-cyan/20 bg-gradient-to-br from-cyan/10 via-navy/30 to-dark p-6">
+    <Card className="border border-border bg-surface p-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-[var(--border)] pb-4">
         <div className="flex items-center gap-3">
           <div className="rounded-xl border border-[var(--accent-cyan)]/30 bg-[var(--accent-cyan)]/10 p-2.5 text-[var(--accent-cyan)]">
@@ -47,7 +47,7 @@ export function MedicalProfileCard({ vitals, onExportPDF }: MedicalProfileCardPr
       </div>
 
       <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
+        <div className="rounded-xl border border-[var(--border)] bg-surface-elevated p-4">
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[var(--accent-cyan)]">
             <Heart className="h-4 w-4" />
             <span>Biometrics</span>
@@ -58,7 +58,7 @@ export function MedicalProfileCard({ vitals, onExportPDF }: MedicalProfileCardPr
           </div>
         </div>
 
-        <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
+        <div className="rounded-xl border border-[var(--border)] bg-surface-elevated p-4">
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[var(--accent-gold)]">
             <AlertTriangle className="h-4 w-4" />
             <span>Allergies</span>
@@ -78,7 +78,7 @@ export function MedicalProfileCard({ vitals, onExportPDF }: MedicalProfileCardPr
           </div>
         </div>
 
-        <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
+        <div className="rounded-xl border border-[var(--border)] bg-surface-elevated p-4">
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[var(--accent-cyan)]">
             <Shield className="h-4 w-4" />
             <span>Chronic Conditions</span>
@@ -98,7 +98,7 @@ export function MedicalProfileCard({ vitals, onExportPDF }: MedicalProfileCardPr
           </div>
         </div>
 
-        <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
+        <div className="rounded-xl border border-[var(--border)] bg-surface-elevated p-4">
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
             <UserCheck className="h-4 w-4" />
             <span>Emergency Contact</span>

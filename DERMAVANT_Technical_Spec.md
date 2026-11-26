@@ -1,4 +1,4 @@
-# Aetheris Health Ecosystem — Technical Specification
+# Dermavant Ecosystem — Technical Specification
 **Prepared from:** founder wireframes (9 photos), SRS v2.0, Investor One-Pager
 **Stack:** Next.js 15 (App Router) + TypeScript + Tailwind + Node/Express API + MongoDB + Clerk Auth
 **Target:** Working MVP in 2–3 days
@@ -7,7 +7,7 @@
 
 ## 1. Project Scope Summary
 
-Aetheris Health is **one main landing site** that branches into **four independently-authenticated portals**, all sharing a design system (Deep Navy `#023047`, Dark BG `#000814`, Medical Cyan `#219EBC`, Gold Accent `#FFB703`, glassmorphism cards, rounded corners, dark-mode default).
+Dermavant is **one main landing site** that branches into **four independently-authenticated portals**, all sharing a design system (Deep Navy `#023047`, Dark BG `#000814`, Medical Cyan `#219EBC`, Gold Accent `#FFB703`, glassmorphism cards, rounded corners, dark-mode default).
 
 ```
 Main Website (Landing Page)
@@ -334,7 +334,7 @@ AuditLog {
 ## 5. Folder Structure
 
 ```
-aetheris-health/
+dermavant/
 ├── apps/
 │   ├── web/                          # Next.js 15 app (all 4 portals)
 │   │   ├── app/
@@ -462,7 +462,7 @@ aetheris-health/
 Paste this into Cursor as your very first prompt, in an empty repo:
 
 ```
-I'm building "Aetheris Health" — an AI-powered digital healthcare ecosystem with FOUR
+I'm building "Dermavant" — an AI-powered digital healthcare ecosystem with FOUR
 separate portals (Patient, Doctor, Pharmacist/E-Pharmacy, Admin) sharing one backend.
 
 STACK: Next.js 15 (App Router, TypeScript), Tailwind CSS, MongoDB + Mongoose,
@@ -472,7 +472,7 @@ TASK 1 — PROJECT FOUNDATION. Do the following, one step at a time, and show me
 each file before moving to the next:
 
 1. Scaffold a Next.js 15 project (App Router, TypeScript, Tailwind, ESLint) named
-   "aetheris-health".
+   "dermavant".
 
 2. Set up the Tailwind theme in tailwind.config.ts with this design system:
    - Deep Navy Blue: #023047
@@ -521,7 +521,7 @@ each file before moving to the next:
    shows the Sidebar + a welcome message with the logged-in user's name and
    role, pulled from Clerk's currentUser().
 
-10. Build a simple main landing page at app/page.tsx with the Aetheris Health
+10. Build a simple main landing page at app/page.tsx with the Dermavant
     branding and four cards linking to /sign-in for each portal (Patient
     Portal, Doctor Portal, E-Pharmacy Portal, Admin Portal), per this note
     from my wireframes: "Each of these portals should have their login and

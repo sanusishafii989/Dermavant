@@ -136,7 +136,7 @@ export function DoctorProfileForm() {
               label="Hospital / Clinic"
               value={profile.hospital}
               onChange={(e) => setProfile({ ...profile, hospital: e.target.value })}
-              placeholder="e.g. Aetheris Medical Centre"
+              placeholder="e.g. Dermavant Medical Centre"
             />
           </div>
 
@@ -158,7 +158,7 @@ export function DoctorProfileForm() {
           <div>
             <label className="mb-2 block text-sm font-medium text-[var(--text-primary)]">Bio</label>
             <textarea
-              className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-4 py-2.5 text-[var(--text-primary)] placeholder:text-[var(--text-muted)] transition-colors focus:border-cyan focus:outline-none focus:ring-2 focus:ring-cyan/20"
+              className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-input)] px-4 py-2.5 text-[var(--text-primary)] placeholder:text-[var(--text-muted)] transition-colors focus:border-[var(--accent-cyan)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-cyan)]/20"
               rows={4}
               value={profile.bio}
               onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
@@ -166,7 +166,7 @@ export function DoctorProfileForm() {
             />
           </div>
 
-          <div className="flex items-center justify-between rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
+          <div className="flex items-center justify-between rounded-2xl border border-[var(--border)] bg-[var(--bg-input)] p-4">
             <div>
               <p className="font-medium text-[var(--text-primary)]">Available today</p>
               <p className="text-sm text-[var(--text-secondary)]">Toggle to show patients you are available for bookings today</p>
@@ -174,7 +174,7 @@ export function DoctorProfileForm() {
             <button
               type="button"
               onClick={() => setProfile({ ...profile, available_today: !profile.available_today })}
-              className={`relative h-7 w-14 rounded-full transition-colors ${profile.available_today ? "bg-cyan" : "bg-[var(--bg-input)]"}`}
+              className={`relative h-7 w-14 rounded-full transition-colors ${profile.available_today ? "bg-[var(--accent-primary)]" : "bg-[var(--bg-input)]"}`}
             >
               <span
                 className={`absolute top-1 h-5 w-5 rounded-full bg-white transition-transform ${profile.available_today ? "left-8" : "left-1"}`}

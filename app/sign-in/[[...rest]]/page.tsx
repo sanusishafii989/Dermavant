@@ -13,7 +13,7 @@ function SignInContent() {
   const searchParams = useSearchParams();
   const portal = searchParams?.get("portal");
   const role = isUserRole(portal) ? portal : null;
-  const portalLabel = role ? PORTAL_LABELS[role] : "Aetheris Health";
+  const portalLabel = role ? PORTAL_LABELS[role] : "Dermavant";
 
   useEffect(() => {
     if (isLoaded) {

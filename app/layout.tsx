@@ -1,28 +1,29 @@
 import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { RegisterSW } from "@/components/pwa/RegisterSW";
-import { DevFestBanner } from "@/components/shared/DevFestBanner";
 import "leaflet/dist/leaflet.css";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const plusJakartaSans = Plus_Jakarta_Sans({
+  variable: "--font-sans",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-mono",
   subsets: ["latin"],
+  weight: ["400", "500", "600"],
 });
 
 const devFestMode = process.env.NEXT_PUBLIC_DEVFEST_MODE !== "false";
 
 export const metadata: Metadata = {
   title: devFestMode
-    ? "Dermavant (Aetheris Health) — GDG Yola DevFest 2026"
-    : "Aetheris Health — AI-Powered Digital Healthcare Ecosystem",
+    ? "Dermavant — GDG Yola DevFest 2026"
+    : "Dermavant — AI Dermatology & Digital Healthcare",
   description:
     devFestMode
       ? "Built by Sanusi Shafii for GDG Yola DevFest 2026, powered by free Google Gemini multimodal skin triage."
@@ -38,12 +39,15 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: devFestMode ? "Dermavant DevFest" : "Dermavant (Aetheris Health)",
+    title: "Dermavant",
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#023047",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#FFFFFF" },
+    { media: "(prefers-color-scheme: dark)", color: "#0B0F17" },
+  ],
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
@@ -63,19 +67,18 @@ export default function RootLayout({
     >
       <html
         lang="en"
-        className={`${geistSans.variable} ${geistMono.variable} dark h-full antialiased`}
+        className={`${plusJakartaSans.variable} ${jetbrainsMono.variable} dark h-full antialiased`}
         suppressHydrationWarning
       >
         <head>
           <script
             dangerouslySetInnerHTML={{
-              __html: `(function(){try{var t=localStorage.getItem('theme');if(t==='light'){document.documentElement.classList.remove('dark');}else{document.documentElement.classList.add('dark');}}catch(e){}})();`,
+              __html: `(function(){try{var t=localStorage.getItem('theme');if(t==='light'||(!t&&window.matchMedia('(prefers-color-scheme: light)').matches)){document.documentElement.classList.remove('dark');}else{document.documentElement.classList.add('dark');}}catch(e){}})();`,
             }}
           />
         </head>
-        <body className="min-h-full flex flex-col bg-background text-primary">
+        <body className="min-h-full flex flex-col bg-background font-sans text-primary">
           <ThemeProvider>
-            <DevFestBanner />
             {children}
             <RegisterSW />
           </ThemeProvider>

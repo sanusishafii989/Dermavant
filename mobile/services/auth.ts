@@ -9,7 +9,7 @@ export interface MobileUserSession {
 export const MOCK_MOBILE_USER: MobileUserSession = {
   userId: 'usr_patient_demo_101',
   fullName: 'Dr. Ahmad Patient',
-  email: 'patient@aetherishealth.com',
+  email: 'patient@dermavant.health',
   role: 'patient',
 };
 

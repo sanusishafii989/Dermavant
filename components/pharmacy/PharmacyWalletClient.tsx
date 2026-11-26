@@ -123,7 +123,7 @@ export function PharmacyWalletClient({
       </Card>
 
       {/* Commission info */}
-      <Card className="border border-cyan/20 bg-[var(--accent-cyan)]/5">
+      <Card className="border border-[var(--accent-cyan)]/25 bg-[var(--accent-cyan)]/5">
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--accent-cyan)]/15 text-[var(--accent-cyan)]">
             <Percent className="h-5 w-5" />
@@ -131,7 +131,7 @@ export function PharmacyWalletClient({
           <div>
             <p className="text-xs uppercase tracking-[0.2em] text-[var(--accent-cyan)]">Platform commission</p>
             <p className="text-sm text-[var(--text-primary)]">
-              Aetheris Health charges <span className="font-semibold text-[var(--text-primary)]">{commissionRate}%</span> commission on each pharmacy order.
+              Dermavant charges <span className="font-semibold text-[var(--text-primary)]">{commissionRate}%</span> commission on each pharmacy order.
               Gross revenue: <span className="font-semibold text-[var(--text-primary)]">₦{initialRevenue.toLocaleString()}</span> ·
               Platform fee: <span className="font-semibold text-[var(--accent-gold)]">₦{platformFee.toLocaleString()}</span> ·
               Net earnings: <span className="font-semibold text-emerald-400">₦{netEarnings.toLocaleString()}</span>

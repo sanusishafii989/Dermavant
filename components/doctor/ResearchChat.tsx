@@ -1,11 +1,23 @@
 "use client";
 
-import { useRef, useState, useEffect, useCallback } from "react";
+import { useRef, useState, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
-import { Send, Stethoscope, AlertCircle, Mic, MicOff, Volume2, VolumeX, Image as ImageIcon, X } from "lucide-react";
+import {
+  Send,
+  Stethoscope,
+  AlertCircle,
+  Mic,
+  Square,
+  Volume2,
+  VolumeX,
+  ImagePlus,
+  Loader2,
+  X,
+} from "lucide-react";
 import { useVoiceChat } from "@/lib/hooks/useVoiceChat";
+import { formatDurationMmSs, mergeTranscriptText } from "@/lib/ai/voiceUtils";
 
 interface ChatMessage {
   role: "user" | "assistant";
@@ -28,17 +40,19 @@ async function postResearchMessage(payload: object) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
-    const data = await response.json();
+    let data: any = {};
+    try {
+      data = await response.json();
+    } catch {
+      data = { ok: false, error: "Invalid response from research service." };
+    }
     const shouldRetry =
       (response.status === 502 || response.status === 503) &&
       data.retryable !== false &&
       attempt < RESEARCH_RETRY_DELAYS.length;
-
     if (!shouldRetry) return { response, data };
-
     await new Promise((resolve) => setTimeout(resolve, RESEARCH_RETRY_DELAYS[attempt]));
   }
-
   throw new Error("Research service did not respond");
 }
 
@@ -51,12 +65,33 @@ export function ResearchChat() {
   const [conversationId, setConversationId] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const preVoiceTextRef = useRef("");
 
-  const { isListening, isSpeaking, ttsEnabled, startListening, stopListening, speak, stopSpeaking, toggleTts, speechSupported, ttsSupported } = useVoiceChat({
-    onTranscript: (text) => setInput(text),
+  const {
+    isListening,
+    isTranscribing,
+    isSpeaking,
+    ttsEnabled,
+    recordingSeconds,
+    audioLevel,
+    voiceError,
+    clearVoiceError,
+    startListening,
+    stopListening,
+    cancelListening,
+    speak,
+    toggleTts,
+    speechSupported,
+    ttsSupported,
+  } = useVoiceChat({
+    onTranscript: (liveText) => {
+      setInput(mergeTranscriptText(preVoiceTextRef.current, liveText));
+    },
+    onFinalTranscript: (finalText) => {
+      setInput(mergeTranscriptText(preVoiceTextRef.current, finalText));
+    },
   });
 
-  // Load chat history on mount
   useEffect(() => {
     const loadHistory = async () => {
       try {
@@ -91,12 +126,13 @@ export function ResearchChat() {
     setSelectedImage(null);
     setLoading(true);
     setError("");
+    clearVoiceError();
 
     try {
       const { data } = await postResearchMessage({
-          messages: newMessages.map((msg) => ({ role: msg.role, content: msg.content })),
-          image: image || undefined,
-          conversationId: conversationId || undefined,
+        messages: newMessages.map((msg) => ({ role: msg.role, content: msg.content })),
+        image: image || undefined,
+        conversationId: conversationId || undefined,
       });
 
       if (data.ok) {
@@ -105,9 +141,8 @@ export function ResearchChat() {
         setMessages([...newMessages, { role: "assistant", content: responseText }]);
         if (ttsEnabled) speak(responseText);
       } else {
-        const errMsg = typeof data.error === "string" ? data.error : JSON.stringify(data.error);
-        const detMsg = typeof data.details === "string" ? data.details : JSON.stringify(data.details);
-        setError(errMsg || detMsg || "Failed to get response");
+        const errMsg = typeof data.error === "string" ? data.error : "Failed to get response";
+        setError(errMsg);
       }
     } catch {
       setError("Failed to connect to research assistant");
@@ -119,7 +154,7 @@ export function ResearchChat() {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      sendMessage();
+      void sendMessage(undefined, selectedImage || undefined);
     }
   };
 
@@ -148,102 +183,65 @@ export function ResearchChat() {
   const handleMicClick = () => {
     if (isListening) {
       stopListening();
-    } else {
-      setInput("");
-      startListening();
+    } else if (!isTranscribing) {
+      preVoiceTextRef.current = input;
+      clearVoiceError();
+      void startListening();
     }
   };
 
+  const meterBars = [0.45, 0.75, 1.0, 0.8, 0.5];
+
   return (
-    <div className="flex h-[calc(100vh-7rem)] flex-col space-y-4">
-      {/* Header */}
-      <Card className="shrink-0">
-        <div className="flex items-center justify-between">
+    <div className="flex h-[calc(100vh-12rem)] flex-col gap-4">
+      <Card className="shrink-0 p-4">
+        <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--accent-cyan)]/15 text-[var(--accent-cyan)]">
-              <Stethoscope className="h-6 w-6" />
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent-cyan/10 text-accent-cyan">
+              <Stethoscope className="h-5 w-5" aria-hidden="true" />
             </div>
             <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-[var(--accent-cyan)]">Research assistant · Google Gemini</p>
-              <h1 className="mt-1 text-xl font-semibold text-[var(--text-primary)]">Medical research chat</h1>
+              <h2 className="font-semibold text-primary">AI Medical Research Assistant</h2>
+              <p className="text-xs text-secondary">
+                Clinical literature, dermatology guidelines &amp; multimodal visual notes
+              </p>
             </div>
           </div>
-          {/* Voice + TTS toggles */}
-          <div className="flex items-center gap-2">
-            {messages.length > 0 ? (
-              <button
-                onClick={() => { setMessages([]); setConversationId(null); }}
-                className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2 text-xs font-medium text-[var(--text-secondary)] transition-colors hover:text-[var(--accent-cyan)]"
-                title="Start new conversation"
-              >
-                New chat
-              </button>
-            ) : null}
-            {speechSupported ? (
-              <button
-                onClick={handleMicClick}
-                className={`flex h-10 w-10 items-center justify-center rounded-xl border transition-colors ${
-                  isListening
-                    ? "border-rose-500/40 bg-rose-500/10 text-rose-500 animate-pulse"
-                    : "border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-secondary)] hover:text-[var(--accent-cyan)]"
-                }`}
-                title={isListening ? "Stop listening" : "Voice input"}
-              >
-                {isListening ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
-              </button>
-            ) : null}
-            {ttsSupported ? (
-              <button
-                onClick={toggleTts}
-                className={`flex h-10 w-10 items-center justify-center rounded-xl border transition-colors ${
-                  ttsEnabled
-                    ? "border-[var(--accent-cyan)]/40 bg-[var(--accent-cyan)]/10 text-[var(--accent-cyan)]"
-                    : "border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-secondary)]"
-                }`}
-                title={ttsEnabled ? "Disable voice output" : "Enable voice output"}
-              >
-                {ttsEnabled ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
-              </button>
-            ) : null}
-            {/* Gemini image review */}
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              className="flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-secondary)] transition-colors hover:text-[var(--accent-cyan)]"
-              title="Upload medical image"
-            >
-              <ImageIcon className="h-5 w-5" />
-            </button>
-            <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp" onChange={handleImageUpload} className="hidden" />
-          </div>
+
+          {isSpeaking ? (
+            <span className="inline-flex items-center gap-1.5 text-xs text-accent-cyan">
+              <Volume2 className="h-3.5 w-3.5" aria-hidden="true" />
+              Reading aloud
+            </span>
+          ) : null}
         </div>
-        {isListening ? (
-          <p className="mt-2 flex items-center gap-1 text-xs text-rose-500 animate-pulse"><Mic className="h-3 w-3" /> Listening — Speak your question</p>
-        ) : null}
-        {isSpeaking ? (
-          <p className="mt-2 flex items-center gap-1 text-xs text-[var(--accent-cyan)]"><Volume2 className="h-3 w-3" /> AI is speaking</p>
-        ) : null}
       </Card>
 
-      {/* Messages */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        onChange={handleImageUpload}
+        className="hidden"
+      />
+
       <Card className="flex-1 overflow-hidden p-0">
         <div ref={scrollRef} className="h-full overflow-y-auto p-6">
           {messages.length === 0 ? (
             <div className="flex h-full flex-col items-center justify-center gap-6">
               <div className="text-center">
-                <Stethoscope className="mx-auto h-12 w-12 text-[var(--accent-cyan)]/40" />
-                <p className="mt-4 text-[var(--text-secondary)]">Ask about clinical guidelines, differential diagnoses, drug interactions, or treatment protocols.</p>
-                <p className="mt-2 flex flex-wrap items-center gap-3 text-xs text-[var(--text-muted)]">
-                  <span className="flex items-center gap-1"><Mic className="h-3 w-3" /> Voice input</span>
-                  <span className="flex items-center gap-1"><Volume2 className="h-3 w-3" /> Voice output</span>
-                  <span className="flex items-center gap-1"><ImageIcon className="h-3 w-3" /> Image upload</span>
+                <Stethoscope className="mx-auto h-12 w-12 text-accent-cyan/40" aria-hidden="true" />
+                <p className="mt-4 text-sm text-secondary">
+                  Ask about clinical guidelines, differential diagnoses, drug interactions, or treatment protocols.
                 </p>
               </div>
               <div className="grid w-full max-w-2xl gap-2 sm:grid-cols-2">
                 {SUGGESTED_PROMPTS.map((prompt) => (
                   <button
                     key={prompt}
-                    onClick={() => sendMessage(prompt)}
-                    className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-3 text-left text-sm text-[var(--text-secondary)] transition-colors hover:border-[var(--accent-cyan)]/40 hover:text-[var(--text-primary)]"
+                    type="button"
+                    onClick={() => void sendMessage(prompt)}
+                    className="rounded-xl border border-border bg-surface-elevated p-3 text-left text-sm text-secondary transition-colors hover:border-accent-cyan/50 hover:text-primary"
                   >
                     {prompt}
                   </button>
@@ -254,25 +252,27 @@ export function ResearchChat() {
             <div className="space-y-4">
               {messages.map((msg, index) => (
                 <div key={index} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-                  <div className={`max-w-[80%] rounded-2xl px-4 py-3 ${
-                    msg.role === "user"
-                      ? "bg-[var(--accent-cyan)] text-white"
-                      : "border border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-primary)]"
-                  }`}>
+                  <div
+                    className={`max-w-[80%] rounded-2xl px-4 py-3 ${
+                      msg.role === "user"
+                        ? "bg-[var(--accent-primary)] text-white"
+                        : "border border-border bg-surface-elevated text-primary"
+                    }`}
+                  >
                     {msg.role === "assistant" ? (
-                      <div className="prose prose-sm prose-invert max-w-none">
+                      <div className="prose prose-sm dark:prose-invert max-w-none">
                         <ReactMarkdown
                           components={{
-                            h1: ({ children }) => <h1 className="text-lg font-bold text-[var(--text-primary)] mt-4 mb-2">{children}</h1>,
-                            h2: ({ children }) => <h2 className="text-base font-semibold text-[var(--text-primary)] mt-4 mb-2">{children}</h2>,
-                            h3: ({ children }) => <h3 className="text-sm font-semibold text-[var(--accent-cyan)] mt-3 mb-1">{children}</h3>,
-                            p: ({ children }) => <p className="text-sm text-[var(--text-primary)] leading-relaxed mb-2">{children}</p>,
-                            ul: ({ children }) => <ul className="list-disc list-inside space-y-1 mb-2 text-sm text-[var(--text-primary)]">{children}</ul>,
-                            ol: ({ children }) => <ol className="list-decimal list-inside space-y-1 mb-2 text-sm text-[var(--text-primary)]">{children}</ol>,
-                            li: ({ children }) => <li className="text-sm text-[var(--text-primary)]">{children}</li>,
-                            strong: ({ children }) => <strong className="font-semibold text-[var(--text-primary)]">{children}</strong>,
-                            code: ({ children }) => <code className="rounded bg-[var(--bg-input)] px-1 py-0.5 text-xs text-[var(--accent-cyan)]">{children}</code>,
-                            blockquote: ({ children }) => <blockquote className="border-l-2 border-[var(--accent-cyan)]/40 pl-3 text-sm text-[var(--text-secondary)] italic">{children}</blockquote>,
+                            h1: ({ children }) => <h1 className="mb-2 mt-4 text-lg font-bold text-primary">{children}</h1>,
+                            h2: ({ children }) => <h2 className="mb-2 mt-4 text-base font-semibold text-primary">{children}</h2>,
+                            h3: ({ children }) => <h3 className="mb-1 mt-3 text-sm font-semibold text-accent-cyan">{children}</h3>,
+                            p: ({ children }) => <p className="mb-2 text-sm leading-relaxed text-primary">{children}</p>,
+                            ul: ({ children }) => <ul className="mb-2 list-inside list-disc space-y-1 text-sm text-primary">{children}</ul>,
+                            ol: ({ children }) => <ol className="mb-2 list-inside list-decimal space-y-1 text-sm text-primary">{children}</ol>,
+                            li: ({ children }) => <li className="text-sm text-primary">{children}</li>,
+                            strong: ({ children }) => <strong className="font-semibold text-primary">{children}</strong>,
+                            code: ({ children }) => <code className="rounded bg-[var(--bg-input)] px-1 py-0.5 text-xs text-accent-cyan">{children}</code>,
+                            blockquote: ({ children }) => <blockquote className="border-l-2 border-accent-cyan/40 pl-3 text-sm italic text-secondary">{children}</blockquote>,
                           }}
                         >
                           {msg.content}
@@ -286,11 +286,10 @@ export function ResearchChat() {
               ))}
               {loading ? (
                 <div className="flex justify-start">
-                  <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] px-4 py-3">
-                    <div className="flex gap-2">
-                      <span className="h-2 w-2 animate-bounce rounded-full bg-[var(--accent-cyan)]" style={{ animationDelay: "0ms" }} />
-                      <span className="h-2 w-2 animate-bounce rounded-full bg-[var(--accent-cyan)]" style={{ animationDelay: "150ms" }} />
-                      <span className="h-2 w-2 animate-bounce rounded-full bg-[var(--accent-cyan)]" style={{ animationDelay: "300ms" }} />
+                  <div className="rounded-2xl border border-border bg-surface-elevated px-4 py-3">
+                    <div className="flex items-center gap-2 text-xs text-secondary">
+                      <Loader2 className="h-4 w-4 animate-spin text-accent-cyan" aria-hidden="true" />
+                      <span>Preparing clinical brief…</span>
                     </div>
                   </div>
                 </div>
@@ -300,49 +299,169 @@ export function ResearchChat() {
         </div>
       </Card>
 
-      {error ? (
-        <div className="flex items-center gap-2 rounded-2xl border border-rose-400/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-700 dark:text-rose-300">
-          <AlertCircle className="h-4 w-4 shrink-0" />
-          {error}
+      {voiceError || error ? (
+        <div
+          role="alert"
+          className="flex items-center gap-2 rounded-xl border border-rose-500/35 bg-danger-bg px-4 py-3 text-sm text-danger-text"
+        >
+          <AlertCircle className="h-4 w-4 shrink-0" aria-hidden="true" />
+          <span>{voiceError || error}</span>
         </div>
       ) : null}
 
-      {/* Image preview */}
-      {selectedImage ? (
-        <div className="flex items-center gap-3 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-3">
-          <img src={selectedImage} alt="Selected" className="h-16 w-16 rounded-xl object-cover" />
-          <span className="flex-1 text-sm text-[var(--text-secondary)]">Image ready for Gemini · up to 3 MB</span>
-          <button onClick={() => { setSelectedImage(null); if (fileInputRef.current) fileInputRef.current.value = ""; }} className="text-[var(--text-muted)] hover:text-rose-500" aria-label="Remove uploaded image">
-            <X className="h-4 w-4" />
-          </button>
-        </div>
-      ) : null}
-
-      {/* Input */}
+      {/* Unified In-Box Composer */}
       <div className="shrink-0">
-        <Card className="p-3">
-          <div className="flex items-end gap-3">
-            <textarea
-              className="flex-1 resize-none rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-4 py-3 text-[var(--text-primary)] placeholder:text-[var(--text-muted)] transition-colors focus:border-[var(--accent-cyan)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-cyan)]/20"
-              rows={2}
-              placeholder="Ask a medical research question…"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              disabled={loading}
-            />
+        <div className="overflow-hidden rounded-2xl border border-border bg-[var(--bg-input)] transition-colors focus-within:border-[var(--accent-primary)] focus-within:ring-2 focus-within:ring-teal-500/20">
+          {selectedImage ? (
+            <div className="flex items-center gap-3 border-b border-border bg-surface px-4 py-2.5">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={selectedImage} alt="Selected" className="h-12 w-12 rounded-xl object-cover" />
+              <span className="flex-1 text-xs text-secondary">Clinical image attached · up to 3 MB</span>
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedImage(null);
+                  if (fileInputRef.current) fileInputRef.current.value = "";
+                }}
+                className="text-muted hover:text-danger"
+                aria-label="Remove uploaded image"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          ) : null}
+
+          {isListening || isTranscribing ? (
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border bg-surface-elevated px-4 py-2">
+              <div className="flex items-center gap-2.5 min-w-0">
+                {isTranscribing ? (
+                  <>
+                    <Loader2 className="h-3.5 w-3.5 animate-spin text-accent-cyan" aria-hidden="true" />
+                    <span className="text-xs font-medium text-primary">Transcribing speech…</span>
+                  </>
+                ) : (
+                  <>
+                    <div className="flex h-4 items-center gap-0.5" aria-hidden="true">
+                      {meterBars.map((weight, idx) => {
+                        const scale = Math.max(0.28, Math.min(1, audioLevel * weight + 0.25));
+                        return (
+                          <span
+                            key={idx}
+                            style={{ transform: `scaleY(${scale})` }}
+                            className="h-3.5 w-1 origin-center rounded-full bg-rose-500 transition-transform duration-75"
+                          />
+                        );
+                      })}
+                    </div>
+                    <span className="font-mono text-xs font-semibold tabular-nums text-rose-500">
+                      {formatDurationMmSs(recordingSeconds)}
+                    </span>
+                    <span className="truncate text-xs text-secondary">
+                      Listening — speak freely, click Done when finished
+                    </span>
+                  </>
+                )}
+              </div>
+
+              {isListening ? (
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    type="button"
+                    onClick={cancelListening}
+                    className="rounded-lg px-2 py-1 text-xs text-secondary hover:bg-surface hover:text-primary"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={stopListening}
+                    className="inline-flex items-center gap-1 rounded-lg bg-[var(--accent-primary)] px-2.5 py-1 text-xs font-semibold text-white hover:bg-[var(--accent-primary-hover)]"
+                  >
+                    <Square className="h-2.5 w-2.5 fill-current" aria-hidden="true" />
+                    Done
+                  </button>
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+
+          <textarea
+            className="block w-full resize-none border-0 bg-transparent px-4 pb-2 pt-3 text-sm text-primary placeholder:text-muted focus:outline-none focus:ring-0"
+            rows={2}
+            placeholder="Ask a medical research question…"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            disabled={loading}
+          />
+
+          <div className="flex items-center justify-between border-t border-border px-3 py-2">
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={loading}
+                aria-label="Upload clinical image"
+                className="inline-flex h-8 items-center gap-1.5 rounded-lg px-2 text-xs font-medium text-secondary transition-colors hover:bg-surface hover:text-accent-cyan disabled:opacity-50"
+              >
+                <ImagePlus className="h-4 w-4" aria-hidden="true" />
+                <span className="hidden sm:inline">Photo</span>
+              </button>
+
+              {speechSupported ? (
+                <button
+                  type="button"
+                  onClick={handleMicClick}
+                  disabled={loading || isTranscribing}
+                  aria-label={isListening ? "Stop voice dictation" : "Start voice dictation"}
+                  className={`inline-flex h-8 items-center gap-1.5 rounded-lg px-2 text-xs font-medium transition-colors disabled:opacity-50 ${
+                    isListening
+                      ? "bg-rose-500/15 text-rose-500"
+                      : "text-secondary hover:bg-surface hover:text-accent-cyan"
+                  }`}
+                >
+                  {isTranscribing ? (
+                    <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                  ) : isListening ? (
+                    <Square className="h-3.5 w-3.5 fill-current" aria-hidden="true" />
+                  ) : (
+                    <Mic className="h-4 w-4" aria-hidden="true" />
+                  )}
+                  <span className="hidden sm:inline">
+                    {isTranscribing ? "Transcribing" : isListening ? "Stop" : "Voice"}
+                  </span>
+                </button>
+              ) : null}
+
+              {ttsSupported ? (
+                <button
+                  type="button"
+                  onClick={toggleTts}
+                  aria-label={ttsEnabled ? "Disable voice readout" : "Enable voice readout"}
+                  className={`inline-flex h-8 w-8 items-center justify-center rounded-lg transition-colors ${
+                    ttsEnabled
+                      ? "bg-teal-500/15 text-accent-cyan"
+                      : "text-secondary hover:bg-surface hover:text-accent-cyan"
+                  }`}
+                >
+                  {ttsEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+                </button>
+              ) : null}
+            </div>
+
             <Button
-              onClick={() => sendMessage(undefined, selectedImage || undefined)}
-              disabled={loading || (!input.trim() && !selectedImage)}
-              className="h-12 px-4"
+              onClick={() => void sendMessage(undefined, selectedImage || undefined)}
+              disabled={loading || isTranscribing || (!input.trim() && !selectedImage)}
+              size="sm"
+              className="whitespace-nowrap shrink-0"
             >
-              <Send className="h-4 w-4" />
+              <Send className="h-3.5 w-3.5" aria-hidden="true" />
             </Button>
           </div>
-          <p className="mt-2 px-2 text-xs text-[var(--text-muted)]">
-            AI-generated responses should be verified against primary sources. Press Enter to send, Shift+Enter for new line. Voice and image supported.
-          </p>
-        </Card>
+        </div>
+        <p className="mt-1.5 px-2 text-xs text-muted">
+          AI-generated summaries must be verified against primary sources. Press Enter to send, Shift+Enter for new line.
+        </p>
       </div>
     </div>
   );

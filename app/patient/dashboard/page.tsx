@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { currentUser } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 import { PortalDashboardShell } from "@/components/layout/PortalDashboardShell";
 import { Avatar } from "@/components/ui/Avatar";
 import { Badge } from "@/components/ui/Badge";
@@ -20,46 +21,64 @@ export const dynamic = "force-dynamic";
 export default async function PatientDashboardPage() {
   const user = await currentUser();
 
-  const fullName =
-    user?.fullName ||
-    [user?.firstName, user?.lastName].filter(Boolean).join(" ") ||
-    "Patient";
+  if (!user) {
+    redirect("/sign-in");
+  }
 
-  // Fetch live data
-  await connectDB();
-  const userDoc = await User.findOne({ clerkId: user?.id }).lean();
-  const patient = userDoc ? await Patient.findOne({ user_id: userDoc._id as any }).lean() : null;
+  const fullName =
+    user.fullName ||
+    [user.firstName, user.lastName].filter(Boolean).join(" ") ||
+    "Patient";
 
   let upcomingCount = 0;
   let walletBalance = 0;
   let activeOrders = 0;
   let aiReportsCount = 0;
   let recentAppointments: any[] = [];
+  let dashboardDataUnavailable = false;
 
-  if (patient) {
-    upcomingCount = await Appointment.countDocuments({
-      patient_id: patient._id as any,
-      consultation_status: "scheduled",
-    } as any);
-    
-    recentAppointments = await Appointment.find({
-      patient_id: patient._id as any,
-    })
-    .sort({ consultation_date: -1 })
-    .limit(3)
-    .lean();
+  try {
+    await connectDB();
+    const userDoc = await User.findOne({ clerkId: user.id }).lean();
+    const patient = userDoc
+      ? await Patient.findOne({ user_id: userDoc._id as any }).lean()
+      : null;
 
-    const wallet = await Wallet.findOne({ ownerId: userDoc!._id as any }).lean();
-    if (wallet) walletBalance = wallet.balance ?? 0;
+    if (patient && userDoc) {
+      upcomingCount = await Appointment.countDocuments({
+        patient_id: patient._id as any,
+        consultation_status: "scheduled",
+      } as any);
 
-    activeOrders = await PharmacyOrder.countDocuments({
-      patient_id: patient._id as any,
-      delivery_status: { $in: ["pending", "processing", "shipped"] },
-    } as any);
+      recentAppointments = await Appointment.find({
+        patient_id: patient._id as any,
+      })
+        .sort({ consultation_date: -1 })
+        .limit(3)
+        .lean();
 
-    aiReportsCount = await AIReport.countDocuments({
-      patient_id: patient._id as any,
-    } as any);
+      const wallet = await Wallet.findOne({ ownerId: userDoc._id as any }).lean();
+      if (wallet) walletBalance = wallet.balance ?? 0;
+
+      activeOrders = await PharmacyOrder.countDocuments({
+        patient_id: patient._id as any,
+        delivery_status: { $in: ["pending", "processing", "shipped"] },
+      } as any);
+
+      aiReportsCount = await AIReport.countDocuments({
+        patient_id: patient._id as any,
+      } as any);
+    }
+  } catch (error) {
+    dashboardDataUnavailable = true;
+    const code =
+      typeof error === "object" && error !== null && "code" in error
+        ? String((error as { code: unknown }).code)
+        : undefined;
+    console.error("[patient-dashboard] data load failed", {
+      name: error instanceof Error ? error.name : "UnknownError",
+      code,
+    });
   }
 
   const primaryAction = (
@@ -88,8 +107,16 @@ export default async function PatientDashboardPage() {
           }
         />
 
+        {dashboardDataUnavailable && (
+          <StatusAlert
+            variant="warning"
+            title="Dashboard data is temporarily unavailable"
+            description="Your sign-in succeeded, but we couldn't load your dashboard information. Refresh the page in a moment."
+          />
+        )}
+
         {/* Highlighted Next Action Area */}
-        {upcomingCount === 0 && (
+        {!dashboardDataUnavailable && upcomingCount === 0 && (
           <StatusAlert 
             variant="info" 
             title="You're up to date"

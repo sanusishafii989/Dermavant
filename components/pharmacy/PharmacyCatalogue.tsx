@@ -177,7 +177,7 @@ export function PharmacyCatalogue() {
 
   return (
     <div className="space-y-6">
-      <Card className="border border-[var(--border)] bg-[var(--bg-card)]">
+      <Card className="border border-[var(--border)] bg-[var(--bg-input)]">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
             <p className="text-xs uppercase tracking-[0.2em] text-[var(--accent-cyan)]">Partner catalogue</p>
@@ -219,7 +219,7 @@ export function PharmacyCatalogue() {
       ) : (
         <div className="grid gap-4 lg:grid-cols-2">
           {medicines.map((medicine) => (
-            <Card key={medicine._id} className="border border-[var(--border)] bg-[var(--bg-card)] p-5">
+            <Card key={medicine._id} className="border border-[var(--border)] bg-[var(--bg-input)] p-5">
               <div className="flex gap-4">
                 {medicine.image && medicine.image !== "/placeholder-pill.svg" ? (
                   <img src={medicine.image} alt={medicine.name} className="h-20 w-20 shrink-0 rounded-xl object-cover" />
@@ -297,7 +297,7 @@ export function PharmacyCatalogue() {
                 reader.onload = () => setForm({ ...form, image: reader.result as string });
                 reader.readAsDataURL(file);
               }}
-              className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-4 py-2.5 text-sm text-[var(--text-primary)] file:mr-3 file:rounded-lg file:border-0 file:bg-[var(--accent-cyan)] file:px-3 file:py-1.5 file:text-white"
+              className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-input)] px-4 py-2.5 text-sm text-[var(--text-primary)] file:mr-3 file:rounded-lg file:border-0 file:bg-[var(--accent-cyan)] file:px-3 file:py-1.5 file:text-white"
             />
             {form.image ? (
               <div className="mt-2 flex items-center gap-2">
@@ -309,7 +309,7 @@ export function PharmacyCatalogue() {
           <div>
             <label className="mb-2 block text-sm font-medium text-[var(--text-primary)]">Description</label>
             <textarea
-              className="w-full resize-none rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-4 py-2.5 text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-cyan focus:outline-none focus:ring-2 focus:ring-cyan/20"
+              className="w-full resize-none rounded-xl border border-[var(--border)] bg-[var(--bg-input)] px-4 py-2.5 text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent-cyan)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-cyan)]/20"
               rows={3}
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}

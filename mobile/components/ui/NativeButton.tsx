@@ -7,7 +7,7 @@ import {
   type ViewStyle,
   type TextStyle,
 } from 'react-native';
-import { AetherisColors } from '../../constants/Colors';
+import { DermavantColors } from '../../constants/Colors';
 
 export interface NativeButtonProps {
   title: string;
@@ -51,7 +51,7 @@ export function NativeButton({
       ]}
     >
       {loading ? (
-        <ActivityIndicator color={isPrimary || isGold ? AetherisColors.dark : AetherisColors.cyan} />
+        <ActivityIndicator color={isPrimary || isGold ? DermavantColors.dark : DermavantColors.cyan} />
       ) : (
         <>
           {icon ? icon : null}
@@ -84,18 +84,18 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   primaryBg: {
-    backgroundColor: AetherisColors.cyan,
+    backgroundColor: DermavantColors.cyan,
   },
   goldBg: {
-    backgroundColor: AetherisColors.gold,
+    backgroundColor: DermavantColors.gold,
   },
   dangerBg: {
-    backgroundColor: AetherisColors.danger,
+    backgroundColor: DermavantColors.danger,
   },
   ghostBg: {
     backgroundColor: 'transparent',
     borderWidth: 1,
-    borderColor: AetherisColors.cyan,
+    borderColor: DermavantColors.cyan,
   },
   disabled: {
     opacity: 0.5,
@@ -103,15 +103,15 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 14,
     fontWeight: '700',
-    color: AetherisColors.white,
+    color: DermavantColors.white,
   },
   darkText: {
-    color: AetherisColors.dark,
+    color: DermavantColors.dark,
   },
   whiteText: {
-    color: AetherisColors.white,
+    color: DermavantColors.white,
   },
   cyanText: {
-    color: AetherisColors.cyan,
+    color: DermavantColors.cyan,
   },
 });

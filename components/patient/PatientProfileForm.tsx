@@ -128,8 +128,8 @@ export function PatientProfileForm() {
 
   if (loading) {
     return (
-      <Card className="p-12 text-center text-white/60">
-        <RefreshCw className="mx-auto h-8 w-8 animate-spin text-cyan mb-3" />
+      <Card className="p-12 text-center text-secondary">
+        <RefreshCw className="mx-auto h-8 w-8 animate-spin text-accent-cyan mb-3" />
         Loading patient medical profile...
       </Card>
     );
@@ -137,7 +137,7 @@ export function PatientProfileForm() {
 
   if (error && !profile) {
     return (
-      <Card className="border border-rose-500/20 bg-rose-500/10 p-6 text-rose-200">
+      <Card className="border border-danger/30 bg-danger-bg p-6 text-danger-text">
         {error}
       </Card>
     );
@@ -155,14 +155,14 @@ export function PatientProfileForm() {
     <form onSubmit={handleSave} className="space-y-6">
       {/* Basic Personal Info */}
       <Card className="space-y-4">
-        <div className="flex items-center justify-between border-b border-white/10 pb-3">
+        <div className="flex items-center justify-between border-b border-border pb-3">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-cyan/15 text-cyan">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-accent-cyan/15 text-accent-cyan">
               <User className="h-5 w-5" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-white">Personal Information</h2>
-              <p className="text-xs text-white/60">Core identity and contact details</p>
+              <h2 className="text-lg font-bold text-primary">Personal Information</h2>
+              <p className="text-xs text-secondary">Core identity and contact details</p>
             </div>
           </div>
           <Badge variant="cyan">Patient ID: {profile.patient_id?.slice(-6) || "N/A"}</Badge>
@@ -197,23 +197,23 @@ export function PatientProfileForm() {
 
       {/* Vitals & Clinical Metrics */}
       <Card className="space-y-4">
-        <div className="flex items-center gap-2.5 border-b border-white/10 pb-3">
+        <div className="flex items-center gap-2.5 border-b border-border pb-3">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500/15 text-emerald-400">
             <HeartPulse className="h-5 w-5" />
           </div>
           <div>
-            <h2 className="text-lg font-bold text-white">Vitals & Clinical Metrics</h2>
-            <p className="text-xs text-white/60">Biometric statistics and vitals summary</p>
+            <h2 className="text-lg font-bold text-primary">Vitals & Clinical Metrics</h2>
+            <p className="text-xs text-secondary">Biometric statistics and vitals summary</p>
           </div>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-white/70">Blood Group</label>
+            <label className="mb-1.5 block text-xs font-medium text-secondary">Blood Group</label>
             <select
               value={profile.blood_group}
               onChange={(e) => setProfile({ ...profile, blood_group: e.target.value })}
-              className="w-full rounded-xl border border-white/10 bg-dark/80 px-3.5 py-2.5 text-sm text-white focus:border-cyan focus:outline-none"
+              className="w-full rounded-xl border border-border bg-input px-3.5 py-2.5 text-sm text-primary focus:border-accent-cyan focus:outline-none"
             >
               {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map((bg) => (
                 <option key={bg} value={bg}>
@@ -246,9 +246,9 @@ export function PatientProfileForm() {
         </div>
 
         {bmi && (
-          <div className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 p-3.5 text-xs text-white/80">
+          <div className="flex items-center justify-between rounded-xl border border-border bg-surface-elevated p-3.5 text-xs text-primary">
             <span className="flex items-center gap-2">
-              <Activity className="h-4 w-4 text-cyan" /> Computed Body Mass Index (BMI):
+              <Activity className="h-4 w-4 text-accent-cyan" /> Computed Body Mass Index (BMI):
             </span>
             <span className="font-mono font-bold text-cyan text-sm">{bmi} kg/m²</span>
           </div>
@@ -257,13 +257,13 @@ export function PatientProfileForm() {
 
       {/* Medical Profile & Conditions */}
       <Card className="space-y-5">
-        <div className="flex items-center gap-2.5 border-b border-white/10 pb-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gold/15 text-gold">
+        <div className="flex items-center gap-2.5 border-b border-border pb-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-accent-gold/15 text-accent-gold">
             <Stethoscope className="h-5 w-5" />
           </div>
           <div>
-            <h2 className="text-lg font-bold text-white">Medical Conditions & Medications</h2>
-            <p className="text-xs text-white/60">Known allergies, ongoing treatments, and surgical history</p>
+            <h2 className="text-lg font-bold text-primary">Medical Conditions & Medications</h2>
+            <p className="text-xs text-secondary">Known allergies, ongoing treatments, and surgical history</p>
           </div>
         </div>
 
@@ -297,21 +297,21 @@ export function PatientProfileForm() {
             {profile.allergies.map((item, idx) => (
               <span
                 key={idx}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-rose-500/30 bg-rose-500/15 px-3 py-1 text-xs font-medium text-rose-200"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-danger/30 bg-danger-bg px-3 py-1 text-xs font-medium text-danger-text"
               >
                 <AlertTriangle className="h-3 w-3 text-rose-400" />
                 {item}
                 <button
                   type="button"
                   onClick={() => removeTag("allergies", idx)}
-                  className="hover:text-white"
+                  className="hover:opacity-75"
                 >
                   <X className="h-3.5 w-3.5" />
                 </button>
               </span>
             ))}
             {profile.allergies.length === 0 && (
-              <p className="text-xs text-white/40 italic">No allergies listed.</p>
+              <p className="text-xs text-muted italic">No allergies listed.</p>
             )}
           </div>
         </div>
@@ -346,20 +346,20 @@ export function PatientProfileForm() {
             {profile.chronic_conditions.map((item, idx) => (
               <span
                 key={idx}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-gold/30 bg-gold/15 px-3 py-1 text-xs font-medium text-gold"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-warning/30 bg-warning-bg px-3 py-1 text-xs font-medium text-warning-text"
               >
                 {item}
                 <button
                   type="button"
                   onClick={() => removeTag("chronic_conditions", idx)}
-                  className="hover:text-white"
+                  className="hover:opacity-75"
                 >
                   <X className="h-3.5 w-3.5" />
                 </button>
               </span>
             ))}
             {profile.chronic_conditions.length === 0 && (
-              <p className="text-xs text-white/40 italic">No chronic conditions listed.</p>
+              <p className="text-xs text-muted italic">No chronic conditions listed.</p>
             )}
           </div>
         </div>
@@ -394,20 +394,20 @@ export function PatientProfileForm() {
             {profile.current_medications.map((item, idx) => (
               <span
                 key={idx}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-cyan/30 bg-cyan/15 px-3 py-1 text-xs font-medium text-cyan"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-accent-cyan/30 bg-accent-cyan/10 px-3 py-1 text-xs font-medium text-accent-cyan"
               >
                 {item}
                 <button
                   type="button"
                   onClick={() => removeTag("current_medications", idx)}
-                  className="hover:text-white"
+                  className="hover:opacity-75"
                 >
                   <X className="h-3.5 w-3.5" />
                 </button>
               </span>
             ))}
             {profile.current_medications.length === 0 && (
-              <p className="text-xs text-white/40 italic">No current medications listed.</p>
+              <p className="text-xs text-muted italic">No current medications listed.</p>
             )}
           </div>
         </div>
@@ -442,34 +442,34 @@ export function PatientProfileForm() {
             {profile.past_surgeries.map((item, idx) => (
               <span
                 key={idx}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-purple-500/30 bg-purple-500/15 px-3 py-1 text-xs font-medium text-purple-200"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-info/30 bg-info-bg px-3 py-1 text-xs font-medium text-info-text"
               >
                 {item}
                 <button
                   type="button"
                   onClick={() => removeTag("past_surgeries", idx)}
-                  className="hover:text-white"
+                  className="hover:opacity-75"
                 >
                   <X className="h-3.5 w-3.5" />
                 </button>
               </span>
             ))}
             {profile.past_surgeries.length === 0 && (
-              <p className="text-xs text-white/40 italic">No past surgeries listed.</p>
+              <p className="text-xs text-muted italic">No past surgeries listed.</p>
             )}
           </div>
         </div>
       </Card>
 
       {/* Emergency Contact */}
-      <Card className="space-y-4 border-rose-500/30 bg-rose-500/5">
-        <div className="flex items-center gap-2.5 border-b border-rose-500/20 pb-3">
+      <Card className="space-y-4 border-danger/30 bg-danger-bg/40">
+        <div className="flex items-center gap-2.5 border-b border-danger/20 pb-3">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-rose-500/20 text-rose-400">
             <PhoneCall className="h-5 w-5" />
           </div>
           <div>
-            <h2 className="text-lg font-bold text-white">Emergency Contact</h2>
-            <p className="text-xs text-rose-200/70">Designated person to reach during clinical emergencies</p>
+            <h2 className="text-lg font-bold text-primary">Emergency Contact</h2>
+            <p className="text-xs text-secondary">Designated person to reach during clinical emergencies</p>
           </div>
         </div>
 
@@ -510,7 +510,7 @@ export function PatientProfileForm() {
           ) : null}
         </div>
 
-        <Button type="submit" disabled={saving} className="w-full sm:w-auto px-8 bg-cyan text-dark font-bold hover:bg-cyan/90">
+        <Button type="submit" disabled={saving} className="w-full sm:w-auto px-8">
           {saving ? (
             <span className="flex items-center gap-2">
               <RefreshCw className="h-4 w-4 animate-spin" /> Saving Changes...

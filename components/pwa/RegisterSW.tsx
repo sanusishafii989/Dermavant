@@ -14,7 +14,7 @@ export function RegisterSW() {
         const cacheNames = await caches.keys();
         await Promise.all(
           cacheNames
-            .filter((name) => name.startsWith("aetheris-health-"))
+            .filter((name) => name.startsWith("aetheris-health-") || name.startsWith("dermavant-"))
             .map((name) => caches.delete(name))
         );
       }).catch(() => {});

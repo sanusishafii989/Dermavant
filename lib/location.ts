@@ -17,8 +17,8 @@ export async function geocodeAddress(address: string): Promise<GeocodeResult | n
     method: "GET",
     headers: {
       Accept: "application/json",
-      "User-Agent": "AetherisHealth/1.0 (+https://aetheris-health.local)",
-      Referer: "https://aetheris-health.local",
+      "User-Agent": "Dermavant/1.0 (+https://dermavant.vercel.app)",
+      Referer: "https://dermavant.vercel.app",
     },
   });
 

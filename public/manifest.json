@@ -1,13 +1,17 @@
 {
-  "name": "Aetheris Health — AI-Powered Digital Healthcare Ecosystem",
-  "short_name": "Aetheris",
-  "description": "Connecting patients to instant dermatological triage, licensed doctors, and verified medicine — all in one platform.",
+  "name": "Dermavant — AI Dermatology & Digital Healthcare",
+  "short_name": "Dermavant",
+  "description": "Dermavant connects patients to instant dermatological triage, licensed doctors, and verified medicine — all in one platform.",
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
   "theme_color": "#023047",
   "background_color": "#000814",
-  "categories": ["health", "medical", "healthcare"],
+  "categories": [
+    "health",
+    "medical",
+    "healthcare"
+  ],
   "icons": [
     {
       "src": "/icon-192.png",

@@ -2,7 +2,15 @@ import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
 import { AIReport, Patient, User } from "@/models";
-import { getGeminiClient, getGeminiModel, isGeminiConfigured, withGeminiRetry } from "@/lib/ai/gemini";
+import {
+  FALLBACK_GEMINI_TEXT_MODELS,
+  deduplicateModels,
+  formatGeminiUserError,
+  getGeminiClient,
+  getGeminiModel,
+  isGeminiConfigured,
+  runWithGeminiModelFallback,
+} from "@/lib/ai/gemini";
 import {
   createDermatologyResponseSchema,
   extractJsonFromText,
@@ -21,21 +29,19 @@ type InlineImage = {
 function parseImageDataUrl(value: unknown): InlineImage | null {
   if (value === undefined || value === null || value === "") return null;
   if (typeof value !== "string") throw new Error("Upload a JPEG, PNG, or WebP image.");
-
   const match = value.match(/^data:(image\/(?:jpeg|png|webp));base64,([A-Za-z0-9+/]+={0,2})$/i);
   if (!match) throw new Error("Upload a JPEG, PNG, or WebP image.");
-
   const encoded = match[2];
   const bytes = Buffer.from(encoded, "base64");
   if (bytes.byteLength === 0 || bytes.byteLength > MAX_IMAGE_BYTES) {
     throw new Error("Image must be 3 MB or smaller.");
   }
-
   return { mimeType: match[1].toLowerCase() as InlineImage["mimeType"], data: encoded };
 }
 
 function buildDermatologyPrompt(symptoms: string, clinicalContext: string, hasImage: boolean): string {
-  return `You are a cautious dermatology triage assistant for Aetheris Health (Dermavant).
+  return `You are a cautious dermatology triage assistant for Dermavant.
+
 Provide preliminary educational triage only — never a definitive medical diagnosis and never prescribe medication.
 
 Rules:
@@ -45,12 +51,10 @@ Rules:
 - Never present model confidence as a medically validated probability.
 - Relevant symptoms may include location, appearance, duration, itching, pain, scaling, color changes, nail changes, and hair loss.
 
-${clinicalContext ? `Relevant general dermatology reference guidance:
-"""
-${clinicalContext}
-"""
-` : ""}
-Return only a JSON object matching the required schema.
+${clinicalContext ? `Relevant general dermatology reference guidance:\n"""\n${clinicalContext}\n"""` : ""}
+
+Return only a JSON object matching the required schema with keys:
+clinicalSummary (string), possibleConditions (array of {condition, confidence (0..1), reasoning}), recommendedNextSteps (string), followUpGuidance (string), confidenceScore (0..1), needsImmediateProfessionalCare (boolean).
 
 Input symptoms:
 """
@@ -58,7 +62,11 @@ ${symptoms || "No symptom description was provided. Comment on visible features 
 """`;
 }
 
-async function generateGeminiTriage(prompt: string, image: InlineImage | null, modelName: string): Promise<string> {
+async function generateGeminiTriage(
+  prompt: string,
+  image: InlineImage | null,
+  candidateModels: string[]
+): Promise<{ text: string; model: string }> {
   const ai = getGeminiClient();
   const contents = image
     ? {
@@ -69,7 +77,7 @@ async function generateGeminiTriage(prompt: string, image: InlineImage | null, m
       }
     : prompt;
 
-  const response = await withGeminiRetry(() =>
+  const { result, model } = await runWithGeminiModelFallback(candidateModels, (modelName) =>
     ai.models.generateContent({
       model: modelName,
       contents,
@@ -82,7 +90,7 @@ async function generateGeminiTriage(prompt: string, image: InlineImage | null, m
     })
   );
 
-  return response.text ?? "";
+  return { text: result.text ?? "", model };
 }
 
 export async function POST(req: Request) {
@@ -91,7 +99,6 @@ export async function POST(req: Request) {
     if (!userId) {
       return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
     }
-
     if (!isGeminiConfigured()) {
       return NextResponse.json(
         { ok: false, error: "Gemini is not configured. Add GEMINI_API_KEY to the server environment." },
@@ -101,7 +108,6 @@ export async function POST(req: Request) {
 
     const body = await req.json();
     const symptoms = String(body.symptoms || body.symptom || "").trim();
-
     if (symptoms.length > MAX_SYMPTOM_LENGTH) {
       return NextResponse.json(
         { ok: false, error: "Please keep the symptom description under 2,000 characters." },
@@ -127,7 +133,6 @@ export async function POST(req: Request) {
     }
 
     await connectDB();
-
     const userDoc = await User.findOne({ clerkId: userId }).lean();
     if (!userDoc) {
       return NextResponse.json(
@@ -135,7 +140,6 @@ export async function POST(req: Request) {
         { status: 404 }
       );
     }
-
     if (userDoc.role !== "patient") {
       return NextResponse.json(
         { ok: false, error: "Only patients may use dermatology AI consultation." },
@@ -148,13 +152,17 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: false, error: "Patient profile not found." }, { status: 404 });
     }
 
-    const modelName = getGeminiModel();
+    const candidateModels = deduplicateModels(getGeminiModel(), FALLBACK_GEMINI_TEXT_MODELS);
     const knowledgeContext = await getRelevantKnowledgeContext(
       symptoms || "skin concern in uploaded image",
       3
     );
     const prompt = buildDermatologyPrompt(symptoms, knowledgeContext, Boolean(image));
-    const rawText = await generateGeminiTriage(prompt, image, modelName);
+    const { text: rawText, model: resolvedModel } = await generateGeminiTriage(
+      prompt,
+      image,
+      candidateModels
+    );
 
     if (!rawText) {
       return NextResponse.json(
@@ -167,12 +175,19 @@ export async function POST(req: Request) {
     try {
       parsedResponse = JSON.parse(rawText);
     } catch {
-      parsedResponse = extractJsonFromText(rawText);
+      try {
+        parsedResponse = extractJsonFromText(rawText);
+      } catch {
+        return NextResponse.json(
+          { ok: false, error: "The AI service returned an unreadable response. Please try again." },
+          { status: 502 }
+        );
+      }
     }
 
     if (!isValidDermatologyResponse(parsedResponse)) {
       return NextResponse.json(
-        { ok: false, error: "The AI service returned an invalid report. Please try again." },
+        { ok: false, error: "The AI service returned an incomplete triage report. Please try again." },
         { status: 502 }
       );
     }
@@ -204,7 +219,7 @@ export async function POST(req: Request) {
           confidenceScore: parsedResponse.confidenceScore,
           needsImmediateProfessionalCare: parsedResponse.needsImmediateProfessionalCare,
           provider: "gemini",
-          model: modelName,
+          model: resolvedModel,
           includedImage: Boolean(image),
         },
       },
@@ -212,10 +227,10 @@ export async function POST(req: Request) {
     );
   } catch (error) {
     console.error("[AI consultation] Failed to process request:", error);
-    const message =
-      error instanceof Error && error.message.startsWith("Gemini is not configured")
-        ? error.message
-        : "Unable to complete the consultation right now. Please try again.";
-    return NextResponse.json({ ok: false, error: message }, { status: 500 });
+    const formatted = formatGeminiUserError(
+      error,
+      "Unable to complete the consultation right now. Please try again."
+    );
+    return NextResponse.json({ ok: false, error: formatted.message }, { status: formatted.status });
   }
 }

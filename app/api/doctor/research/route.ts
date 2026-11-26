@@ -3,14 +3,21 @@ import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
 import { User, ChatHistory } from "@/models";
-import { getGeminiClient, getGeminiModel, isGeminiConfigured, withGeminiRetry } from "@/lib/ai/gemini";
+import {
+  FALLBACK_GEMINI_TEXT_MODELS,
+  deduplicateModels,
+  formatGeminiUserError,
+  getGeminiClient,
+  getGeminiModel,
+  isGeminiConfigured,
+  runWithGeminiModelFallback,
+} from "@/lib/ai/gemini";
 
 const MAX_IMAGE_BYTES = 3 * 1024 * 1024;
 type ResearchMessage = { role: "user" | "assistant"; content: string };
 type ResearchImage = { mimeType: "image/jpeg" | "image/png" | "image/webp"; data: string };
 
-const RESEARCH_SYSTEM_PROMPT = `You are a medical research assistant for licensed healthcare professionals on the Aetheris Health (Dermavant) platform.
-
+const RESEARCH_SYSTEM_PROMPT = `You are a medical research assistant for licensed healthcare professionals on the Dermavant platform.
 Your role:
 - Provide evidence-based medical research summaries, clinical insights, and literature references.
 - Assist doctors with differential diagnosis reasoning, treatment protocol reviews, and drug interaction checks.
@@ -39,26 +46,17 @@ function parseImage(value: unknown): ResearchImage | null {
 async function generateGeminiAnswer(
   messages: ResearchMessage[],
   image: ResearchImage | null,
-  modelName: string
-): Promise<string> {
+  candidateModels: string[]
+): Promise<{ text: string; model: string }> {
   const ai = getGeminiClient();
   const systemInstruction = image
-    ? `${RESEARCH_SYSTEM_PROMPT}
-For an attached image, describe observable features and limitations first. Do not identify a definitive diagnosis from an image alone.`
+    ? `${RESEARCH_SYSTEM_PROMPT}\nFor an attached image, describe observable features and limitations first. Do not identify a definitive diagnosis from an image alone.`
     : RESEARCH_SYSTEM_PROMPT;
 
   const history = messages.slice(0, -1).map((message) => ({
     role: message.role === "assistant" ? ("model" as const) : ("user" as const),
     parts: [{ text: message.content }],
   }));
-
-  const chat = ai.chats.create({
-    model: modelName,
-    history,
-    config: {
-      systemInstruction,
-    },
-  });
 
   const lastMessage = messages[messages.length - 1];
   const messagePayload = image
@@ -68,8 +66,16 @@ For an attached image, describe observable features and limitations first. Do no
       ]
     : lastMessage.content;
 
-  const response = await withGeminiRetry(() => chat.sendMessage({ message: messagePayload }));
-  return response.text ?? "";
+  const { result: response, model } = await runWithGeminiModelFallback(candidateModels, (modelName) => {
+    const chat = ai.chats.create({
+      model: modelName,
+      history,
+      config: { systemInstruction },
+    });
+    return chat.sendMessage({ message: messagePayload });
+  });
+
+  return { text: response.text ?? "", model };
 }
 
 export async function POST(req: Request) {
@@ -125,9 +131,12 @@ export async function POST(req: Request) {
       );
     }
 
-    const modelName = getGeminiModel();
-    const responseText = await generateGeminiAnswer(messages, image, modelName);
-
+    const candidateModels = deduplicateModels(getGeminiModel(), FALLBACK_GEMINI_TEXT_MODELS);
+    const { text: responseText, model: resolvedModel } = await generateGeminiAnswer(
+      messages,
+      image,
+      candidateModels
+    );
     if (!responseText) {
       return NextResponse.json(
         { ok: false, error: "The research service returned an empty response.", retryable: true },
@@ -158,7 +167,7 @@ export async function POST(req: Request) {
         response: responseText,
         conversationId,
         provider: "gemini",
-        model: modelName,
+        model: resolvedModel,
       });
     }
 
@@ -177,13 +186,21 @@ export async function POST(req: Request) {
       response: responseText,
       conversationId: newChat?._id?.toString?.() || newChat?._id,
       provider: "gemini",
-      model: modelName,
+      model: resolvedModel,
     });
   } catch (error: any) {
     console.error("[DOCTOR RESEARCH] Error:", error?.message || String(error));
+    const formatted = formatGeminiUserError(
+      error,
+      "The research service could not process your request."
+    );
     return NextResponse.json(
-      { ok: false, error: "The research service could not process your request.", retryable: true },
-      { status: 502 }
+      {
+        ok: false,
+        error: formatted.message,
+        retryable: formatted.status === 429 || formatted.status >= 500,
+      },
+      { status: formatted.status >= 500 ? 502 : formatted.status }
     );
   }
 }

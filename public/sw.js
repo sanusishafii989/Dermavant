@@ -1,4 +1,4 @@
-const CACHE_NAME = "aetheris-health-v2";
+const CACHE_NAME = "dermavant-v2";
 const STATIC_ASSETS = ["/", "/manifest.json", "/logo.svg", "/logo-light.svg"];
 
 // Install — cache static assets

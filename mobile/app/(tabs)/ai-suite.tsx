@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   SafeAreaView,
 } from 'react-native';
-import { AetherisColors } from '../../constants/Colors';
+import { DermavantColors } from '../../constants/Colors';
 import { NativeGlassCard } from '../../components/ui/NativeGlassCard';
 import { NativeBadge } from '../../components/ui/NativeBadge';
 import { NativeButton } from '../../components/ui/NativeButton';
@@ -17,7 +17,7 @@ export default function MobileAISuiteScreen() {
   const [messages, setMessages] = useState([
     {
       sender: 'ai',
-      text: 'Hello! I am your Aetheris Clinical AI assistant. Describe your symptoms or questions below.',
+      text: 'Hello! I am your Dermavant Clinical AI assistant. Describe your symptoms or questions below.',
     },
   ]);
   const [input, setInput] = useState('');
@@ -92,18 +92,18 @@ export default function MobileAISuiteScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: AetherisColors.dark,
+    backgroundColor: DermavantColors.dark,
   },
   headerBanner: {
     padding: 14,
     backgroundColor: 'rgba(2, 48, 71, 0.8)',
     borderBottomWidth: 1,
-    borderBottomColor: AetherisColors.glassBorder,
+    borderBottomColor: DermavantColors.glassBorder,
     gap: 4,
   },
   bannerText: {
     fontSize: 12,
-    color: AetherisColors.white,
+    color: DermavantColors.white,
     fontWeight: '700',
   },
   chatContainer: {
@@ -117,13 +117,13 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   aiBubble: {
-    backgroundColor: AetherisColors.glassBg,
-    borderColor: AetherisColors.glassBorder,
+    backgroundColor: DermavantColors.glassBg,
+    borderColor: DermavantColors.glassBorder,
     borderWidth: 1,
     alignSelf: 'flex-start',
   },
   userBubble: {
-    backgroundColor: AetherisColors.cyan,
+    backgroundColor: DermavantColors.cyan,
     alignSelf: 'flex-end',
   },
   msgSender: {
@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
   },
   msgText: {
     fontSize: 13,
-    color: AetherisColors.white,
+    color: DermavantColors.white,
     lineHeight: 18,
   },
   inputContainer: {
@@ -142,8 +142,8 @@ const styles = StyleSheet.create({
     padding: 12,
     gap: 8,
     borderTopWidth: 1,
-    borderTopColor: AetherisColors.glassBorder,
-    backgroundColor: AetherisColors.dark,
+    borderTopColor: DermavantColors.glassBorder,
+    backgroundColor: DermavantColors.dark,
   },
   textInput: {
     flex: 1,
@@ -151,10 +151,10 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     paddingHorizontal: 14,
     paddingVertical: 10,
-    color: AetherisColors.white,
+    color: DermavantColors.white,
     fontSize: 13,
     borderWidth: 1,
-    borderColor: AetherisColors.glassBorder,
+    borderColor: DermavantColors.glassBorder,
   },
   sendBtn: {
     paddingHorizontal: 16,

@@ -37,7 +37,7 @@ export function Modal({ open, onClose, title, children, className }: ModalProps)
       <button
         type="button"
         aria-label="Close modal overlay"
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        className="absolute inset-0 bg-slate-950/75 backdrop-blur-sm"
         onClick={onClose}
       />
       <div
@@ -45,7 +45,7 @@ export function Modal({ open, onClose, title, children, className }: ModalProps)
         aria-modal="true"
         aria-labelledby={title ? "modal-title" : undefined}
         className={cn(
-          "glass-panel relative z-10 w-full max-w-lg p-4 sm:p-6 max-h-[85vh] overflow-y-auto custom-scrollbar",
+          "relative z-10 w-full max-w-lg rounded-2xl border border-border bg-surface p-4 sm:p-6 max-h-[85vh] overflow-y-auto custom-scrollbar shadow-theme-lg",
           className
         )}
       >

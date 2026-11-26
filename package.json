@@ -13,7 +13,7 @@
   "dependencies": {
     "@clerk/nextjs": "^7.7.9",
     "@clerk/types": "^4.101.26",
-    "@google/genai": "^2.4.0",
+    "@google/genai": "^3.6.1",
     "@types/leaflet": "^1.9.22",
     "@vercel/blob": "^2.3.0",
     "clsx": "^2.1.1",
@@ -27,12 +27,14 @@
     "react-leaflet": "^5.0.0",
     "react-markdown": "^10.1.0",
     "svix": "^1.98.0",
-    "tailwind-merge": "^3.6.0"
+    "tailwind-merge": "^3.6.0",
+    "three": "^0.175.0"
   },
   "devDependencies": {
     "@types/node": "^20.19.43",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
+    "@types/three": "^0.175.0",
     "autoprefixer": "^10.5.4",
     "eslint": "^8.57.0",
     "eslint-config-next": "^15.5.20",
@@ -42,6 +44,6 @@
     "tsx": "^4.21.0",
     "typescript": "5.8.2"
   },
-  "description": "Dermavant (Aetheris Health) — Free Google Gemini-powered dermatology triage & digital healthcare ecosystem for GDG Yola DevFest 2026",
+  "description": "Dermavant — Free Google Gemini-powered dermatology triage & digital healthcare ecosystem for GDG Yola DevFest 2026",
   "author": "Sanusi Shafii"
 }

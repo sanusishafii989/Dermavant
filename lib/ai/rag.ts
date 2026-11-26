@@ -1,5 +1,12 @@
 import knowledgeBase from "@/knowledge_base-1.json";
-import { getGeminiApiKey, getGeminiClient, getGeminiEmbeddingModel } from "@/lib/ai/gemini";
+import {
+  FALLBACK_GEMINI_EMBEDDING_MODELS,
+  deduplicateModels,
+  getGeminiApiKey,
+  getGeminiClient,
+  getGeminiEmbeddingModel,
+  runWithGeminiModelFallback,
+} from "@/lib/ai/gemini";
 
 export type KnowledgeChunk = {
   id: string;
@@ -12,6 +19,7 @@ export type KnowledgeChunk = {
 const EMBED_BATCH_SIZE = 50;
 let cachedChunks: KnowledgeChunk[] | null = null;
 let embeddingInitPromise: Promise<void> | null = null;
+let resolvedEmbeddingModel: string | null = null;
 
 export function normalizeKnowledgeBase(raw: unknown): KnowledgeChunk[] {
   if (Array.isArray(raw)) {
@@ -44,17 +52,14 @@ export function normalizeKnowledgeBase(raw: unknown): KnowledgeChunk[] {
 
 export function cosineSimilarity(vecA: number[], vecB: number[]): number {
   if (!vecA || !vecB || vecA.length === 0 || vecA.length !== vecB.length) return 0;
-
   let dotProduct = 0;
   let normA = 0;
   let normB = 0;
-
   for (let i = 0; i < vecA.length; i += 1) {
     dotProduct += vecA[i] * vecB[i];
     normA += vecA[i] * vecA[i];
     normB += vecB[i] * vecB[i];
   }
-
   if (normA === 0 || normB === 0) return 0;
   return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
 }
@@ -88,8 +93,8 @@ export function getKeywordFallbackContext(symptoms: string, topK = 3, sourceChun
 
   scored.sort((a, b) => b.score - a.score);
   const selected = scored.filter((item) => item.score > 0).slice(0, topK);
-
   if (selected.length === 0) return "";
+
   return selected
     .map(({ chunk }) => `- **[${chunk.condition} — ${chunk.category}]**: ${chunk.text}`)
     .join("\n");
@@ -99,7 +104,6 @@ async function ensureEmbeddingsInitialized(): Promise<KnowledgeChunk[]> {
   if (!cachedChunks) {
     cachedChunks = normalizeKnowledgeBase(knowledgeBase);
   }
-
   if (cachedChunks.some((chunk) => Array.isArray(chunk.embedding))) {
     return cachedChunks;
   }
@@ -107,14 +111,21 @@ async function ensureEmbeddingsInitialized(): Promise<KnowledgeChunk[]> {
   if (!embeddingInitPromise) {
     embeddingInitPromise = (async () => {
       const ai = getGeminiClient();
-      const model = getGeminiEmbeddingModel();
+      const candidateModels = deduplicateModels(
+        resolvedEmbeddingModel || getGeminiEmbeddingModel(),
+        FALLBACK_GEMINI_EMBEDDING_MODELS
+      );
       const chunks = cachedChunks!;
 
       for (let start = 0; start < chunks.length; start += EMBED_BATCH_SIZE) {
         const batch = chunks.slice(start, start + EMBED_BATCH_SIZE);
         const contents = batch.map((c) => `${c.condition} (${c.category}): ${c.text}`);
         try {
-          const response = await ai.models.embedContent({ model, contents });
+          const { result: response, model } = await runWithGeminiModelFallback(
+            candidateModels,
+            (modelName) => ai.models.embedContent({ model: modelName, contents })
+          );
+          resolvedEmbeddingModel = model;
           const embeddings = response.embeddings ?? [];
           batch.forEach((chunk, index) => {
             const values = embeddings[index]?.values;
@@ -124,6 +135,7 @@ async function ensureEmbeddingsInitialized(): Promise<KnowledgeChunk[]> {
           });
         } catch (err) {
           console.error(`[RAG] Batch embedding failed at offset ${start}:`, err);
+          break;
         }
       }
     })();
@@ -143,18 +155,22 @@ export async function getRelevantKnowledgeContext(symptoms: string, topK = 3): P
     const embeddedChunks = chunks.filter(
       (chunk): chunk is KnowledgeChunk & { embedding: number[] } => Array.isArray(chunk.embedding)
     );
-
     if (embeddedChunks.length === 0) {
       return getKeywordFallbackContext(symptoms, topK, chunks);
     }
 
     const ai = getGeminiClient();
-    const queryRes = await ai.models.embedContent({
-      model: getGeminiEmbeddingModel(),
-      contents: symptoms,
-    });
+    const candidateModels = deduplicateModels(
+      resolvedEmbeddingModel || getGeminiEmbeddingModel(),
+      FALLBACK_GEMINI_EMBEDDING_MODELS
+    );
+    const { result: queryRes } = await runWithGeminiModelFallback(candidateModels, (modelName) =>
+      ai.models.embedContent({
+        model: modelName,
+        contents: symptoms,
+      })
+    );
     const queryVector = queryRes.embeddings?.[0]?.values;
-
     if (!Array.isArray(queryVector) || queryVector.length === 0) {
       return getKeywordFallbackContext(symptoms, topK, chunks);
     }
@@ -163,10 +179,8 @@ export async function getRelevantKnowledgeContext(symptoms: string, topK = 3): P
       chunk,
       score: cosineSimilarity(queryVector, chunk.embedding),
     }));
-
     scored.sort((a, b) => b.score - a.score);
     const selected = scored.slice(0, topK);
-
     if (selected.length === 0) {
       return getKeywordFallbackContext(symptoms, topK, chunks);
     }

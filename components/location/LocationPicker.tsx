@@ -163,7 +163,7 @@ export function LocationPicker({
         </MapContainer>
       </div>
 
-      <div className="flex items-center justify-between rounded-xl border border-cyan/20 bg-[var(--accent-cyan)]/5 px-3 py-2 text-sm text-[var(--text-primary)]">
+      <div className="flex items-center justify-between rounded-xl border border-[var(--accent-cyan)]/25 bg-[var(--accent-cyan)]/5 px-3 py-2 text-sm text-[var(--text-primary)]">
         <span>Confirmed coordinates</span>
         <span className="font-medium text-[var(--accent-cyan)]">{locationSummary}</span>
       </div>

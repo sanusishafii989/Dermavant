@@ -393,8 +393,8 @@ export function UserDetailModal({
                 )}
 
                 {kyc.review_notes && (
-                  <div className="rounded-lg bg-amber-500/5 border border-amber-500/20 p-3 text-sm text-amber-200/80">
-                    <span className="text-xs text-amber-300 font-medium block mb-1">Previous Review Notes</span>
+                  <div className="rounded-lg bg-warning-bg border border-warning/25 p-3 text-sm text-warning-text">
+                    <span className="text-xs font-semibold block mb-1">Previous Review Notes</span>
                     {kyc.review_notes}
                   </div>
                 )}
@@ -407,11 +407,11 @@ export function UserDetailModal({
 
         {/* KYC Review Action Banner (Doctors & Pharmacists only) */}
         {canReviewKYC && kyc.status === "pending" && (
-          <div className="rounded-xl bg-amber-500/10 p-4 border border-amber-500/30">
-            <h4 className="text-sm font-semibold text-amber-300 flex items-center gap-2">
+          <div className="rounded-xl bg-warning-bg p-4 border border-warning/30">
+            <h4 className="text-sm font-semibold text-warning-text flex items-center gap-2">
               <ShieldAlert className="h-4 w-4" /> KYC Review Required
             </h4>
-            <p className="mt-1 text-xs text-amber-200/80">
+            <p className="mt-1 text-xs text-secondary">
               Review the credentials above before approving. You can add notes below.
             </p>
             <input
@@ -419,13 +419,13 @@ export function UserDetailModal({
               placeholder="Review notes (optional)..."
               value={reviewNotes}
               onChange={(e) => setReviewNotes(e.target.value)}
-              className="mt-3 w-full rounded-lg border border-amber-500/20 bg-amber-500/5 px-3 py-2 text-sm text-primary placeholder:text-primary/30 focus:border-amber-400 focus:outline-none"
+              className="mt-3 w-full rounded-lg border border-border bg-input px-3 py-2 text-sm text-primary placeholder:text-muted focus:border-accent-cyan focus:outline-none"
             />
             <div className="mt-3 flex gap-3">
               <Button
                 variant="primary"
                 size="sm"
-                className="bg-emerald-600 hover:bg-emerald-500 text-primary flex-1"
+                className="bg-emerald-600 hover:bg-emerald-500 text-white flex-1"
                 disabled={loading}
                 onClick={() => handleKYCAction("approved")}
               >
@@ -434,7 +434,7 @@ export function UserDetailModal({
               <Button
                 variant="secondary"
                 size="sm"
-                className="border-red-500/40 text-red-300 hover:bg-red-500/20 flex-1"
+                className="border-danger/35 text-danger-text hover:bg-danger-bg flex-1"
                 disabled={loading}
                 onClick={() => handleKYCAction("rejected")}
               >
@@ -446,18 +446,18 @@ export function UserDetailModal({
 
         {/* Legacy Verify button (for users without KYC application) */}
         {isPending && onVerifyChange && !canReviewKYC && (
-          <div className="rounded-xl bg-amber-500/10 p-4 border border-amber-500/30">
-            <h4 className="text-sm font-semibold text-amber-300 flex items-center gap-2">
+          <div className="rounded-xl bg-warning-bg p-4 border border-warning/30">
+            <h4 className="text-sm font-semibold text-warning-text flex items-center gap-2">
               <ShieldAlert className="h-4 w-4" /> Pending Credential Verification
             </h4>
-            <p className="mt-1 text-xs text-amber-200/80">
+            <p className="mt-1 text-xs text-secondary">
               No KYC application on file. Verify based on role profile status.
             </p>
             <div className="mt-3 flex gap-3">
               <Button
                 variant="primary"
                 size="sm"
-                className="bg-emerald-600 hover:bg-emerald-500 text-primary flex-1"
+                className="bg-emerald-600 hover:bg-emerald-500 text-white flex-1"
                 disabled={loading}
                 onClick={() => handleAction(() => onVerifyChange(user._id, "verified"))}
               >
@@ -466,7 +466,7 @@ export function UserDetailModal({
               <Button
                 variant="secondary"
                 size="sm"
-                className="border-red-500/40 text-red-300 hover:bg-red-500/20 flex-1"
+                className="border-danger/35 text-danger-text hover:bg-danger-bg flex-1"
                 disabled={loading}
                 onClick={() => handleAction(() => onVerifyChange(user._id, "rejected"))}
               >
@@ -486,7 +486,7 @@ export function UserDetailModal({
             <Button
               variant="secondary"
               size="sm"
-              className="border-red-500/50 text-red-400 hover:bg-red-500/20"
+              className="border-danger/40 text-danger-text hover:bg-danger-bg"
               disabled={loading}
               onClick={() => handleAction(() => onStatusChange(user._id, "suspended"))}
             >
@@ -496,7 +496,7 @@ export function UserDetailModal({
             <Button
               variant="primary"
               size="sm"
-              className="bg-emerald-600 hover:bg-emerald-500 text-primary"
+              className="bg-emerald-600 hover:bg-emerald-500 text-white"
               disabled={loading}
               onClick={() => handleAction(() => onStatusChange(user._id, "active"))}
             >

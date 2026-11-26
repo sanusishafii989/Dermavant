@@ -1,33 +1,33 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
 import { View, Text, StyleSheet } from 'react-native';
-import { AetherisColors } from '../../constants/Colors';
+import { DermavantColors } from '../../constants/Colors';
 
 export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
         headerStyle: {
-          backgroundColor: AetherisColors.dark,
+          backgroundColor: DermavantColors.dark,
           elevation: 0,
           shadowOpacity: 0,
           borderBottomWidth: 1,
-          borderBottomColor: AetherisColors.glassBorder,
+          borderBottomColor: DermavantColors.glassBorder,
         },
         headerTitleStyle: {
-          color: AetherisColors.white,
+          color: DermavantColors.white,
           fontWeight: '700',
           fontSize: 16,
         },
         tabBarStyle: {
-          backgroundColor: AetherisColors.dark,
+          backgroundColor: DermavantColors.dark,
           borderTopWidth: 1,
-          borderTopColor: AetherisColors.glassBorder,
+          borderTopColor: DermavantColors.glassBorder,
           height: 60,
           paddingBottom: 8,
           paddingTop: 6,
         },
-        tabBarActiveTintColor: AetherisColors.cyan,
+        tabBarActiveTintColor: DermavantColors.cyan,
         tabBarInactiveTintColor: 'rgba(255, 255, 255, 0.4)',
       }}
     >
@@ -35,7 +35,7 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Home',
-          headerTitle: 'Aetheris Portal',
+          headerTitle: 'Dermavant Portal',
           tabBarIcon: ({ color, focused }) => (
             <Text style={[styles.tabIconText, { color }]}>{focused ? '🏠' : '🏚️'}</Text>
           ),

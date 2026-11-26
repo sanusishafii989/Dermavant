@@ -92,8 +92,8 @@ export default function AdminSupportPage() {
                   onClick={() => setStatusFilter(tab.value)}
                   className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
                     statusFilter === tab.value
-                      ? "bg-accent-cyan text-dark font-bold"
-                      : "bg-surface-elevated text-secondary hover:bg-surface-elevated"
+                      ? "bg-[var(--accent-primary)] text-white font-semibold"
+                      : "bg-surface-elevated text-secondary hover:text-primary border border-border"
                   }`}
                 >
                   {tab.label}
@@ -107,7 +107,7 @@ export default function AdminSupportPage() {
               <select
                 value={categoryFilter}
                 onChange={(e) => setCategoryFilter(e.target.value)}
-                className="rounded-lg bg-surface px-3 py-1.5 text-xs text-primary border border-border focus:border-cyan focus:outline-none"
+                className="rounded-xl bg-input px-3 py-1.5 text-xs text-primary border border-border focus:border-accent-cyan focus:outline-none"
               >
                 <option value="all">All Categories</option>
                 <option value="general">General</option>
@@ -192,9 +192,9 @@ export default function AdminSupportPage() {
                 </p>
 
                 {t.adminResponse && (
-                  <div className="text-xs text-emerald-300 flex items-center gap-1.5 pt-1">
-                    <CheckCircle className="h-3.5 w-3.5 text-emerald-400" /> Replied by Admin:{" "}
-                    <span className="truncate italic text-emerald-200/90">{t.adminResponse}</span>
+                  <div className="text-xs text-success-text flex items-center gap-1.5 pt-1">
+                    <CheckCircle className="h-3.5 w-3.5 text-success" /> Replied by Admin:{" "}
+                    <span className="truncate italic text-secondary">{t.adminResponse}</span>
                   </div>
                 )}
               </Card>

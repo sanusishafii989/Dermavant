@@ -146,7 +146,7 @@ export async function POST(req: Request) {
   await connectDB();
 
   const fullName =
-    [data.first_name, data.last_name].filter(Boolean).join(" ") || "Aetheris User";
+    [data.first_name, data.last_name].filter(Boolean).join(" ") || "Dermavant User";
   const email = data.email_addresses[0]?.email_address ?? "";
   const phone = data.phone_numbers[0]?.phone_number ?? "";
   const profilePhoto = data.image_url ?? undefined;

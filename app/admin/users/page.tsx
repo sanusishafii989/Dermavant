@@ -106,21 +106,21 @@ export default function AdminUsersPage() {
         {/* Header & Controls */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-white">User Account Management</h1>
-            <p className="text-sm text-white/60">
+            <h1 className="text-2xl font-bold text-primary">User Account Management</h1>
+            <p className="text-sm text-secondary">
               Manage accounts, verify credentials, and govern system access
             </p>
           </div>
           <div className="flex items-center gap-2">
             {syncMessage && (
-              <span className="text-xs text-cyan">{syncMessage}</span>
+              <span className="text-xs text-accent-cyan">{syncMessage}</span>
             )}
             <Button
               variant="ghost"
               size="sm"
               onClick={handleSyncFromClerk}
               disabled={syncing}
-              className="text-cyan hover:bg-cyan/10"
+              className="text-accent-cyan hover:bg-accent-cyan/10"
             >
               <CloudDownload className={`mr-1.5 h-4 w-4 ${syncing ? "animate-pulse" : ""}`} />
               {syncing ? "Syncing..." : "Sync from Clerk"}
@@ -130,7 +130,7 @@ export default function AdminUsersPage() {
               size="sm"
               onClick={fetchUsers}
               disabled={loading}
-              className="text-cyan hover:bg-cyan/10"
+              className="text-accent-cyan hover:bg-accent-cyan/10"
             >
               <RefreshCw className={`mr-1.5 h-4 w-4 ${loading ? "animate-spin" : ""}`} /> Refresh List
             </Button>
@@ -142,12 +142,12 @@ export default function AdminUsersPage() {
           <div className="flex flex-col md:flex-row gap-4 justify-between items-stretch md:items-center">
             {/* Search Input */}
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted" />
               <Input
                 placeholder="Search by name, email, or phone..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 bg-dark/80 border-white/20 text-white placeholder:text-white/40"
+                className="pl-9"
               />
             </div>
 
@@ -165,8 +165,8 @@ export default function AdminUsersPage() {
                   onClick={() => setRoleFilter(tab.value)}
                   className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
                     roleFilter === tab.value
-                      ? "bg-cyan text-dark font-bold"
-                      : "bg-white/5 text-white/70 hover:bg-white/10"
+                      ? "bg-[var(--accent-primary)] text-white font-semibold"
+                      : "bg-surface-elevated text-secondary hover:text-primary border border-border"
                   }`}
                 >
                   {tab.label}
@@ -178,7 +178,7 @@ export default function AdminUsersPage() {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="rounded-lg bg-dark/80 px-3 py-2 text-xs text-white border border-white/20 focus:border-cyan focus:outline-none"
+              className="rounded-xl bg-input px-3 py-2 text-xs text-primary border border-border focus:border-accent-cyan focus:outline-none"
             >
               <option value="all">All Statuses</option>
               <option value="active">Active</option>
@@ -193,12 +193,12 @@ export default function AdminUsersPage() {
           {/* Mobile View */}
           <div className="block md:hidden">
             {loading ? (
-              <div className="py-12 text-center text-white/50">
-                <RefreshCw className="mx-auto h-6 w-6 animate-spin text-cyan mb-2" />
+              <div className="py-12 text-center text-secondary">
+                <RefreshCw className="mx-auto h-6 w-6 animate-spin text-accent-cyan mb-2" />
                 Loading user accounts...
               </div>
             ) : users.length === 0 ? (
-              <div className="py-12 text-center text-white/40">
+              <div className="py-12 text-center text-muted">
                 No user accounts found matching selected criteria.
               </div>
             ) : (

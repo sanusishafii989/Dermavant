@@ -102,10 +102,10 @@ export function SupportResponseModal({
         {/* Previous Admin Response if exists */}
         {ticket.adminResponse && (
           <div className="space-y-1.5">
-            <label className="text-xs uppercase tracking-wider text-emerald-400 font-semibold flex items-center gap-1.5">
+            <label className="text-xs uppercase tracking-wider text-success-text font-semibold flex items-center gap-1.5">
               <CheckCircle className="h-3.5 w-3.5" /> Previous Admin Reply
             </label>
-            <div className="rounded-xl bg-emerald-500/10 p-3.5 border border-emerald-500/20 text-sm text-emerald-200 leading-relaxed">
+            <div className="rounded-xl bg-success-bg p-3.5 border border-success/20 text-sm text-success-text leading-relaxed">
               {ticket.adminResponse}
             </div>
           </div>
@@ -122,7 +122,7 @@ export function SupportResponseModal({
               value={response}
               onChange={(e) => setResponse(e.target.value)}
               placeholder="Type resolution message or instructions for the user..."
-              className="w-full rounded-xl bg-surface p-3 text-sm text-primary border border-border focus:border-cyan focus:outline-none focus:ring-1 focus:ring-cyan placeholder:text-muted resize-none"
+              className="w-full rounded-xl bg-input p-3 text-sm text-primary border border-border focus:border-accent-cyan focus:outline-none focus:ring-2 focus:ring-accent-cyan/20 placeholder:text-muted resize-none"
             />
           </div>
 
@@ -132,7 +132,7 @@ export function SupportResponseModal({
               <select
                 value={status}
                 onChange={(e) => setStatus(e.target.value)}
-                className="rounded-lg bg-surface px-3 py-1.5 text-xs text-primary border border-border focus:border-cyan focus:outline-none"
+                className="rounded-xl bg-input px-3 py-1.5 text-xs text-primary border border-border focus:border-accent-cyan focus:outline-none"
               >
                 <option value="resolved">Resolved</option>
                 <option value="in_progress">In Progress</option>
@@ -149,7 +149,7 @@ export function SupportResponseModal({
                 type="submit"
                 variant="primary"
                 size="sm"
-                className="bg-accent-cyan hover:bg-accent-cyan/80 text-dark font-semibold"
+                className="font-semibold"
                 disabled={submitting || (!response.trim() && status !== "resolved")}
               >
                 <Send className="mr-1.5 h-4 w-4" /> {submitting ? "Sending..." : "Submit Reply"}

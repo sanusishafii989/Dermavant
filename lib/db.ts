@@ -28,11 +28,18 @@ export async function connectDB(): Promise<typeof mongoose> {
   }
 
   if (!cached.promise) {
-    cached.promise = mongoose.connect(MONGODB_URI, {
-      bufferCommands: true,
-      autoIndex: false,
-      serverSelectionTimeoutMS: 10000,
-    });
+    cached.promise = mongoose
+      .connect(MONGODB_URI, {
+        bufferCommands: true,
+        autoIndex: false,
+        serverSelectionTimeoutMS: 10000,
+      })
+      .catch((error) => {
+        // A rejected connection promise must not poison every later request
+        // in a warm serverless instance; allow the next request to retry.
+        cached.promise = null;
+        throw error;
+      });
   }
 
   cached.conn = await cached.promise;
