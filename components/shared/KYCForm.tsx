@@ -1,17 +1,34 @@
 "use client";
 
+import { useUser } from "@clerk/nextjs";
+import { upload } from "@vercel/blob/client";
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Badge } from "@/components/ui/Badge";
-import { ShieldCheck, Upload, Clock, CheckCircle, XCircle } from "lucide-react";
+import { ShieldCheck, Upload, Clock, CheckCircle, XCircle, FileText } from "lucide-react";
+
+const MAX_DOCUMENT_BYTES = 5 * 1024 * 1024;
+const ACCEPTED_DOCUMENT_TYPES = ["application/pdf", "image/jpeg", "image/png"];
+type DocumentKind = "license" | "business" | "identity";
+const DOCUMENT_FIELDS: Record<DocumentKind, string> = {
+  license: "license_document_url",
+  business: "business_document_url",
+  identity: "id_document_url",
+};
+
+function documentHref(pathname: string) {
+  return `/api/kyc/documents?pathname=${encodeURIComponent(pathname)}`;
+}
 
 export function KYCForm({ role }: { role: "doctor" | "partner" }) {
+  const { user } = useUser();
   const [status, setStatus] = useState<string>("loading");
   const [reviewNotes, setReviewNotes] = useState("");
   const [form, setForm] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
+  const [uploading, setUploading] = useState<DocumentKind | null>(null);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -20,7 +37,7 @@ export function KYCForm({ role }: { role: "doctor" | "partner" }) {
 
   const checkKYCStatus = async () => {
     try {
-      const res = await fetch("/api/kyc");
+      const res = await fetch("/api/kyc", { cache: "no-store" });
       const data = await res.json();
       if (data.ok) {
         setStatus(data.application?.status || "none");
@@ -37,6 +54,9 @@ export function KYCForm({ role }: { role: "doctor" | "partner" }) {
             pharmacist_license: data.application.pharmacist_license || "",
             phone_number: data.application.phone_number || "",
             address: data.application.address || "",
+            license_document_url: data.application.license_document_url || "",
+            business_document_url: data.application.business_document_url || "",
+            id_document_url: data.application.id_document_url || "",
           });
         }
       } else {
@@ -44,6 +64,38 @@ export function KYCForm({ role }: { role: "doctor" | "partner" }) {
       }
     } catch {
       setStatus("none");
+    }
+  };
+
+  const uploadDocument = async (kind: DocumentKind, file: File) => {
+    setError("");
+    if (file.size === 0 || file.size > MAX_DOCUMENT_BYTES) {
+      setError("Choose a non-empty document up to 5 MB.");
+      return;
+    }
+    if (!ACCEPTED_DOCUMENT_TYPES.includes(file.type)) {
+      setError("Use a PDF, JPG, or PNG document.");
+      return;
+    }
+    if (!user?.id) {
+      setError("Please sign in again before uploading.");
+      return;
+    }
+
+    setUploading(kind);
+    try {
+      const pathname = `kyc/${user.id}/${kind}/current`;
+      const blob = await upload(pathname, file, {
+        access: "private",
+        contentType: file.type,
+        handleUploadUrl: "/api/kyc/documents",
+        clientPayload: JSON.stringify({ role, kind }),
+      });
+      setForm((current) => ({ ...current, [DOCUMENT_FIELDS[kind]]: blob.pathname }));
+    } catch {
+      setError("The secure upload failed. Check that the private document store is connected, then try again.");
+    } finally {
+      setUploading(null);
     }
   };
 
@@ -79,7 +131,6 @@ export function KYCForm({ role }: { role: "doctor" | "partner" }) {
   };
 
   const cfg = statusConfig[status] || statusConfig.none;
-
   const doctorFields: Array<{ key: string; label: string; required: boolean; type?: string }> = [
     { key: "license_number", label: "Medical License Number", required: true },
     { key: "specialization", label: "Specialization", required: true },
@@ -87,22 +138,52 @@ export function KYCForm({ role }: { role: "doctor" | "partner" }) {
     { key: "years_of_experience", label: "Years of Experience", type: "number", required: true },
     { key: "medical_school", label: "Medical School", required: false },
   ];
-
   const pharmacyFields: Array<{ key: string; label: string; required: boolean; type?: string }> = [
     { key: "business_name", label: "Business Name", required: true },
     { key: "business_registration_number", label: "Business Registration Number (CAC)", required: true },
     { key: "pharmacist_license", label: "Pharmacist License Number", required: true },
   ];
-
   const sharedFields: Array<{ key: string; label: string; required: boolean; type?: string }> = [
     { key: "phone_number", label: "Phone Number", required: true },
     { key: "address", label: "Practice/Business Address", required: true },
   ];
-
   const fields = role === "doctor" ? [...doctorFields, ...sharedFields] : [...pharmacyFields, ...sharedFields];
+  const hasRequiredDocuments = Boolean(form.license_document_url) &&
+    (role !== "partner" || Boolean(form.business_document_url));
 
-  // If approved or pending, show status card
-  if (status === "approved" || status === "pending") {
+  const uploadField = (kind: DocumentKind, label: string, required: boolean) => {
+    const path = form[DOCUMENT_FIELDS[kind]];
+    return (
+      <div key={kind} className="rounded-2xl border border-border bg-surface p-4">
+        <label className="block text-sm font-medium text-primary">
+          {label}{required ? " *" : " (optional)"}
+          <span className="mt-1 block text-xs font-normal text-secondary">PDF, JPG, or PNG · max 5 MB</span>
+          <input
+            type="file"
+            accept="application/pdf,image/jpeg,image/png"
+            disabled={uploading !== null || submitting}
+            onChange={(event) => {
+              const file = event.currentTarget.files?.[0];
+              event.currentTarget.value = "";
+              if (file) void uploadDocument(kind, file);
+            }}
+            className="mt-3 block w-full text-sm text-secondary file:mr-3 file:rounded-lg file:border-0 file:bg-accent-cyan/10 file:px-3 file:py-2 file:text-sm file:font-medium file:text-accent-cyan"
+          />
+        </label>
+        {uploading === kind ? (
+          <p className="mt-3 flex items-center gap-2 text-sm text-secondary"><Upload className="h-4 w-4 animate-pulse" /> Uploading privately…</p>
+        ) : path ? (
+          <a className="mt-3 inline-flex items-center gap-2 text-sm text-accent-cyan hover:underline" href={documentHref(path)} target="_blank" rel="noreferrer">
+            <FileText className="h-4 w-4" /> View uploaded document
+          </a>
+        ) : (
+          <p className="mt-3 text-xs text-secondary">No document uploaded yet.</p>
+        )}
+      </div>
+    );
+  };
+
+  if (status === "approved" || (status === "pending" && hasRequiredDocuments)) {
     return (
       <Card className="max-w-3xl">
         <div className="flex items-center gap-4">
@@ -117,8 +198,18 @@ export function KYCForm({ role }: { role: "doctor" | "partner" }) {
             <p className="mt-1 text-sm text-secondary">
               {status === "approved"
                 ? "Your account has been verified. You have full access to all features."
-                : "Your application is under review by our admin team. This typically takes 1-2 business days."}
+                : "Your application and documents are under review by the admin team."}
             </p>
+            {form.license_document_url ? (
+              <a className="mt-3 inline-flex items-center gap-2 text-sm text-accent-cyan hover:underline" href={documentHref(form.license_document_url)} target="_blank" rel="noreferrer">
+                <FileText className="h-4 w-4" /> View license document
+              </a>
+            ) : null}
+            {form.business_document_url ? (
+              <a className="mt-2 flex items-center gap-2 text-sm text-accent-cyan hover:underline" href={documentHref(form.business_document_url)} target="_blank" rel="noreferrer">
+                <FileText className="h-4 w-4" /> View business registration document
+              </a>
+            ) : null}
             {reviewNotes ? (
               <p className="mt-2 rounded-xl border border-border bg-surface p-3 text-sm text-secondary">
                 Admin notes: {reviewNotes}
@@ -139,8 +230,8 @@ export function KYCForm({ role }: { role: "doctor" | "partner" }) {
             <h2 className="mt-1 text-xl font-semibold text-primary">KYC Application</h2>
             <p className="mt-1 text-sm text-secondary">
               {role === "doctor"
-                ? "Submit your professional credentials for verification. Required before you can accept consultations."
-                : "Submit your business credentials for verification. Required before you can list medicines."}
+                ? "Submit your professional credentials for verification."
+                : "Submit your pharmacy business and pharmacist credentials for verification."}
             </p>
           </div>
           <Badge variant={cfg.variant}>{cfg.label}</Badge>
@@ -166,14 +257,20 @@ export function KYCForm({ role }: { role: "doctor" | "partner" }) {
           ))}
         </div>
 
-        {error ? <p className="text-sm text-rose-400">{error}</p> : null}
-
-        <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-3 text-xs text-secondary">
-          Note: Document upload (ID, license certificate) will be available in a future update. For now, please ensure all license and registration numbers are accurate — admin will verify them.
+        <div className="grid gap-4 sm:grid-cols-2">
+          {uploadField("license", role === "doctor" ? "Medical license" : "Pharmacist license", true)}
+          {role === "partner" ? uploadField("business", "Business registration certificate", true) : null}
+          {uploadField("identity", "Identity document", false)}
         </div>
 
+        <p className="rounded-2xl border border-accent-cyan/20 bg-accent-cyan/5 p-3 text-xs text-secondary">
+          Files are stored privately. Only the account owner and authorized admins can download them. Upload genuine documents only.
+        </p>
+
+        {error ? <p className="text-sm text-rose-400" role="alert">{error}</p> : null}
+
         <div className="flex justify-end">
-          <Button type="submit" disabled={submitting}>
+          <Button type="submit" disabled={submitting || uploading !== null || !hasRequiredDocuments}>
             {submitting ? "Submitting..." : "Submit for verification"}
           </Button>
         </div>

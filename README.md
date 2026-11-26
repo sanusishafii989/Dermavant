@@ -32,6 +32,11 @@ Dermavant's AI and ML workflows depend exclusively on **free-tier Google tools**
 - **Doctor Portal (`/doctor/*`):** Appointment management, consultation room, multimodal Google Gemini Medical Research Chat with history, practice location editor, KYC, and earnings wallet.
 - **E-Pharmacy Partner Portal (`/pharmacy/*`):** Medicine catalogue CRUD, inventory management, order fulfillment, KYC, and earnings wallet.
 - **Admin Portal (`/admin/*`):** User management, KYC verification, platform stats/revenue, audit logs, and support ticket handling.
+- **Credential uploads:** Doctor and pharmacy KYC supports private PDF/JPG/PNG documents up to 5 MB per file. The owner and authorized admins download documents through an authenticated route.
+
+### Private KYC document storage
+
+In the **Dermavant Vercel project**, create a **private** Blob store under **Storage** and enable its read-write token environment variable. Connect it to the environments where uploads will run; Vercel provides `BLOB_READ_WRITE_TOKEN`. Add that variable to `.env.local` for local development, and never commit its value. Redeploy after connecting the store. Uploads are rejected until the private store is configured.
 
 ---
 
