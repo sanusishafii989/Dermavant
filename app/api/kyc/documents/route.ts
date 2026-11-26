@@ -61,7 +61,7 @@ export async function POST(request: Request) {
           throw new Error("Invalid document destination.");
         }
 
-        const application = await KYCApplication.findOne({ user_id: user._id }).lean();
+        const application = await KYCApplication.findOne({ user_id: user._id as any }).lean();
         if (application?.status === "approved") {
           throw new Error("Verified accounts cannot replace their submitted documents.");
         }
