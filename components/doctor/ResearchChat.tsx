@@ -32,6 +32,8 @@ const SUGGESTED_PROMPTS = [
 ];
 
 const RESEARCH_RETRY_DELAYS = [500, 1000];
+const RESEARCH_CONTEXT_MESSAGES = 20;
+const MAX_RESEARCH_MESSAGE_CHARS = 5000;
 
 async function postResearchMessage(payload: object) {
   for (let attempt = 0; attempt <= RESEARCH_RETRY_DELAYS.length; attempt += 1) {
@@ -100,7 +102,15 @@ export function ResearchChat() {
         if (data.ok && data.conversations?.length > 0) {
           const latest = data.conversations[0];
           setConversationId(latest.id);
-          setMessages(latest.messages.map((m: any) => ({ role: m.role, content: m.content })));
+          const history = Array.isArray(latest.messages) ? latest.messages : [];
+          setMessages(history.flatMap((message: any) => {
+            if (
+              !message ||
+              !["user", "assistant"].includes(message.role) ||
+              typeof message.content !== "string"
+            ) return [];
+            return [{ role: message.role as ChatMessage["role"], content: message.content }];
+          }));
         }
       } catch {
         // silent — start fresh
@@ -121,6 +131,16 @@ export function ResearchChat() {
 
     const userMsg: ChatMessage = { role: "user", content: content || "Please analyze this image." };
     const newMessages: ChatMessage[] = [...messages, userMsg];
+    const validHistory = newMessages.slice(0, -1).filter(
+      (message) =>
+        (message.role === "user" || message.role === "assistant") &&
+        typeof message.content === "string" &&
+        message.content.length <= MAX_RESEARCH_MESSAGE_CHARS
+    );
+    const requestMessages = [
+      ...validHistory.slice(-(RESEARCH_CONTEXT_MESSAGES - 1)),
+      userMsg,
+    ];
     setMessages(newMessages);
     setInput("");
     setSelectedImage(null);
@@ -130,7 +150,7 @@ export function ResearchChat() {
 
     try {
       const { data } = await postResearchMessage({
-        messages: newMessages.map((msg) => ({ role: msg.role, content: msg.content })),
+        messages: requestMessages.map((msg) => ({ role: msg.role, content: msg.content })),
         image: image || undefined,
         conversationId: conversationId || undefined,
       });
