@@ -27,7 +27,7 @@ export async function ensureAdminUser() {
 
   await connectDB();
 
-  let user = await User.findOneAndUpdate(
+  const user = await User.findOneAndUpdate(
     { clerkId: clerkUser.id },
     {
       $set: {
