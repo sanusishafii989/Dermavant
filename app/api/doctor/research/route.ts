@@ -14,6 +14,9 @@ import {
 } from "@/lib/ai/gemini";
 
 const MAX_IMAGE_BYTES = 3 * 1024 * 1024;
+const MAX_REQUEST_MESSAGES = 200;
+const MAX_CONTEXT_MESSAGES = 20;
+const MAX_MESSAGE_CHARS = 5000;
 type ResearchMessage = { role: "user" | "assistant"; content: string };
 type ResearchImage = { mimeType: "image/jpeg" | "image/png" | "image/webp"; data: string };
 
@@ -94,23 +97,38 @@ export async function POST(req: Request) {
     const rawMessages = body.messages;
     const conversationId = typeof body.conversationId === "string" ? body.conversationId : null;
 
-    if (!Array.isArray(rawMessages) || rawMessages.length === 0 || rawMessages.length > 40) {
-      return NextResponse.json({ ok: false, error: "Provide between 1 and 40 chat messages." }, { status: 400 });
+    if (!Array.isArray(rawMessages) || rawMessages.length === 0 || rawMessages.length > MAX_REQUEST_MESSAGES) {
+      return NextResponse.json({ ok: false, error: "The conversation history is invalid or too large." }, { status: 400 });
     }
 
-    const messages = rawMessages as ResearchMessage[];
+    const latestRawMessage = rawMessages[rawMessages.length - 1] as Record<string, unknown> | null;
     if (
-      messages.some(
-        (message) =>
-          !message ||
-          !["user", "assistant"].includes(message.role) ||
-          typeof message.content !== "string" ||
-          message.content.length > 5000
-      ) ||
-      messages[messages.length - 1].role !== "user"
+      !latestRawMessage ||
+      latestRawMessage.role !== "user" ||
+      typeof latestRawMessage.content !== "string"
     ) {
-      return NextResponse.json({ ok: false, error: "The research message format is invalid." }, { status: 400 });
+      return NextResponse.json({ ok: false, error: "Your latest research message is missing or invalid." }, { status: 400 });
     }
+    if (latestRawMessage.content.length > MAX_MESSAGE_CHARS) {
+      return NextResponse.json({ ok: false, error: "Keep each research message under 5,000 characters." }, { status: 400 });
+    }
+
+    // Older saved conversations may contain malformed or oversized messages.
+    // Keep only valid recent context so one legacy entry cannot block new turns.
+    const validHistory = rawMessages.slice(0, -1).flatMap((value: unknown) => {
+      if (!value || typeof value !== "object") return [];
+      const message = value as Record<string, unknown>;
+      if (
+        (message.role !== "user" && message.role !== "assistant") ||
+        typeof message.content !== "string" ||
+        message.content.length > MAX_MESSAGE_CHARS
+      ) return [];
+      return [{ role: message.role, content: message.content } as ResearchMessage];
+    });
+    const messages: ResearchMessage[] = [
+      ...validHistory.slice(-(MAX_CONTEXT_MESSAGES - 1)),
+      { role: "user", content: latestRawMessage.content },
+    ];
 
     let image: ResearchImage | null;
     try {
