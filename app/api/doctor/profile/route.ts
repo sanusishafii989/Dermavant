@@ -1,7 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-import { connectDB } from "@/lib/db";
-import { Doctor, User } from "@/models";
+import { ensureKycRoleUser } from "@/lib/ensure-role-user";
+import { Doctor } from "@/models";
 
 export async function GET() {
   try {
@@ -10,11 +10,10 @@ export async function GET() {
       return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
     }
 
-    await connectDB();
-    const user = await User.findOne({ clerkId: userId }).lean();
-    if (!user || user.role !== "doctor") {
-      return NextResponse.json({ ok: false, error: "Doctor profile not found" }, { status: 404 });
-    }
+    const account = await ensureKycRoleUser("doctor");
+    if (!account.ok) return NextResponse.json({ ok: false, error: account.error }, { status: account.status });
+    if (account.user.clerkId !== userId) return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
+    const user = account.user;
 
     const doctor = await Doctor.findOne({ user_id: user._id as any }).lean();
     if (!doctor) {
@@ -55,11 +54,10 @@ export async function PUT(request: Request) {
 
     const body = await request.json();
 
-    await connectDB();
-    const user = await User.findOne({ clerkId: userId }).lean();
-    if (!user || user.role !== "doctor") {
-      return NextResponse.json({ ok: false, error: "Doctor profile not found" }, { status: 404 });
-    }
+    const account = await ensureKycRoleUser("doctor");
+    if (!account.ok) return NextResponse.json({ ok: false, error: account.error }, { status: account.status });
+    if (account.user.clerkId !== userId) return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
+    const user = account.user;
 
     const doctor = await Doctor.findOne({ user_id: user._id as any });
     if (!doctor) {

@@ -3,6 +3,7 @@ import { get, head } from "@vercel/blob";
 import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
+import { ensureKycRoleUser } from "@/lib/ensure-role-user";
 import { KYCApplication, User } from "@/models";
 
 export const runtime = "nodejs";
@@ -30,19 +31,22 @@ export async function POST(request: Request) {
         const { userId } = await auth();
         if (!userId) throw new Error("Sign in is required.");
 
-        await connectDB();
-        const user = await User.findOne({ clerkId: userId }).lean();
-        if (!user || (user.role !== "doctor" && user.role !== "partner")) {
-          throw new Error("Only doctor and pharmacy accounts can upload credentials.");
-        }
-        if (user.status === "suspended") throw new Error("This account cannot upload documents.");
-
         let payload: { role?: unknown; kind?: unknown };
         try {
           payload = JSON.parse(clientPayload || "{}");
         } catch {
           throw new Error("Invalid upload details.");
         }
+        if (payload.role !== "doctor" && payload.role !== "partner") {
+          throw new Error("Invalid account type for credential upload.");
+        }
+
+        const account = await ensureKycRoleUser(payload.role);
+        if (!account.ok || account.user.clerkId !== userId) {
+          throw new Error(account.ok ? "Sign in again to upload credentials." : account.error);
+        }
+        const user = account.user;
+        if (user.status === "suspended") throw new Error("This account cannot upload documents.");
 
         if (payload.role !== user.role || !isDocumentKind(payload.kind)) {
           throw new Error("Invalid document type for this account.");
@@ -88,9 +92,10 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json(result);
-  } catch {
+  } catch (error) {
+    console.error("KYC private upload authorization failed", error);
     return NextResponse.json(
-      { error: "Could not authorize this private upload. Check the file and try again." },
+      { error: error instanceof Error ? error.message : "Could not authorize this private upload." },
       { status: 400 },
     );
   }
