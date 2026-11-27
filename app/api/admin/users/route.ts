@@ -1,6 +1,6 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-import { connectDB } from "@/lib/db";
+import { ensureAdminUser } from "@/lib/ensure-admin-user";
 import { User, Doctor, Partner, Patient } from "@/models";
 
 export const dynamic = "force-dynamic";
@@ -12,11 +12,9 @@ export async function GET(request: Request) {
       return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
     }
 
-    await connectDB();
-    const adminUser = await User.findOne({ clerkId: userId }).lean();
-    if (!adminUser || adminUser.role !== "admin") {
-      return NextResponse.json({ ok: false, error: "Forbidden: Admin access required" }, { status: 403 });
-    }
+    const admin = await ensureAdminUser();
+    if (!admin.ok) return NextResponse.json({ ok: false, error: admin.error }, { status: admin.status });
+    if (admin.user.clerkId !== userId) return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
 
     const { searchParams } = new URL(request.url);
     const role = searchParams.get("role");

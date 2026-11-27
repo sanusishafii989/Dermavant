@@ -1,6 +1,6 @@
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-import { connectDB } from "@/lib/db";
+import { ensureAdminUser } from "@/lib/ensure-admin-user";
 import { isUserRole, type UserRole } from "@/lib/roles";
 import { Admin, Doctor, Partner, Patient, User, Wallet } from "@/models";
 
@@ -71,12 +71,9 @@ export async function POST() {
       return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
     }
 
-    await connectDB();
-
-    const adminDoc = await User.findOne({ clerkId: userId }).lean();
-    if (!adminDoc || adminDoc.role !== "admin") {
-      return NextResponse.json({ ok: false, error: "Admin access required" }, { status: 403 });
-    }
+    const admin = await ensureAdminUser();
+    if (!admin.ok) return NextResponse.json({ ok: false, error: admin.error }, { status: admin.status });
+    if (admin.user.clerkId !== userId) return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
 
     const client = await clerkClient();
     const clerkUsers = await client.users.getUserList({ limit: 100 });
