@@ -1,6 +1,6 @@
 import { currentUser } from "@clerk/nextjs/server";
 import { connectDB } from "@/lib/db";
-import { Doctor, Partner, User } from "@/models";
+import { Doctor, Partner, User, Wallet } from "@/models";
 
 export type KycRole = "doctor" | "partner";
 
@@ -34,9 +34,6 @@ export async function ensureKycRoleUser(expectedRole?: KycRole) {
   await connectDB();
 
   let user = await User.findOne({ clerkId: clerkUser.id });
-  if (user && user.role !== metadataRole) {
-    return { ok: false as const, status: 403, error: "Your account role does not match this portal. Contact an administrator." };
-  }
 
   if (!user) {
     try {
@@ -61,9 +58,30 @@ export async function ensureKycRoleUser(expectedRole?: KycRole) {
     }
   }
 
-  if (!user || user.role !== metadataRole) {
+  if (!user) {
     return { ok: false as const, status: 500, error: "Could not initialize your application account. Please retry." };
   }
+
+  // Clerk public metadata is the trusted role source. Reconcile a stale MongoDB
+  // patient record created by the former webhook fallback instead of blocking
+  // the selected doctor/pharmacy account. Existing patient records are retained.
+  if (user.role !== metadataRole) {
+    user.role = metadataRole;
+    user.fullName = fullName;
+    user.email = email.toLowerCase();
+    user.phone = phone;
+    if (clerkUser.imageUrl) user.profilePhoto = clerkUser.imageUrl;
+    await user.save();
+  }
+
+  await Wallet.updateOne(
+    { ownerId: user._id } as any,
+    {
+      $set: { ownerRole: metadataRole },
+      $setOnInsert: { balance: 0, currency: "NGN" },
+    },
+    { upsert: true, setDefaultsOnInsert: true },
+  );
 
   if (metadataRole === "doctor") {
     await Doctor.updateOne(

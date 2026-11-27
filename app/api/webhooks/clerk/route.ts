@@ -23,6 +23,7 @@ type ClerkUserEvent = {
     phone_numbers: Array<{ phone_number: string }>;
     image_url: string | null;
     public_metadata: { role?: string };
+    unsafe_metadata?: { role?: string };
     deleted?: boolean;
   };
 };
@@ -74,16 +75,15 @@ async function ensureRoleProfile(
     }
   }
 
-  // Ensure wallet exists
-  const walletExists = await Wallet.findOne({ ownerId: userId } as any).lean();
-  if (!walletExists) {
-    await Wallet.create({
-      ownerId: userId,
-      ownerRole: role,
-      balance: 0,
-      currency: "NGN",
-    } as any);
-  }
+  // Keep the existing balance while synchronizing ownership after a role repair.
+  await Wallet.updateOne(
+    { ownerId: userId } as any,
+    {
+      $set: { ownerRole: role },
+      $setOnInsert: { balance: 0, currency: "NGN" },
+    },
+    { upsert: true, setDefaultsOnInsert: true },
+  );
 }
 
 export async function POST(req: Request) {
@@ -141,7 +141,21 @@ export async function POST(req: Request) {
   }
 
   const roleFromPublic = data.public_metadata?.role;
-  const role: UserRole = isUserRole(roleFromPublic) ? roleFromPublic : "patient";
+  const requestedRole = data.unsafe_metadata?.role;
+  const selfSignupRole = requestedRole === "patient" || requestedRole === "doctor" || requestedRole === "partner"
+    ? requestedRole
+    : undefined;
+  const role: UserRole | undefined = isUserRole(roleFromPublic)
+    ? roleFromPublic === "patient" && selfSignupRole && selfSignupRole !== "patient"
+      ? selfSignupRole
+      : roleFromPublic
+    : selfSignupRole;
+
+  // Do not invent a patient role for users whose signup role has not arrived yet.
+  // The redirect route will promote a valid selected role after authentication.
+  if (!role) {
+    return NextResponse.json({ received: true, deferred: true });
+  }
 
   await connectDB();
 
@@ -155,7 +169,6 @@ export async function POST(req: Request) {
 
   if (existingUser) {
     // Update existing user with latest Clerk data
-    const oldRole = existingUser.role;
     existingUser.fullName = fullName;
     existingUser.email = email;
     existingUser.phone = phone;
@@ -166,10 +179,8 @@ export async function POST(req: Request) {
     }
     await existingUser.save();
 
-    // If role changed, ensure role-specific profile exists
-    if (oldRole !== role) {
-      await ensureRoleProfile(role, existingUser._id, fullName, email, phone);
-    }
+    // Create the selected role's profile and preserve the wallet balance.
+    await ensureRoleProfile(role, existingUser._id, fullName, email, phone);
 
     return NextResponse.json({ received: true, updated: true });
   }

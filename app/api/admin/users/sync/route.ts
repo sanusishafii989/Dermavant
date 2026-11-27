@@ -53,15 +53,14 @@ async function ensureRoleProfile(
     }
   }
 
-  const walletExists = await Wallet.findOne({ ownerId: userId } as any).lean();
-  if (!walletExists) {
-    await Wallet.create({
-      ownerId: userId,
-      ownerRole: role,
-      balance: 0,
-      currency: "NGN",
-    } as any);
-  }
+  await Wallet.updateOne(
+    { ownerId: userId } as any,
+    {
+      $set: { ownerRole: role },
+      $setOnInsert: { balance: 0, currency: "NGN" },
+    },
+    { upsert: true, setDefaultsOnInsert: true },
+  );
 }
 
 export async function POST() {
@@ -80,7 +79,7 @@ export async function POST() {
 
     let created = 0;
     let updated = 0;
-    const skipped = 0;
+    let skipped = 0;
 
     for (const clerkUser of clerkUsers.data) {
       const clerkId = clerkUser.id;
@@ -89,8 +88,22 @@ export async function POST() {
       const email = clerkUser.emailAddresses[0]?.emailAddress || `${clerkId}@example.com`;
       const phone = clerkUser.phoneNumbers[0]?.phoneNumber || "";
       const profilePhoto = clerkUser.imageUrl;
-      const roleFromMeta = (clerkUser as any).publicMetadata?.role;
-      const role: UserRole = isUserRole(roleFromMeta) ? roleFromMeta : "patient";
+      const roleFromPublic = clerkUser.publicMetadata?.role;
+      const unsafeRole = clerkUser.unsafeMetadata?.role;
+      const roleFromUnsafe = unsafeRole === "patient" || unsafeRole === "doctor" || unsafeRole === "partner"
+        ? unsafeRole
+        : undefined;
+      const role: UserRole | undefined = isUserRole(roleFromPublic)
+        ? roleFromPublic === "patient" && roleFromUnsafe && roleFromUnsafe !== "patient"
+          ? roleFromUnsafe
+          : roleFromPublic
+        : roleFromUnsafe;
+
+      // Missing/untrusted metadata should never silently become a patient.
+      if (!role) {
+        skipped++;
+        continue;
+      }
 
       let userDoc = await User.findOne({ clerkId });
 
