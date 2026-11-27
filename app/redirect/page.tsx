@@ -13,22 +13,27 @@ export default async function PostLoginRedirect() {
     redirect("/sign-in");
   }
 
-  const publicRole = user.publicMetadata?.role;
-  if (typeof publicRole === "string" && isUserRole(publicRole)) {
-    redirect(ROLE_DASHBOARD[publicRole]);
-  }
-
-  // Sign-up records the chosen role in unsafeMetadata. Copy only a permitted
-  // self-signup role into trusted publicMetadata on the server. Admin is never
-  // accepted from user-controlled metadata.
   const requestedRole = user.unsafeMetadata?.role;
-  const role: UserRole = SELF_SIGNUP_ROLES.includes(requestedRole as UserRole)
+  const requestedSelfSignupRole = SELF_SIGNUP_ROLES.includes(requestedRole as UserRole)
     ? (requestedRole as UserRole)
-    : "patient";
+    : undefined;
+  const publicRole = user.publicMetadata?.role;
+
+  // A newly-created user's webhook can arrive before signup's selected role is
+  // copied into publicMetadata. If that happened, the webhook's old patient
+  // default must not override a valid doctor/pharmacy selection.
+  const role: UserRole =
+    requestedSelfSignupRole &&
+    (publicRole === "patient" || !isUserRole(publicRole))
+      ? requestedSelfSignupRole
+      : isUserRole(publicRole)
+        ? publicRole
+        : requestedSelfSignupRole ?? "patient";
 
   const clerk = await clerkClient();
   await clerk.users.updateUserMetadata(user.id, {
-    publicMetadata: { role },
+    publicMetadata: { ...user.publicMetadata, role },
+    unsafeMetadata: { ...user.unsafeMetadata, role: null },
   });
 
   redirect(ROLE_DASHBOARD[role]);
